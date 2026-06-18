@@ -17,13 +17,7 @@ export default function AboutPage() {
           </h1>
           <p className="text-[var(--text-muted)] leading-relaxed">
             CodingAnthem is a collection of developer tools built to be fast, free, and zero-friction.
-            No sign-up, no tracking, no ads in your face. Every tool runs entirely in your browser —
-            your data never leaves your machine.
-          </p>
-          <p className="text-[var(--text-muted)] leading-relaxed">
-            It started as a personal project — tired of slow, cluttered online tools that make you
-            register just to format some JSON. The goal is simple: build tools that developers actually
-            want to use every day.
+            Every tool runs entirely in your browser — your data never leaves your machine.
           </p>
         </div>
 
