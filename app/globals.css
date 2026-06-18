@@ -1,0 +1,119 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+
+  /* Background */
+  --color-base: var(--bg-base);
+  --color-surface: var(--bg-surface);
+  --color-elevated: var(--bg-elevated);
+
+  /* Borders */
+  --color-border: var(--border);
+
+  /* Text */
+  --color-primary: var(--text-primary);
+  --color-muted: var(--text-muted);
+
+  /* Accent */
+  --color-accent: #6366f1;
+  --color-accent-hover: #4f46e5;
+
+  /* States */
+  --color-success: #22c55e;
+  --color-error: #ef4444;
+  --color-warning: #f59e0b;
+}
+
+/* Dark mode (default) */
+:root {
+  --bg-base: #0a0a0a;
+  --bg-surface: #111111;
+  --bg-elevated: #1a1a1a;
+  --border: #1f1f1f;
+  --text-primary: #ededed;
+  --text-muted: #888888;
+}
+
+/* Light mode */
+[data-theme="light"] {
+  --bg-base: #ffffff;
+  --bg-surface: #f9fafb;
+  --bg-elevated: #f3f4f6;
+  --border: #e5e7eb;
+  --text-primary: #111111;
+  --text-muted: #6b7280;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  color-scheme: dark;
+}
+
+[data-theme="light"] {
+  color-scheme: light;
+}
+
+body {
+  background-color: var(--bg-base);
+  color: var(--text-primary);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-surface);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* Focus ring */
+*:focus-visible {
+  outline: 2px solid #6366f1;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Links inherit color by default */
+a {
+  color: inherit;
+}
+
+/* Textarea / input resets */
+textarea,
+input {
+  font-family: inherit;
+  background: transparent;
+  color: inherit;
+}
+
+textarea:focus,
+input:focus {
+  outline: none;
+}
+
+/* Monospace areas */
+.mono {
+  font-family: var(--font-geist-mono), 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+/* Hero radial glow */
+.hero-glow {
+  background: radial-gradient(ellipse 80% 40% at 50% 0%, rgba(99, 102, 241, 0.12), transparent 70%);
+}
