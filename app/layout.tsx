@@ -22,11 +22,46 @@ export const metadata: Metadata = {
     template: "%s | CodingAnthem",
   },
   description:
-    "Fast, free developer tools that run entirely in your browser. JSON formatter, Base64, UUID generator, regex tester, and more.",
+    "Fast, free developer tools that run entirely in your browser. JSON formatter, Base64 encoder, UUID generator, regex tester, hash generator, and more. No signup required.",
   metadataBase: new URL("https://codinganthem.com"),
+  keywords: [
+    "developer tools",
+    "json formatter",
+    "base64 encoder",
+    "uuid generator",
+    "regex tester",
+    "hash generator",
+    "timestamp converter",
+    "color converter",
+    "case converter",
+    "text diff",
+    "online developer tools",
+    "free dev tools",
+  ],
+  alternates: {
+    canonical: "https://codinganthem.com",
+  },
   openGraph: {
     siteName: "CodingAnthem",
     type: "website",
+    url: "https://codinganthem.com",
+    title: "CodingAnthem — Developer Tools That Just Work",
+    description:
+      "Fast, free developer tools that run entirely in your browser. No signup required.",
+  },
+  twitter: {
+    card: "summary",
+    title: "CodingAnthem — Developer Tools That Just Work",
+    description:
+      "Fast, free developer tools that run entirely in your browser. No signup required.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+    },
   },
 };
 

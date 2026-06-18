@@ -41,5 +41,21 @@ export function ToolPageClient({ slug }: { slug: string }) {
   const ToolComponent = TOOL_MAP[slug];
   if (!ToolComponent) return notFound();
 
-  return <ToolComponent />;
+  return (
+    <>
+      <ToolComponent />
+      {tool.explainer && (
+        <div className="max-w-7xl mx-auto px-6 pb-12">
+          <div className="border-t border-[var(--border)] pt-8">
+            <h2 className="text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)] mb-3">
+              About {tool.name}
+            </h2>
+            <p className="text-sm text-[var(--text-muted)] leading-relaxed max-w-3xl">
+              {tool.explainer}
+            </p>
+          </div>
+        </div>
+      )}
+    </>
+  );
 }
