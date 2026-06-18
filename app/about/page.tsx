@@ -71,7 +71,7 @@ export default function AboutPage() {
             Browse all tools
           </Link>
           <a
-            href="https://github.com/rahul/codinganthem"
+            href="https://github.com/RahulGo8u/codinganthem"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-[var(--border)] text-[var(--text-muted)] text-sm font-medium hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"

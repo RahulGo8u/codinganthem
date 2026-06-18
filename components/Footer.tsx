@@ -25,7 +25,7 @@ export function Footer() {
               About
             </Link>
             <a
-              href="https://github.com/rahul/codinganthem"
+              href="https://github.com/RahulGo8u/codinganthem"
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-[var(--text-primary)] transition-colors"

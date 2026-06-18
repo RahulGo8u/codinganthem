@@ -56,9 +56,6 @@ export default function HomePage() {
               <line x1="21" y1="21" x2="16.65" y2="16.65" />
             </svg>
             <span className="flex-1 text-left text-sm">Search tools...</span>
-            <span className="shrink-0 text-[11px] border border-[var(--border)] rounded-md px-1.5 py-0.5 bg-[var(--bg-elevated)] font-mono leading-none opacity-60">
-              ⌘K
-            </span>
           </button>
 
         </div>
