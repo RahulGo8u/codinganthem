@@ -6,6 +6,6 @@ export default function robots(): MetadataRoute.Robots {
       userAgent: "*",
       allow: "/",
     },
-    sitemap: "https://codinganthem.com/sitemap.xml",
+    sitemap: "https://www.codinganthem.com/sitemap.xml",
   };
 }

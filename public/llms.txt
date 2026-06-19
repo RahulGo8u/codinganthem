@@ -10,16 +10,22 @@ CodingAnthem is a collection of free, browser-based developer utilities built fo
 - Markdown Previewer — live preview of Markdown as rendered HTML: /tools/markdown-preview
 - JSON Statistics — analyze node count, nesting depth, type distribution, and size: /tools/json-statistics
 - JSON Diff — compare two JSON documents and highlight changes: /tools/json-diff
+- SQL Formatter — format and beautify SQL queries with dialect-aware indentation: /tools/sql-formatter
+- JavaScript Formatter — format and beautify JavaScript code: /tools/js-formatter
+- HTML Formatter — format and beautify HTML markup: /tools/html-formatter
+- CSS Formatter — format and beautify CSS stylesheets: /tools/css-formatter
 
 ## Encoders
 
 - Base64 Encoder / Decoder — encode and decode text to and from Base64: /tools/base64
 - String Escape / Unescape — escape or unescape special characters in strings: /tools/string-escape
+- Image to Base64 — convert any image to a Base64 data URL: /tools/image-to-base64
 
 ## Generators
 
 - UUID Generator — generate version 4 UUIDs instantly: /tools/uuid-generator
 - Lorem Ipsum Generator — generate placeholder text: /tools/lorem-ipsum
+- QR Code Generator — generate a QR code for any text or URL: /tools/qr-code-generator
 
 ## Converters
 
@@ -31,6 +37,8 @@ CodingAnthem is a collection of free, browser-based developer utilities built fo
 - JSON to CSV — convert a JSON array to CSV: /tools/json-to-csv
 - YAML to JSON — convert YAML configuration to JSON: /tools/yaml-to-json
 - JSON to YAML — convert JSON to YAML: /tools/json-to-yaml
+- JSON to TypeScript — generate TypeScript interfaces from a JSON object: /tools/json-to-typescript
+- SQL IN Generator — turn a list of values into a SQL IN clause: /tools/sql-in-generator
 
 ## Text Utils
 
@@ -45,6 +53,7 @@ CodingAnthem is a collection of free, browser-based developer utilities built fo
 - Password Generator — create strong, random passwords with custom rules: /tools/password-generator
 - JWT Decoder — decode and inspect JWT tokens (header, payload, signature): /tools/jwt-decoder
 - JWT Generator — create signed JWT tokens with HS256/384/512: /tools/jwt-generator
+- JWT Validator — verify a JWT token's signature and check its expiry: /tools/jwt-validator
 
 ## Web
 
@@ -52,6 +61,7 @@ CodingAnthem is a collection of free, browser-based developer utilities built fo
 - URL Parser — break a URL into protocol, host, path, query params, and hash: /tools/url-parser
 - HTML Entities Encoder / Decoder — escape and unescape HTML entities: /tools/html-entities
 - Slug Generator — convert any text into a URL-friendly slug: /tools/slug-generator
+- cURL to Fetch — convert a cURL command into a JavaScript fetch() call: /tools/curl-to-fetch
 
 ## About
 

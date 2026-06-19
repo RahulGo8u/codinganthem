@@ -5,6 +5,11 @@ import { getToolBySlug } from "@/lib/tools";
 
 export const metadata: Metadata = {
   title: "404 — Page Not Found",
+  description: "The page you're looking for doesn't exist. Browse all free developer tools on CodingAnthem.",
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 const FEATURED = ["json-formatter", "jwt-decoder", "regex-tester", "uuid-generator"];

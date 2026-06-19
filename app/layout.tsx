@@ -56,12 +56,14 @@ export const metadata: Metadata = {
     title: "CodingAnthem — Free Online Developer Utilities & Tools",
     description:
       "Fast, free developer tools for your browser and AI workflows. Format JSON, encode Base64, generate UUIDs, test regex, convert timestamps, and more.",
+    images: [{ url: "/opengraph-image", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
     title: "CodingAnthem — Free Online Developer Utilities & Tools",
     description:
       "Fast, free developer tools for your browser and AI workflows. Format JSON, encode Base64, generate UUIDs, test regex, and more.",
+    images: ["/opengraph-image"],
   },
   robots: {
     index: true,
