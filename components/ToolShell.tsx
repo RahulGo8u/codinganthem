@@ -5,6 +5,22 @@ import Link from "next/link";
 import type { Tool } from "@/lib/tools";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
+
+const ALLOWED_EXTENSIONS = new Set([
+  "txt", "text", "log",
+  "json", "jsonl", "ndjson",
+  "xml", "html", "htm", "svg",
+  "yaml", "yml",
+  "csv", "tsv",
+  "md", "mdx", "markdown",
+  "js", "jsx", "ts", "tsx",
+  "css", "scss", "sass", "less",
+  "sh", "bash", "zsh",
+  "py", "rb", "go", "rs", "java", "c", "cpp", "h", "cs",
+  "toml", "ini", "cfg", "conf", "env",
+  "graphql", "gql", "sql",
+]);
+
 const ALLOWED_MIME_PREFIXES = ["text/"];
 const ALLOWED_MIME_TYPES = new Set([
   "application/json",
@@ -81,7 +97,7 @@ export function ToolShell({
   const handleUpload = useCallback(() => {
     const input_el = document.createElement("input");
     input_el.type = "file";
-    input_el.accept = "text/*,.json,.xml,.yaml,.yml,.csv,.md,.txt";
+    input_el.accept = "text/*,.json,.jsonl,.xml,.yaml,.yml,.csv,.tsv,.md,.mdx,.toml,.ini,.cfg,.conf,.graphql,.gql,.sql";
     input_el.onchange = (e) => {
       const file = (e.target as HTMLInputElement).files?.[0];
       if (!file) return;
@@ -93,12 +109,20 @@ export function ToolShell({
         return;
       }
 
-      const isAllowed =
+      const ext = file.name.split(".").pop()?.toLowerCase() ?? "";
+      if (!ALLOWED_EXTENSIONS.has(ext)) {
+        setUploadError(
+          `".${ext}" files are not supported. Only plain-text files are allowed (JSON, YAML, CSV, XML, Markdown, source code, etc.).`
+        );
+        return;
+      }
+
+      const isMimeAllowed =
         ALLOWED_MIME_PREFIXES.some((p) => file.type.startsWith(p)) ||
         ALLOWED_MIME_TYPES.has(file.type) ||
         file.type === "";
 
-      if (!isAllowed) {
+      if (!isMimeAllowed) {
         setUploadError(
           "Only text-based files are supported (JSON, XML, CSV, YAML, TXT, etc.)."
         );
