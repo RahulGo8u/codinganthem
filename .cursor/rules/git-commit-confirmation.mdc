@@ -1,0 +1,31 @@
+---
+description: Never commit or push to git without explicit user confirmation
+alwaysApply: true
+---
+
+# Git Commit / Push Policy
+
+**Never run `git commit` or `git push` without explicit confirmation from the user.**
+
+## Required flow
+
+1. Show the user a summary of what will be committed (files changed, brief description of changes).
+2. Ask: "Shall I commit and push this?" — or wait for the user to say "commit", "push", "yes go ahead", etc.
+3. Only then run `git add`, `git commit`, and `git push`.
+
+## What counts as explicit confirmation
+
+- "commit and push"
+- "yes", "go ahead", "do it", "push it"
+- "lets push", "push"
+- The user triggering a plan → agent mode transition and saying implement
+
+## What does NOT count
+
+- Completing a set of code changes (even if all todos are done)
+- The user saying "done" or "looks good" about the code itself
+- A build passing cleanly
+
+## Never do this automatically
+
+Do not commit as part of implementing a plan unless the user has specifically asked for it in that message.
