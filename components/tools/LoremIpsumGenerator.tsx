@@ -27,10 +27,10 @@ function randomWord(exclude?: string): string {
 }
 
 function generateSentence(wordCount: number): string {
-  const words = Array.from({ length: wordCount }, (_, i) => i === 0
-    ? randomWord().charAt(0).toUpperCase() + randomWord().slice(1)
-    : randomWord()
-  );
+  const words = Array.from({ length: wordCount }, (_, i) => {
+    const w = randomWord();
+    return i === 0 ? w.charAt(0).toUpperCase() + w.slice(1) : w;
+  });
   return words.join(" ") + ".";
 }
 

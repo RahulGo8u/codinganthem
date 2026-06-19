@@ -72,7 +72,8 @@ function parseInput(input: string): { rgb: RGB; hex: string; hsl: HSL } | null {
   // RGB
   const rgbMatch = s.match(/^rgba?\(?\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/i);
   if (rgbMatch) {
-    const rgb = { r: Number(rgbMatch[1]), g: Number(rgbMatch[2]), b: Number(rgbMatch[3]) };
+    const clamp = (n: number) => Math.max(0, Math.min(255, n));
+    const rgb = { r: clamp(Number(rgbMatch[1])), g: clamp(Number(rgbMatch[2])), b: clamp(Number(rgbMatch[3])) };
     return { rgb, hex: rgbToHex(rgb), hsl: rgbToHsl(rgb) };
   }
 

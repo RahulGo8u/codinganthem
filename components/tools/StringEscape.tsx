@@ -21,13 +21,14 @@ function escapeString(str: string): string {
 
 function unescapeString(str: string): string {
   return str
+    .replace(/\\\\/g, "\x00BSLASH\x00")
     .replace(/\\n/g, "\n")
     .replace(/\\r/g, "\r")
     .replace(/\\t/g, "\t")
     .replace(/\\0/g, "\0")
     .replace(/\\u([0-9a-fA-F]{4})/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)))
     .replace(/\\"/g, '"')
-    .replace(/\\\\/g, "\\");
+    .replace(/\x00BSLASH\x00/g, "\\");
 }
 
 export function StringEscape() {

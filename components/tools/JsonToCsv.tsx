@@ -9,12 +9,24 @@ const tool = getToolBySlug("json-to-csv")!;
 function toCsv(data: unknown): string {
   if (!Array.isArray(data)) throw new Error("Input must be a JSON array of objects.");
   if (data.length === 0) throw new Error("Array is empty — nothing to convert.");
+  if (data.some((item) => typeof item !== "object" || item === null || Array.isArray(item))) {
+    throw new Error("All items in the array must be plain objects, not arrays or primitives.");
+  }
 
-  const headers = Object.keys(data[0] as object);
+  // Collect all unique keys across all rows (not just the first)
+  const headerSet = new Set<string>();
+  (data as Record<string, unknown>[]).forEach((row) => Object.keys(row).forEach((k) => headerSet.add(k)));
+  const headers = Array.from(headerSet);
   if (headers.length === 0) throw new Error("Objects in the array have no keys.");
 
+  const serialize = (val: unknown): string => {
+    if (val === null || val === undefined) return "";
+    if (typeof val === "object") return JSON.stringify(val);
+    return String(val);
+  };
+
   const escape = (val: unknown): string => {
-    const str = val === null || val === undefined ? "" : String(val);
+    const str = serialize(val);
     return str.includes(",") || str.includes('"') || str.includes("\n")
       ? `"${str.replace(/"/g, '""')}"`
       : str;

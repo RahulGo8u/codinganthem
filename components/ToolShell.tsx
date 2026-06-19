@@ -282,6 +282,7 @@ export function ToolShell({
               Download
             </button>
           )}
+          {(!outputContent || output !== "") && (
           <button
             onClick={handleCopy}
             disabled={!output}
@@ -293,6 +294,7 @@ export function ToolShell({
           >
             {copied ? "Copied ✓" : "Copy"}
           </button>
+          )}
         </div>
       </div>
       </div>

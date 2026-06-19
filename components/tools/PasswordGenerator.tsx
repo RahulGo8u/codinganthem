@@ -43,7 +43,10 @@ export function PasswordGenerator() {
     if (useLower) charset += LOWERCASE;
     if (useNumbers) charset += NUMBERS;
     if (useSymbols) charset += SYMBOLS;
-    if (!charset) return;
+    if (!charset) {
+      setOutput("⚠ Select at least one character set (A–Z, a–z, 0–9, or !@#).");
+      return;
+    }
 
     const charsetSize = charset.length;
     // Rejection sampling: discard values in the biased tail so every

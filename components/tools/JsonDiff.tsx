@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { diffLines } from "diff";
 import { getToolBySlug } from "@/lib/tools";
 import Link from "next/link";
@@ -75,25 +75,25 @@ export function JsonDiff() {
   const [leftError, setLeftError] = useState<string | undefined>();
   const [rightError, setRightError] = useState<string | undefined>();
 
-  const rows = useMemo(() => {
-    if (!left.trim() && !right.trim()) return null;
+  const { rows, lErr, rErr } = useMemo(() => {
+    if (!left.trim() && !right.trim()) return { rows: null, lErr: undefined, rErr: undefined };
     let leftNorm = "";
     let rightNorm = "";
-    let lErr: string | undefined;
-    let rErr: string | undefined;
+    let lE: string | undefined;
+    let rE: string | undefined;
 
     try { leftNorm = left.trim() ? normalizeJson(left) : ""; }
-    catch (e) { lErr = (e as Error).message; }
+    catch (e) { lE = (e as Error).message; }
 
     try { rightNorm = right.trim() ? normalizeJson(right) : ""; }
-    catch (e) { rErr = (e as Error).message; }
+    catch (e) { rE = (e as Error).message; }
 
-    setLeftError(lErr);
-    setRightError(rErr);
-
-    if (lErr || rErr || (!leftNorm && !rightNorm)) return null;
-    return buildRows(leftNorm, rightNorm);
+    if (lE || rE || (!leftNorm && !rightNorm)) return { rows: null, lErr: lE, rErr: rE };
+    return { rows: buildRows(leftNorm, rightNorm), lErr: lE, rErr: rE };
   }, [left, right]);
+
+  useEffect(() => { setLeftError(lErr); }, [lErr]);
+  useEffect(() => { setRightError(rErr); }, [rErr]);
 
   const stats = useMemo(() => {
     if (!rows) return null;

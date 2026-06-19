@@ -16,29 +16,47 @@ function base64UrlDecode(str: string): string {
   return atob(padded);
 }
 
-function decodeJwt(token: string): { header: unknown; payload: unknown; signature: string } {
+function tsToDate(ts: unknown): string | null {
+  if (typeof ts !== "number") return null;
+  const ms = ts > 1e10 ? ts : ts * 1000;
+  try { return new Date(ms).toISOString(); } catch { return null; }
+}
+
+function decodeJwt(token: string): { header: unknown; payload: unknown; signature: string; meta: string[] } {
   const parts = token.trim().split(".");
   if (parts.length !== 3) throw new Error("Invalid JWT — expected 3 dot-separated parts (header.payload.signature).");
   const header = JSON.parse(base64UrlDecode(parts[0]));
-  const payload = JSON.parse(base64UrlDecode(parts[1]));
-  return { header, payload, signature: parts[2] };
+  const payload = JSON.parse(base64UrlDecode(parts[1])) as Record<string, unknown>;
+
+  const meta: string[] = [];
+  const expDate = tsToDate(payload.exp);
+  if (expDate) {
+    const expired = Date.now() > (payload.exp as number) * 1000;
+    meta.push(`exp → ${expDate}${expired ? "  ⚠ EXPIRED" : "  ✓ valid"}`);
+  }
+  const iatDate = tsToDate(payload.iat);
+  if (iatDate) meta.push(`iat → ${iatDate}`);
+  const nbfDate = tsToDate(payload.nbf);
+  if (nbfDate) meta.push(`nbf → ${nbfDate}`);
+
+  return { header, payload, signature: parts[2], meta };
 }
 
 export function JwtDecoder() {
   const [input, setInput] = useState("");
 
-  const { output, error } = useMemo(() => {
-    if (!input.trim()) return { output: "", error: undefined };
+  const { output, meta, error } = useMemo(() => {
+    if (!input.trim()) return { output: "", meta: [], error: undefined };
     try {
-      const { header, payload, signature } = decodeJwt(input);
+      const { header, payload, signature, meta } = decodeJwt(input);
       const result = {
         header,
         payload,
         signature: `${signature.slice(0, 16)}… (not verified)`,
       };
-      return { output: JSON.stringify(result, null, 2), error: undefined };
+      return { output: JSON.stringify(result, null, 2), meta, error: undefined };
     } catch (e) {
-      return { output: "", error: (e as Error).message };
+      return { output: "", meta: [], error: (e as Error).message };
     }
   }, [input]);
 
@@ -62,7 +80,22 @@ export function JwtDecoder() {
           Load sample
         </button>
       }
-      outputContent={output ? <HighlightedOutput code={output} /> : undefined}
+      outputContent={
+        output ? (
+          <div className="flex flex-col">
+            {meta.length > 0 && (
+              <div className="px-4 py-2 border-b border-[var(--border)] flex flex-col gap-0.5">
+                {meta.map((m) => (
+                  <p key={m} className={`text-xs mono ${m.includes("EXPIRED") ? "text-[#ef4444]" : "text-[#22c55e]"}`}>
+                    {m}
+                  </p>
+                ))}
+              </div>
+            )}
+            <HighlightedOutput code={output} />
+          </div>
+        ) : undefined
+      }
     />
   );
 }

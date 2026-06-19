@@ -8,7 +8,8 @@ import { HighlightedOutput } from "@/lib/highlight";
 const tool = getToolBySlug("csv-to-json")!;
 
 function parseCsv(csv: string): Record<string, string>[] {
-  const lines = csv.trim().split(/\r?\n/);
+  const allLines = csv.split(/\r?\n/);
+  const lines = allLines.filter((l) => l.trim() !== "");
   if (lines.length < 2) throw new Error("CSV must have at least a header row and one data row.");
 
   const headers = splitCsvLine(lines[0]);
@@ -31,6 +32,7 @@ function splitCsvLine(line: string): string[] {
   const fields: string[] = [];
   let current = "";
   let inQuotes = false;
+  let wasQuoted = false;
 
   for (let i = 0; i < line.length; i++) {
     const ch = line[i];
@@ -40,15 +42,17 @@ function splitCsvLine(line: string): string[] {
         i++;
       } else {
         inQuotes = !inQuotes;
+        wasQuoted = true;
       }
     } else if (ch === "," && !inQuotes) {
-      fields.push(current.trim());
+      fields.push(wasQuoted ? current : current.trim());
       current = "";
+      wasQuoted = false;
     } else {
       current += ch;
     }
   }
-  fields.push(current.trim());
+  fields.push(wasQuoted ? current : current.trim());
   return fields;
 }
 
