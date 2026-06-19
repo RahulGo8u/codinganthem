@@ -318,6 +318,96 @@ export const tools: Tool[] = [
     explainer:
       "Generate a QR code for any text, URL, or data instantly — entirely in your browser.\n\n• Works with URLs, plain text, email addresses, phone numbers, and more\n• Choose output size: 128px, 256px, or 512px\n• Download as PNG with one click\n• Nothing is sent to a server — all generation happens locally",
   },
+  {
+    slug: "sql-formatter",
+    name: "SQL Formatter",
+    description: "Format and beautify SQL queries with dialect-aware indentation",
+    category: "formatters",
+    icon: "Database",
+    keywords: ["sql", "format", "beautify", "query", "mysql", "postgresql", "sqlite", "database"],
+    explainer:
+      "Format SQL queries instantly — supports multiple dialects with proper indentation and keyword casing.\n\n• Supports SQL, MySQL, PostgreSQL, SQLite, and more\n• Uppercase keywords, consistent indentation, clean output\n• Paste minified or messy SQL and get readable formatted output\n• Useful before sharing queries, adding to documentation, or code review",
+  },
+  {
+    slug: "image-to-base64",
+    name: "Image to Base64",
+    description: "Convert any image to a Base64 data URL instantly",
+    category: "encoders",
+    icon: "Image",
+    keywords: ["image", "base64", "encode", "data url", "png", "jpg", "svg", "convert"],
+    explainer:
+      "Convert any image to a Base64 data URL instantly — entirely in your browser.\n\n• Supports PNG, JPG, JPEG, GIF, WebP, and SVG\n• Output includes the full data URL and the raw Base64 string separately\n• Useful for embedding images in CSS, HTML, or JSON without a file reference\n• Nothing is uploaded — the conversion happens locally in your browser",
+  },
+  {
+    slug: "jwt-validator",
+    name: "JWT Validator",
+    description: "Verify a JWT token's signature and check its expiry",
+    category: "security",
+    icon: "ShieldCheck",
+    keywords: ["jwt", "json web token", "validate", "verify", "signature", "hmac", "auth", "bearer"],
+    explainer:
+      "Verify a JWT token's HMAC signature and check expiry — entirely in your browser.\n\n• Validates HS256, HS384, and HS512 signed tokens\n• Enter the secret key to verify the signature cryptographically\n• Shows expiry status (valid / expired) and decoded claims\n• Note: only HMAC (shared secret) tokens can be verified — RS256/ES256 require a public key",
+  },
+  {
+    slug: "js-formatter",
+    name: "JavaScript Formatter",
+    description: "Format and beautify JavaScript code with proper indentation",
+    category: "formatters",
+    icon: "FileCode",
+    keywords: ["javascript", "js", "format", "beautify", "prettify", "indent", "code"],
+    explainer:
+      "Format and beautify messy or minified JavaScript instantly.\n\n• Proper indentation, consistent spacing, and readable structure\n• Paste minified JS and get clean, formatted output\n• Useful for reading bundled code, debugging, or code review\n• Runs entirely in the browser — your code never leaves your machine",
+  },
+  {
+    slug: "html-formatter",
+    name: "HTML Formatter",
+    description: "Format and beautify HTML markup with proper indentation",
+    category: "formatters",
+    icon: "FileCode",
+    keywords: ["html", "format", "beautify", "prettify", "indent", "markup"],
+    explainer:
+      "Format and beautify HTML markup instantly.\n\n• Proper nesting indentation and clean structure\n• Paste minified HTML and get readable output\n• Useful for inspecting page source, email templates, or generated markup\n• Runs entirely in the browser — nothing is sent to a server",
+  },
+  {
+    slug: "css-formatter",
+    name: "CSS Formatter",
+    description: "Format and beautify CSS with proper indentation",
+    category: "formatters",
+    icon: "FileCode",
+    keywords: ["css", "format", "beautify", "prettify", "indent", "stylesheet"],
+    explainer:
+      "Format and beautify minified or messy CSS instantly.\n\n• Each rule and property on its own line with consistent indentation\n• Paste minified CSS and get readable output\n• Useful for inspecting compiled stylesheets or third-party CSS\n• Runs entirely in the browser — nothing leaves your machine",
+  },
+  {
+    slug: "sql-in-generator",
+    name: "SQL IN Generator",
+    description: "Turn a list of values into a SQL IN clause",
+    category: "converters",
+    icon: "Database",
+    keywords: ["sql", "in", "clause", "list", "comma", "query", "where", "ids"],
+    explainer:
+      "Turn a list of IDs or values into a ready-to-use SQL IN clause.\n\n• Paste values one per line — get them comma-separated inside IN (...)\n• Choose to quote values (for strings) or leave them bare (for numbers)\n• Optionally add a column name and WHERE prefix\n• Saves you from manually adding commas and quotes to long lists",
+  },
+  {
+    slug: "json-to-typescript",
+    name: "JSON to TypeScript",
+    description: "Generate TypeScript interfaces from a JSON object",
+    category: "converters",
+    icon: "Braces",
+    keywords: ["json", "typescript", "interface", "type", "convert", "ts", "types"],
+    explainer:
+      "Generate TypeScript interfaces from any JSON object instantly.\n\n• Recursively infers types for nested objects and arrays\n• Produces clean interface definitions ready to paste into your code\n• Useful when consuming an API and you need types for the response\n• Runs entirely in the browser — your data never leaves your machine",
+  },
+  {
+    slug: "curl-to-fetch",
+    name: "cURL to Fetch",
+    description: "Convert a cURL command into a JavaScript fetch() call",
+    category: "web",
+    icon: "Terminal",
+    keywords: ["curl", "fetch", "convert", "http", "request", "javascript", "api"],
+    explainer:
+      "Convert a cURL command into an equivalent JavaScript fetch() call.\n\n• Parses the method, headers, and request body from any curl command\n• Produces a ready-to-use fetch() snippet with options\n• Useful when copying curl commands from DevTools, Postman, or API docs\n• Runs entirely in the browser — nothing is sent to a server",
+  },
 ];
 
 export function getToolBySlug(slug: string): Tool | undefined {

@@ -95,6 +95,33 @@ const TOOL_MAP: Record<string, React.ComponentType> = {
   "qr-code-generator": dynamic(() =>
     import("@/components/tools/QrCodeGenerator").then((m) => ({ default: m.QrCodeGenerator }))
   ),
+  "sql-formatter": dynamic(() =>
+    import("@/components/tools/SqlFormatter").then((m) => ({ default: m.SqlFormatter }))
+  ),
+  "image-to-base64": dynamic(() =>
+    import("@/components/tools/ImageToBase64").then((m) => ({ default: m.ImageToBase64 }))
+  ),
+  "jwt-validator": dynamic(() =>
+    import("@/components/tools/JwtValidator").then((m) => ({ default: m.JwtValidator }))
+  ),
+  "js-formatter": dynamic(() =>
+    import("@/components/tools/JsFormatter").then((m) => ({ default: m.JsFormatter }))
+  ),
+  "html-formatter": dynamic(() =>
+    import("@/components/tools/HtmlFormatter").then((m) => ({ default: m.HtmlFormatter }))
+  ),
+  "css-formatter": dynamic(() =>
+    import("@/components/tools/CssFormatter").then((m) => ({ default: m.CssFormatter }))
+  ),
+  "sql-in-generator": dynamic(() =>
+    import("@/components/tools/SqlInGenerator").then((m) => ({ default: m.SqlInGenerator }))
+  ),
+  "json-to-typescript": dynamic(() =>
+    import("@/components/tools/JsonToTypeScript").then((m) => ({ default: m.JsonToTypeScript }))
+  ),
+  "curl-to-fetch": dynamic(() =>
+    import("@/components/tools/CurlToFetch").then((m) => ({ default: m.CurlToFetch }))
+  ),
 };
 
 export function ToolPageClient({ slug }: { slug: string }) {
