@@ -92,6 +92,9 @@ const TOOL_MAP: Record<string, React.ComponentType> = {
   "json-diff": dynamic(() =>
     import("@/components/tools/JsonDiff").then((m) => ({ default: m.JsonDiff }))
   ),
+  "qr-code-generator": dynamic(() =>
+    import("@/components/tools/QrCodeGenerator").then((m) => ({ default: m.QrCodeGenerator }))
+  ),
 };
 
 export function ToolPageClient({ slug }: { slug: string }) {

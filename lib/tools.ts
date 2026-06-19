@@ -308,6 +308,16 @@ export const tools: Tool[] = [
     explainer:
       "Compare two JSON documents side by side — keys are sorted so formatting differences don't create noise.\n\n• Added keys shown in green, removed in red, unchanged in grey\n• JSON-aware: reorders keys before diffing so only real changes show\n• Useful for comparing API responses, config files, or database snapshots\n• Handles nested objects and arrays of any depth",
   },
+  {
+    slug: "qr-code-generator",
+    name: "QR Code Generator",
+    description: "Generate a QR code for any text or URL instantly",
+    category: "generators",
+    icon: "QrCode",
+    keywords: ["qr", "qr code", "generate", "barcode", "scan", "url", "link"],
+    explainer:
+      "Generate a QR code for any text, URL, or data instantly — entirely in your browser.\n\n• Works with URLs, plain text, email addresses, phone numbers, and more\n• Choose output size: 128px, 256px, or 512px\n• Download as PNG with one click\n• Nothing is sent to a server — all generation happens locally",
+  },
 ];
 
 export function getToolBySlug(slug: string): Tool | undefined {
