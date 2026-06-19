@@ -3,12 +3,11 @@
 import { useEffect, useState, useCallback } from "react";
 import { Command } from "cmdk";
 import { useRouter } from "next/navigation";
-import * as Icons from "lucide-react";
+import { ICON_MAP, type IconName } from "@/lib/icons";
 import { tools, CATEGORY_LABELS, type ToolCategory } from "@/lib/tools";
 
-type IconName = keyof typeof Icons;
 function ToolIcon({ name }: { name: string }) {
-  const Icon = Icons[name as IconName] as React.ComponentType<{ size?: number; className?: string }> | undefined;
+  const Icon = ICON_MAP[name as IconName] as React.ComponentType<{ size?: number; className?: string }> | undefined;
   if (!Icon) return null;
   return <Icon size={14} className="text-[var(--text-muted)]" />;
 }

@@ -1,13 +1,12 @@
 import Link from "next/link";
-import * as Icons from "lucide-react";
-import { ArrowRight } from "lucide-react";
+import { ICON_MAP, type IconName } from "@/lib/icons";
 import type { Tool } from "@/lib/tools";
 import { CATEGORY_LABELS } from "@/lib/tools";
 
-type IconName = keyof typeof Icons;
+const { ArrowRight } = ICON_MAP;
 
 function ToolIcon({ name }: { name: string }) {
-  const Icon = Icons[name as IconName] as React.ComponentType<{ size?: number; className?: string }> | undefined;
+  const Icon = ICON_MAP[name as IconName] as React.ComponentType<{ size?: number; className?: string }> | undefined;
   if (!Icon) return null;
   return <Icon size={18} className="text-[#6366f1]" />;
 }

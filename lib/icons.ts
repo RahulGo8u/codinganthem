@@ -1,0 +1,56 @@
+import {
+  AlignLeft,
+  ArrowLeftRight,
+  ArrowRight,
+  BarChart2,
+  Binary,
+  Braces,
+  CaseSensitive,
+  Clock,
+  Code,
+  FileJson,
+  FileText,
+  Fingerprint,
+  GitCompare,
+  Hash,
+  KeyRound,
+  KeySquare,
+  Link,
+  Link2,
+  Palette,
+  Regex,
+  ShieldCheck,
+  Table,
+  Timer,
+} from "lucide-react";
+import type { LucideProps } from "lucide-react";
+
+export type { LucideProps };
+
+export const ICON_MAP = {
+  AlignLeft,
+  ArrowLeftRight,
+  ArrowRight,
+  BarChart2,
+  Binary,
+  Braces,
+  CaseSensitive,
+  Clock,
+  Code,
+  FileJson,
+  FileText,
+  Fingerprint,
+  GitCompare,
+  Hash,
+  KeyRound,
+  KeySquare,
+  Link,
+  Link2,
+  Palette,
+  Regex,
+  ShieldCheck,
+  Table,
+  Timer,
+} as const;
+
+export type IconName = keyof typeof ICON_MAP;
