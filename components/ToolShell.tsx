@@ -47,6 +47,8 @@ interface ToolShellProps {
   extraActions?: React.ReactNode;
   /** Hide Upload file + Download buttons (e.g. generator tools) */
   hideFileActions?: boolean;
+  /** Show Clear button even when hideFileActions is true (for tools with input but no file I/O) */
+  showClear?: boolean;
   /** Hide the input pane entirely — output takes full width (e.g. UUID / password generators) */
   hideInputPane?: boolean;
 }
@@ -66,6 +68,7 @@ export function ToolShell({
   outputContent,
   extraActions,
   hideFileActions = false,
+  showClear = false,
   hideInputPane = false,
 }: ToolShellProps) {
   const [copied, setCopied] = useState(false);
@@ -252,7 +255,7 @@ export function ToolShell({
         )}
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <div className="flex items-center gap-2">
-          {!hideFileActions && (
+          {(!hideFileActions || showClear) && (
             <button
               onClick={handleClear}
               disabled={!input}

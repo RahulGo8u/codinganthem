@@ -68,6 +68,7 @@ export function JwtDecoder() {
       onInputChange={setInput}
       error={error}
       hideFileActions
+      showClear
       inputLabel="JWT Token"
       outputLabel="Decoded"
       inputPlaceholder="Paste your JWT here (eyJ...)"

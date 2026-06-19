@@ -60,6 +60,7 @@ export function TimestampConverter() {
       onInputChange={setInput}
       error={error}
       hideFileActions
+      showClear
       inputLabel={mode === "to-date" ? "Unix Timestamp" : "Date / Time String"}
       outputLabel="Result"
       inputPlaceholder={

@@ -57,6 +57,7 @@ export function UrlParser() {
       onInputChange={setInput}
       error={error}
       hideFileActions
+      showClear
       inputLabel="URL"
       outputLabel="Components"
       extraActions={

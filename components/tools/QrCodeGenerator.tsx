@@ -41,6 +41,7 @@ export function QrCodeGenerator() {
       onInputChange={setInput}
       error={error}
       hideFileActions
+      showClear
       inputLabel="Text or URL"
       outputLabel="QR Code"
       inputPlaceholder={"Enter any text or URL...\n\nhttps://www.codinganthem.com"}

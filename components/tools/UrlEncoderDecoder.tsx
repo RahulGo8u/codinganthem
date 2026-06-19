@@ -52,6 +52,7 @@ export function UrlEncoderDecoder() {
       onInputChange={setInput}
       error={error}
       hideFileActions
+      showClear
       inputLabel={mode === "decode" ? "URL-encoded text" : "Plain text"}
       outputLabel={mode === "decode" ? "Decoded text" : "Encoded"}
       inputPlaceholder={

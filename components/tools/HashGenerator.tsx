@@ -128,6 +128,7 @@ export function HashGenerator() {
       output={output}
       onInputChange={setInput}
       hideFileActions
+      showClear
       inputLabel="Input text"
       outputLabel={`${algo} Hash`}
       inputPlaceholder="Enter text to hash..."
