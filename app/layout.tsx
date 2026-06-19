@@ -43,7 +43,10 @@ export const metadata: Metadata = {
     canonical: "https://www.codinganthem.com",
   },
   icons: {
-    icon: "/apple-touch-icon.png",
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/apple-touch-icon.png", type: "image/png" },
+    ],
     apple: "/apple-touch-icon.png",
   },
   openGraph: {
