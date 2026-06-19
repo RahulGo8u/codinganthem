@@ -124,6 +124,86 @@ export const tools: Tool[] = [
     explainer:
       "Spot exactly what changed between two texts — line by line, instantly.\n\n• Added lines highlighted in green, removed in red — same style as Git diffs\n• Paste config files, API responses, code snippets, or any two blocks of text\n• Useful for reviewing changes before committing or debugging response differences\n• No size limit — compares as much text as you paste",
   },
+  {
+    slug: "url-encoder",
+    name: "URL Encoder / Decoder",
+    description: "Encode and decode URLs and query string parameters",
+    category: "encoders",
+    icon: "Link",
+    keywords: ["url", "encode", "decode", "percent", "uri", "query", "string", "escape"],
+    explainer:
+      "Encode and decode URLs instantly — no libraries, no server.\n\n• Encode special characters to percent-encoded format for safe use in URLs\n• Decode percent-encoded strings back to readable text\n• Handles full URLs and individual query parameter values\n• Essential when building APIs, query strings, or parsing redirect URLs",
+  },
+  {
+    slug: "jwt-decoder",
+    name: "JWT Decoder",
+    description: "Decode and inspect JWT tokens — header, payload, and signature",
+    category: "encoders",
+    icon: "KeySquare",
+    keywords: ["jwt", "json web token", "decode", "token", "auth", "bearer", "header", "payload"],
+    explainer:
+      "Decode and inspect JWT tokens instantly — entirely in your browser.\n\n• Reveals the header algorithm, payload claims, and raw signature\n• Useful for debugging auth issues, checking expiry (exp), and reading claims\n• Signature is NOT verified — this tool only decodes, it does not validate\n• Nothing is sent to a server — your tokens stay private",
+  },
+  {
+    slug: "base-converter",
+    name: "Number Base Converter",
+    description: "Convert numbers between binary, octal, decimal, and hexadecimal",
+    category: "converters",
+    icon: "Binary",
+    keywords: ["binary", "hex", "hexadecimal", "octal", "decimal", "base", "convert", "number"],
+    explainer:
+      "Convert any number between binary, octal, decimal, and hex instantly.\n\n• Enter a number in any base and see all four representations at once\n• Supports binary (base 2), octal (base 8), decimal (base 10), and hex (base 16)\n• Validates digits against the selected input base\n• Useful for bitwise operations, memory addresses, and color values",
+  },
+  {
+    slug: "lorem-ipsum",
+    name: "Lorem Ipsum Generator",
+    description: "Generate placeholder lorem ipsum text for designs and mockups",
+    category: "generators",
+    icon: "AlignLeft",
+    keywords: ["lorem", "ipsum", "placeholder", "text", "dummy", "generate", "paragraph"],
+    explainer:
+      "Generate classic lorem ipsum placeholder text in seconds.\n\n• Choose how many paragraphs to generate (1–10)\n• Classic lorem ipsum words used by designers and developers worldwide\n• Copy all generated text in one click\n• Useful for wireframes, UI mockups, and testing text-heavy layouts",
+  },
+  {
+    slug: "csv-to-json",
+    name: "CSV to JSON",
+    description: "Convert CSV data to a JSON array instantly",
+    category: "converters",
+    icon: "Table",
+    keywords: ["csv", "json", "convert", "table", "data", "spreadsheet", "parse"],
+    explainer:
+      "Convert CSV files or pasted data to JSON in one click.\n\n• First row is used as the key names in the JSON output\n• Handles quoted fields, commas inside quotes, and missing values\n• Output is a properly formatted JSON array ready to use in code\n• Useful when importing spreadsheet data into APIs or databases",
+  },
+  {
+    slug: "html-entities",
+    name: "HTML Entities Encoder / Decoder",
+    description: "Encode and decode HTML entities like &amp;lt; and &amp;gt;",
+    category: "encoders",
+    icon: "Code",
+    keywords: ["html", "entities", "encode", "decode", "escape", "unescape", "amp", "lt", "gt"],
+    explainer:
+      "Encode and decode HTML entities instantly — no setup required.\n\n• Encode <, >, &, \", and ' into safe HTML entity equivalents\n• Decode named and numeric entities back to their original characters\n• Essential for safely embedding user content in HTML\n• Useful when writing HTML emails, templates, or sanitizing output",
+  },
+  {
+    slug: "yaml-to-json",
+    name: "YAML to JSON",
+    description: "Convert YAML configuration to JSON format instantly",
+    category: "converters",
+    icon: "FileJson",
+    keywords: ["yaml", "json", "convert", "config", "yml", "parse", "transform"],
+    explainer:
+      "Convert YAML to JSON instantly — useful for config file transformations.\n\n• Paste any YAML document and get properly formatted JSON output\n• Handles nested objects, arrays, multi-line strings, and anchors\n• Common use: converting docker-compose.yml, GitHub Actions, or Kubernetes configs\n• Syntax errors are reported with a plain-English message",
+  },
+  {
+    slug: "markdown-preview",
+    name: "Markdown Previewer",
+    description: "Write Markdown and see a live rendered HTML preview",
+    category: "formatters",
+    icon: "FileText",
+    keywords: ["markdown", "preview", "render", "html", "md", "format", "readme"],
+    explainer:
+      "Write Markdown and see a live rendered preview as you type.\n\n• Supports standard Markdown: headings, bold, italic, lists, links, code blocks\n• Preview updates in real time with no submit button\n• Useful for drafting READMEs, documentation, and blog posts\n• Runs entirely in the browser — nothing is sent to a server",
+  },
 ];
 
 export function getToolBySlug(slug: string): Tool | undefined {

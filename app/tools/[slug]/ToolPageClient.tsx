@@ -37,6 +37,30 @@ const TOOL_MAP: Record<string, React.ComponentType> = {
   "text-diff": dynamic(() =>
     import("@/components/tools/TextDiff").then((m) => ({ default: m.TextDiff }))
   ),
+  "url-encoder": dynamic(() =>
+    import("@/components/tools/UrlEncoderDecoder").then((m) => ({ default: m.UrlEncoderDecoder }))
+  ),
+  "jwt-decoder": dynamic(() =>
+    import("@/components/tools/JwtDecoder").then((m) => ({ default: m.JwtDecoder }))
+  ),
+  "base-converter": dynamic(() =>
+    import("@/components/tools/BaseConverter").then((m) => ({ default: m.BaseConverter }))
+  ),
+  "lorem-ipsum": dynamic(() =>
+    import("@/components/tools/LoremIpsumGenerator").then((m) => ({ default: m.LoremIpsumGenerator }))
+  ),
+  "csv-to-json": dynamic(() =>
+    import("@/components/tools/CsvToJson").then((m) => ({ default: m.CsvToJson }))
+  ),
+  "html-entities": dynamic(() =>
+    import("@/components/tools/HtmlEntities").then((m) => ({ default: m.HtmlEntities }))
+  ),
+  "yaml-to-json": dynamic(() =>
+    import("@/components/tools/YamlToJson").then((m) => ({ default: m.YamlToJson }))
+  ),
+  "markdown-preview": dynamic(() =>
+    import("@/components/tools/MarkdownPreviewer").then((m) => ({ default: m.MarkdownPreviewer }))
+  ),
 };
 
 export function ToolPageClient({ slug }: { slug: string }) {
