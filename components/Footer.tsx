@@ -32,6 +32,14 @@ export function Footer() {
             >
               GitHub
             </a>
+            <a
+              href="https://buymeacoffee.com/codinganthem"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-[var(--text-primary)] transition-colors"
+            >
+              Support ☕
+            </a>
           </nav>
 
         </div>
