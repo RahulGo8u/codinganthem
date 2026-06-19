@@ -61,6 +61,27 @@ const TOOL_MAP: Record<string, React.ComponentType> = {
   "markdown-preview": dynamic(() =>
     import("@/components/tools/MarkdownPreviewer").then((m) => ({ default: m.MarkdownPreviewer }))
   ),
+  "word-counter": dynamic(() =>
+    import("@/components/tools/WordCounter").then((m) => ({ default: m.WordCounter }))
+  ),
+  "json-to-yaml": dynamic(() =>
+    import("@/components/tools/JsonToYaml").then((m) => ({ default: m.JsonToYaml }))
+  ),
+  "json-to-csv": dynamic(() =>
+    import("@/components/tools/JsonToCsv").then((m) => ({ default: m.JsonToCsv }))
+  ),
+  "url-parser": dynamic(() =>
+    import("@/components/tools/UrlParser").then((m) => ({ default: m.UrlParser }))
+  ),
+  "slug-generator": dynamic(() =>
+    import("@/components/tools/SlugGenerator").then((m) => ({ default: m.SlugGenerator }))
+  ),
+  "cron-parser": dynamic(() =>
+    import("@/components/tools/CronParser").then((m) => ({ default: m.CronParser }))
+  ),
+  "string-escape": dynamic(() =>
+    import("@/components/tools/StringEscape").then((m) => ({ default: m.StringEscape }))
+  ),
 };
 
 export function ToolPageClient({ slug }: { slug: string }) {

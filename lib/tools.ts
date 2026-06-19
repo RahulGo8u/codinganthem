@@ -204,6 +204,76 @@ export const tools: Tool[] = [
     explainer:
       "Write Markdown and see a live rendered preview as you type.\n\n• Supports standard Markdown: headings, bold, italic, lists, links, code blocks\n• Preview updates in real time with no submit button\n• Useful for drafting READMEs, documentation, and blog posts\n• Runs entirely in the browser — nothing is sent to a server",
   },
+  {
+    slug: "word-counter",
+    name: "Word Counter",
+    description: "Count words, characters, sentences, and estimate reading time",
+    category: "text",
+    icon: "AlignLeft",
+    keywords: ["word", "counter", "character", "count", "reading", "time", "text", "length"],
+    explainer:
+      "Count words, characters, sentences, and paragraphs instantly — paste any text and see results live.\n\n• Word count, character count with and without spaces\n• Sentence and paragraph count\n• Estimated reading time at 200 words per minute\n• Updates in real time as you type or paste",
+  },
+  {
+    slug: "json-to-yaml",
+    name: "JSON to YAML",
+    description: "Convert JSON to YAML format instantly",
+    category: "converters",
+    icon: "FileJson",
+    keywords: ["json", "yaml", "convert", "config", "yml", "transform"],
+    explainer:
+      "Convert JSON to YAML instantly — the reverse of YAML to JSON.\n\n• Paste any valid JSON and get clean, readable YAML output\n• Handles nested objects, arrays, and all JSON value types\n• Common use: converting API responses to config file format\n• Syntax errors in the input JSON are reported clearly",
+  },
+  {
+    slug: "json-to-csv",
+    name: "JSON to CSV",
+    description: "Convert a JSON array to CSV format",
+    category: "converters",
+    icon: "Table",
+    keywords: ["json", "csv", "convert", "table", "data", "spreadsheet", "export"],
+    explainer:
+      "Convert a JSON array to CSV in one click — ready to open in Excel or Google Sheets.\n\n• First object's keys become the CSV header row\n• All rows are flattened to string values\n• Handles null and missing fields gracefully\n• Useful for exporting API data to spreadsheets or databases",
+  },
+  {
+    slug: "url-parser",
+    name: "URL Parser",
+    description: "Break a URL into its components — protocol, host, path, query params, and hash",
+    category: "converters",
+    icon: "Link",
+    keywords: ["url", "parse", "components", "query", "params", "hostname", "path", "hash", "protocol"],
+    explainer:
+      "Parse any URL into its individual components instantly.\n\n• Shows protocol, hostname, port, pathname, query parameters, and hash\n• Each query parameter displayed as a separate key-value pair\n• Useful for debugging redirect URLs, OAuth callbacks, and API endpoints\n• Uses the browser's built-in URL parser — handles all edge cases correctly",
+  },
+  {
+    slug: "slug-generator",
+    name: "Slug Generator",
+    description: "Convert any text into a URL-friendly slug",
+    category: "text",
+    icon: "Link2",
+    keywords: ["slug", "url", "kebab", "snake", "case", "generate", "permalink", "friendly"],
+    explainer:
+      "Convert any text to a clean, URL-friendly slug instantly.\n\n• Converts spaces and special characters to hyphens or underscores\n• Strips accents, punctuation, and non-ASCII characters\n• Choose between kebab-case (hello-world) and snake_case (hello_world)\n• Useful for blog post URLs, API route names, and file names",
+  },
+  {
+    slug: "cron-parser",
+    name: "Cron Expression Parser",
+    description: "Decode cron expressions into plain-English schedules",
+    category: "converters",
+    icon: "Timer",
+    keywords: ["cron", "schedule", "expression", "parse", "crontab", "job", "timer", "interval"],
+    explainer:
+      "Decode any cron expression into plain English — no more guessing what * * * * * means.\n\n• Supports standard 5-field and extended 6-field (with seconds) cron syntax\n• Handles *, */n, ranges (n-m), and lists (n,m)\n• Shows the next 5 scheduled run times\n• Useful for debugging crontabs, CI schedules, and cloud functions",
+  },
+  {
+    slug: "string-escape",
+    name: "String Escape / Unescape",
+    description: "Escape or unescape special characters in strings",
+    category: "text",
+    icon: "Braces",
+    keywords: ["escape", "unescape", "string", "json", "backslash", "newline", "special", "characters"],
+    explainer:
+      "Escape or unescape special characters in strings for use in code or JSON payloads.\n\n• Escape mode: converts newlines, tabs, quotes, and backslashes to their escaped equivalents\n• Unescape mode: reverses escaped sequences back to raw characters\n• Useful when embedding strings in JSON, debugging API responses, or copying code\n• Updates live as you type",
+  },
 ];
 
 export function getToolBySlug(slug: string): Tool | undefined {
