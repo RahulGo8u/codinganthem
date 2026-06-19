@@ -3,7 +3,9 @@ export type ToolCategory =
   | "encoders"
   | "generators"
   | "converters"
-  | "text";
+  | "text"
+  | "security"
+  | "web";
 
 export type Tool = {
   slug: string;
@@ -21,6 +23,8 @@ export const CATEGORY_LABELS: Record<ToolCategory, string> = {
   generators: "Generators",
   converters: "Converters",
   text: "Text Utils",
+  security: "Security",
+  web: "Web",
 };
 
 export const tools: Tool[] = [
@@ -58,7 +62,7 @@ export const tools: Tool[] = [
     slug: "password-generator",
     name: "Password Generator",
     description: "Generate strong, random passwords with custom rules",
-    category: "generators",
+    category: "security",
     icon: "KeyRound",
     keywords: ["password", "generate", "random", "secure", "strength"],
     explainer:
@@ -68,7 +72,7 @@ export const tools: Tool[] = [
     slug: "hash-generator",
     name: "Hash Generator",
     description: "Generate MD5, SHA-1, SHA-256, and SHA-512 hashes",
-    category: "generators",
+    category: "security",
     icon: "Hash",
     keywords: ["hash", "md5", "sha256", "sha512", "sha1", "checksum", "crypto"],
     explainer:
@@ -128,7 +132,7 @@ export const tools: Tool[] = [
     slug: "url-encoder",
     name: "URL Encoder / Decoder",
     description: "Encode and decode URLs and query string parameters",
-    category: "encoders",
+    category: "web",
     icon: "Link",
     keywords: ["url", "encode", "decode", "percent", "uri", "query", "string", "escape"],
     explainer:
@@ -138,7 +142,7 @@ export const tools: Tool[] = [
     slug: "jwt-decoder",
     name: "JWT Decoder",
     description: "Decode and inspect JWT tokens — header, payload, and signature",
-    category: "encoders",
+    category: "security",
     icon: "KeySquare",
     keywords: ["jwt", "json web token", "decode", "token", "auth", "bearer", "header", "payload"],
     explainer:
@@ -178,7 +182,7 @@ export const tools: Tool[] = [
     slug: "html-entities",
     name: "HTML Entities Encoder / Decoder",
     description: "Encode and decode HTML entities like &amp;lt; and &amp;gt;",
-    category: "encoders",
+    category: "web",
     icon: "Code",
     keywords: ["html", "entities", "encode", "decode", "escape", "unescape", "amp", "lt", "gt"],
     explainer:
@@ -238,7 +242,7 @@ export const tools: Tool[] = [
     slug: "url-parser",
     name: "URL Parser",
     description: "Break a URL into its components — protocol, host, path, query params, and hash",
-    category: "converters",
+    category: "web",
     icon: "Link",
     keywords: ["url", "parse", "components", "query", "params", "hostname", "path", "hash", "protocol"],
     explainer:
@@ -248,7 +252,7 @@ export const tools: Tool[] = [
     slug: "slug-generator",
     name: "Slug Generator",
     description: "Convert any text into a URL-friendly slug",
-    category: "text",
+    category: "web",
     icon: "Link2",
     keywords: ["slug", "url", "kebab", "snake", "case", "generate", "permalink", "friendly"],
     explainer:
