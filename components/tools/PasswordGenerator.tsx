@@ -45,11 +45,23 @@ export function PasswordGenerator() {
     if (useSymbols) charset += SYMBOLS;
     if (!charset) return;
 
-    const passwords = Array.from({ length: count }, () => {
-      const arr = new Uint32Array(length);
-      crypto.getRandomValues(arr);
-      return Array.from(arr, (n) => charset[n % charset.length]).join("");
-    });
+    const charsetSize = charset.length;
+    // Rejection sampling: discard values in the biased tail so every
+    // character in the charset has exactly equal probability of selection.
+    const limit = Math.floor(0x100000000 / charsetSize) * charsetSize;
+    function unbiasedChar(): string {
+      const buf = new Uint32Array(1);
+      let n: number;
+      do {
+        crypto.getRandomValues(buf);
+        n = buf[0];
+      } while (n >= limit);
+      return charset[n % charsetSize];
+    }
+
+    const passwords = Array.from({ length: count }, () =>
+      Array.from({ length }, unbiasedChar).join("")
+    );
     setOutput(passwords.join("\n"));
   }, [length, useUpper, useLower, useNumbers, useSymbols, count]);
 
@@ -62,6 +74,7 @@ export function PasswordGenerator() {
       output={output}
       onInputChange={() => {}}
       hideFileActions
+      hideInputPane
       outputLabel="Generated Passwords"
       outputPlaceholder="Click Generate to create passwords..."
       options={
@@ -112,6 +125,23 @@ export function PasswordGenerator() {
             Generate
           </button>
         </div>
+      }
+      extraActions={
+        <button
+          onClick={() => {
+            setOutput("");
+            setCount(1);
+            setLength(16);
+            setUseUpper(true);
+            setUseLower(true);
+            setUseNumbers(true);
+            setUseSymbols(true);
+          }}
+          disabled={!output}
+          className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+        >
+          Clear
+        </button>
       }
       outputContent={
         output ? (

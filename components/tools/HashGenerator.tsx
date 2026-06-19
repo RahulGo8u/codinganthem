@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ToolShell } from "@/components/ToolShell";
 import { getToolBySlug } from "@/lib/tools";
 
@@ -106,13 +106,18 @@ export function HashGenerator() {
   const [input, setInput] = useState("");
   const [algo, setAlgo] = useState<HashAlgo>("SHA-256");
   const [output, setOutput] = useState("");
+  const reqRef = useRef(0);
 
   useEffect(() => {
     if (!input) { setOutput(""); return; }
+    const id = ++reqRef.current;
     if (algo === "MD5") {
-      setOutput(md5(input));
+      const result = md5(input);
+      if (id === reqRef.current) setOutput(result);
     } else {
-      sha(input, algo).then(setOutput);
+      sha(input, algo).then((result) => {
+        if (id === reqRef.current) setOutput(result);
+      });
     }
   }, [input, algo]);
 

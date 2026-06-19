@@ -1,0 +1,26 @@
+# CodingAnthem
+
+> Fast, free developer tools for your browser and AI workflows.
+
+CodingAnthem is a collection of free, browser-based developer utilities built for developers and AI-assisted workflows. All tools run entirely client-side — no data is sent to a server. No sign-up required.
+
+## Tools
+
+- JSON Formatter — format, validate, and minify JSON: /tools/json-formatter
+- Base64 Encoder / Decoder — encode and decode text to and from Base64: /tools/base64
+- UUID Generator — generate version 4 UUIDs instantly: /tools/uuid-generator
+- Password Generator — create strong, random passwords with custom rules: /tools/password-generator
+- Hash Generator — compute MD5, SHA-1, SHA-256, and SHA-512 checksums: /tools/hash-generator
+- Unix Timestamp Converter — convert between Unix timestamps and human-readable dates: /tools/timestamp-converter
+- Color Converter — translate colors between HEX, RGB, and HSL formats: /tools/color-converter
+- Regex Tester — test regular expressions with live match results: /tools/regex-tester
+- Case Converter — switch between camelCase, snake_case, PascalCase, and more: /tools/case-converter
+- Text Diff — compare two blocks of text and highlight what changed: /tools/text-diff
+
+## About
+
+- All tools are free and require no account or sign-up.
+- All processing happens in the browser using JavaScript and Web APIs.
+- No data is transmitted to any server.
+- Built with Next.js and React.
+- Source: https://github.com/RahulGo8u/codinganthem

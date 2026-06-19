@@ -32,7 +32,7 @@ export const tools: Tool[] = [
     icon: "Braces",
     keywords: ["json", "format", "validate", "beautify", "minify", "pretty"],
     explainer:
-      "Paste any JSON string to instantly format it with proper indentation, making it easy to read and debug. The validator highlights syntax errors with plain-English messages so you know exactly what to fix. You can also sort keys alphabetically or minify JSON to reduce payload size — useful before sending data to an API or storing it in a database.",
+      "Format, validate, and transform JSON instantly — no setup, no server.\n\n• Paste messy JSON to get it properly indented and readable\n• Syntax errors are shown in plain English so you know exactly what's wrong\n• Sort keys alphabetically to normalize structure before diffing or storing\n• Minify to strip whitespace before sending payloads to an API",
   },
   {
     slug: "base64",
@@ -42,7 +42,7 @@ export const tools: Tool[] = [
     icon: "ArrowLeftRight",
     keywords: ["base64", "encode", "decode", "btoa", "atob"],
     explainer:
-      "Base64 is an encoding scheme that converts binary data into ASCII text, commonly used in data URLs, email attachments, JWT tokens, and HTTP Basic Authentication headers. Use this tool to encode plain text or file contents to Base64, or decode a Base64 string back to its original form. All encoding happens in your browser — nothing is sent to a server.",
+      "Encode or decode Base64 in one click — entirely in your browser.\n\n• Encode plain text to Base64 for use in JWTs, data URLs, or auth headers\n• Decode a Base64 string back to its original form instantly\n• Switch between encode and decode mode with one click\n• Nothing is sent to a server — all processing stays local",
   },
   {
     slug: "uuid-generator",
@@ -52,7 +52,7 @@ export const tools: Tool[] = [
     icon: "Fingerprint",
     keywords: ["uuid", "guid", "generate", "unique", "id", "random"],
     explainer:
-      "A UUID (Universally Unique Identifier) is a 128-bit identifier used to uniquely label resources in software systems without central coordination. Version 4 UUIDs are randomly generated, making collisions statistically impossible. Use them as primary keys in databases, session tokens, or any scenario where a unique ID is needed. Generate up to 100 UUIDs at once and copy them all with one click.",
+      "Generate one or hundreds of v4 UUIDs instantly — no libraries needed.\n\n• Cryptographically random — collisions are statistically impossible\n• Use as database primary keys, session tokens, or request IDs\n• Generate up to 100 at once and copy them all in one click\n• Runs entirely in the browser using the native crypto API",
   },
   {
     slug: "password-generator",
@@ -62,7 +62,7 @@ export const tools: Tool[] = [
     icon: "KeyRound",
     keywords: ["password", "generate", "random", "secure", "strength"],
     explainer:
-      "Generate cryptographically strong random passwords using the Web Crypto API — the same standard used by password managers. Customize the length (up to 128 characters) and choose which character sets to include: uppercase, lowercase, numbers, and symbols. A strength indicator shows how secure the generated password is. Nothing is stored or transmitted — passwords are generated entirely in your browser.",
+      "Generate strong, random passwords using the Web Crypto API — the same standard used by password managers.\n\n• Customize length up to 128 characters\n• Choose character sets: uppercase, lowercase, numbers, symbols\n• Strength indicator shows how secure each password is\n• Generate multiple passwords at once — nothing is stored or transmitted",
   },
   {
     slug: "hash-generator",
@@ -72,7 +72,7 @@ export const tools: Tool[] = [
     icon: "Hash",
     keywords: ["hash", "md5", "sha256", "sha512", "sha1", "checksum", "crypto"],
     explainer:
-      "A cryptographic hash function converts any input into a fixed-length string (the hash). Even a single character change in the input produces a completely different hash. Common uses include verifying file integrity, storing passwords securely, and generating checksums. SHA-256 and SHA-512 use the browser's native Web Crypto API for fast, secure hashing. MD5 and SHA-1 are provided for legacy compatibility — they are not recommended for security-sensitive use.",
+      "Compute cryptographic hashes instantly — live as you type.\n\n• SHA-256 and SHA-512 use the browser's native Web Crypto API\n• MD5 and SHA-1 included for legacy compatibility (not recommended for security use)\n• Any single character change produces a completely different hash\n• Common uses: checksums, file integrity verification, password storage",
   },
   {
     slug: "timestamp-converter",
@@ -82,7 +82,7 @@ export const tools: Tool[] = [
     icon: "Clock",
     keywords: ["timestamp", "unix", "epoch", "date", "time", "convert"],
     explainer:
-      "A Unix timestamp is the number of seconds (or milliseconds) elapsed since January 1, 1970 00:00:00 UTC — also known as the Unix epoch. It is the standard way to represent time in databases, APIs, and log files because it is timezone-independent. This tool converts a Unix timestamp to a human-readable date in local time, UTC, and ISO 8601 format, and also converts any date string back to its Unix timestamp.",
+      "Convert Unix timestamps to readable dates and back — instantly.\n\n• Paste a timestamp (seconds or milliseconds) to see it in local time, UTC, and ISO 8601\n• Enter any date string to get its Unix timestamp\n• Timestamps are timezone-independent — the standard for APIs, databases, and logs\n• Current time shown automatically so you always have a reference point",
   },
   {
     slug: "color-converter",
@@ -92,7 +92,7 @@ export const tools: Tool[] = [
     icon: "Palette",
     keywords: ["color", "hex", "rgb", "hsl", "convert", "colour"],
     explainer:
-      "Web colors can be expressed in multiple formats: HEX (e.g. #6366f1), RGB (e.g. rgb(99, 102, 241)), and HSL (e.g. hsl(239, 84%, 67%)). Different tools and languages expect different formats — CSS commonly uses HEX or HSL, while image processing libraries often prefer RGB. Enter any color value and instantly get all three formats with a live color preview.",
+      "Convert any color between HEX, RGB, and HSL instantly — with a live preview.\n\n• Paste a HEX code, RGB value, or HSL string to get all three formats at once\n• Live color swatch updates as you type\n• Copy any format individually with one click\n• Useful when switching between CSS, Figma, Tailwind, and image processing tools",
   },
   {
     slug: "regex-tester",
@@ -102,7 +102,7 @@ export const tools: Tool[] = [
     icon: "Regex",
     keywords: ["regex", "regexp", "regular expression", "pattern", "match", "test"],
     explainer:
-      "Regular expressions (regex) are patterns used to match, search, and manipulate text. They are supported in every major programming language and are used for input validation, log parsing, search-and-replace, and data extraction. Enter your pattern and test string to see all matches in real time. Toggle flags like global (g), case insensitive (i), and multiline (m) to refine your expression.",
+      "Test and debug regular expressions in real time — no console needed.\n\n• See all matches highlighted as you type the pattern\n• Toggle flags: global (g), case insensitive (i), multiline (m)\n• Match count and positions shown for each result\n• Works with any regex supported by JavaScript's RegExp engine",
   },
   {
     slug: "case-converter",
@@ -112,7 +112,7 @@ export const tools: Tool[] = [
     icon: "CaseSensitive",
     keywords: ["case", "camel", "snake", "pascal", "kebab", "upper", "lower", "convert"],
     explainer:
-      "Different programming languages and conventions use different naming styles. JavaScript typically uses camelCase for variables, Python prefers snake_case, and class names use PascalCase across most languages. URL slugs and CSS class names use kebab-case. This tool converts text between all common case formats instantly, and supports multiple lines so you can convert a whole list at once.",
+      "Convert text between any naming convention instantly — paste a whole list at once.\n\n• Supports camelCase, snake_case, PascalCase, kebab-case, UPPER_CASE, and more\n• Multi-line input — convert an entire list of variable names in one go\n• Useful when migrating codebases, renaming API fields, or generating slugs\n• Results update live as you type",
   },
   {
     slug: "text-diff",
@@ -122,7 +122,7 @@ export const tools: Tool[] = [
     icon: "GitCompare",
     keywords: ["diff", "compare", "text", "difference", "changes"],
     explainer:
-      "Paste two versions of a text to see exactly what changed between them. Added lines are highlighted in green, removed lines in red, and unchanged lines in grey — the same style used by Git. Useful for comparing configuration files, API responses, code snippets, or any two blocks of text where you need to spot differences quickly.",
+      "Spot exactly what changed between two texts — line by line, instantly.\n\n• Added lines highlighted in green, removed in red — same style as Git diffs\n• Paste config files, API responses, code snippets, or any two blocks of text\n• Useful for reviewing changes before committing or debugging response differences\n• No size limit — compares as much text as you paste",
   },
 ];
 

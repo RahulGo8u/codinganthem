@@ -1,32 +1,42 @@
 "use client";
 
 import { notFound } from "next/navigation";
+import dynamic from "next/dynamic";
 import { addRecentTool } from "@/components/CommandPalette";
 import { getToolBySlug } from "@/lib/tools";
 import { useEffect } from "react";
 
-import { JsonFormatter } from "@/components/tools/JsonFormatter";
-import { Base64Tool } from "@/components/tools/Base64Tool";
-import { UuidGenerator } from "@/components/tools/UuidGenerator";
-import { PasswordGenerator } from "@/components/tools/PasswordGenerator";
-import { HashGenerator } from "@/components/tools/HashGenerator";
-import { TimestampConverter } from "@/components/tools/TimestampConverter";
-import { ColorConverter } from "@/components/tools/ColorConverter";
-import { RegexTester } from "@/components/tools/RegexTester";
-import { CaseConverter } from "@/components/tools/CaseConverter";
-import { TextDiff } from "@/components/tools/TextDiff";
-
 const TOOL_MAP: Record<string, React.ComponentType> = {
-  "json-formatter": JsonFormatter,
-  "base64": Base64Tool,
-  "uuid-generator": UuidGenerator,
-  "password-generator": PasswordGenerator,
-  "hash-generator": HashGenerator,
-  "timestamp-converter": TimestampConverter,
-  "color-converter": ColorConverter,
-  "regex-tester": RegexTester,
-  "case-converter": CaseConverter,
-  "text-diff": TextDiff,
+  "json-formatter": dynamic(() =>
+    import("@/components/tools/JsonFormatter").then((m) => ({ default: m.JsonFormatter }))
+  ),
+  "base64": dynamic(() =>
+    import("@/components/tools/Base64Tool").then((m) => ({ default: m.Base64Tool }))
+  ),
+  "uuid-generator": dynamic(() =>
+    import("@/components/tools/UuidGenerator").then((m) => ({ default: m.UuidGenerator }))
+  ),
+  "password-generator": dynamic(() =>
+    import("@/components/tools/PasswordGenerator").then((m) => ({ default: m.PasswordGenerator }))
+  ),
+  "hash-generator": dynamic(() =>
+    import("@/components/tools/HashGenerator").then((m) => ({ default: m.HashGenerator }))
+  ),
+  "timestamp-converter": dynamic(() =>
+    import("@/components/tools/TimestampConverter").then((m) => ({ default: m.TimestampConverter }))
+  ),
+  "color-converter": dynamic(() =>
+    import("@/components/tools/ColorConverter").then((m) => ({ default: m.ColorConverter }))
+  ),
+  "regex-tester": dynamic(() =>
+    import("@/components/tools/RegexTester").then((m) => ({ default: m.RegexTester }))
+  ),
+  "case-converter": dynamic(() =>
+    import("@/components/tools/CaseConverter").then((m) => ({ default: m.CaseConverter }))
+  ),
+  "text-diff": dynamic(() =>
+    import("@/components/tools/TextDiff").then((m) => ({ default: m.TextDiff }))
+  ),
 };
 
 export function ToolPageClient({ slug }: { slug: string }) {
@@ -50,7 +60,7 @@ export function ToolPageClient({ slug }: { slug: string }) {
             <h2 className="text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)] mb-3">
               About {tool.name}
             </h2>
-            <p className="text-sm text-[var(--text-muted)] leading-relaxed max-w-3xl">
+            <p className="text-sm text-[var(--text-muted)] leading-relaxed max-w-3xl whitespace-pre-line">
               {tool.explainer}
             </p>
           </div>

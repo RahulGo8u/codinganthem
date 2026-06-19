@@ -22,7 +22,7 @@ export function UuidGenerator() {
       output={output}
       onInputChange={() => {}}
       hideFileActions
-      inputLabel="Options"
+      hideInputPane
       outputLabel="Generated UUIDs"
       outputPlaceholder="Click Generate to create UUIDs..."
       options={
@@ -47,12 +47,22 @@ export function UuidGenerator() {
         </div>
       }
       extraActions={
-        <button
-          onClick={generate}
-          className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
-        >
-          Regenerate
-        </button>
+        <>
+          <button
+            onClick={() => { setOutput(""); setCount(1); }}
+            disabled={!output}
+            className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          >
+            Clear
+          </button>
+          <button
+            onClick={generate}
+            disabled={!output}
+            className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          >
+            Regenerate
+          </button>
+        </>
       }
     />
   );

@@ -4,6 +4,15 @@ import { useState, useCallback } from "react";
 import Link from "next/link";
 import type { Tool } from "@/lib/tools";
 
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
+const ALLOWED_MIME_PREFIXES = ["text/"];
+const ALLOWED_MIME_TYPES = new Set([
+  "application/json",
+  "application/xml",
+  "application/x-yaml",
+  "application/yaml",
+]);
+
 interface ToolShellProps {
   tool: Tool;
   input: string;
@@ -22,6 +31,8 @@ interface ToolShellProps {
   extraActions?: React.ReactNode;
   /** Hide Upload file + Download buttons (e.g. generator tools) */
   hideFileActions?: boolean;
+  /** Hide the input pane entirely — output takes full width (e.g. UUID / password generators) */
+  hideInputPane?: boolean;
 }
 
 export function ToolShell({
@@ -39,15 +50,21 @@ export function ToolShell({
   outputContent,
   extraActions,
   hideFileActions = false,
+  hideInputPane = false,
 }: ToolShellProps) {
   const [copied, setCopied] = useState(false);
   const [shared, setShared] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
 
   const handleCopy = useCallback(async () => {
     if (!output) return;
-    await navigator.clipboard.writeText(output);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
+    try {
+      await navigator.clipboard.writeText(output);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      setCopied(false);
+    }
   }, [output]);
 
   const handleDownload = useCallback(() => {
@@ -68,8 +85,30 @@ export function ToolShell({
     input_el.onchange = (e) => {
       const file = (e.target as HTMLInputElement).files?.[0];
       if (!file) return;
+
+      if (file.size > MAX_FILE_SIZE) {
+        setUploadError(
+          `File too large (${(file.size / 1024 / 1024).toFixed(1)} MB). Maximum is 5 MB.`
+        );
+        return;
+      }
+
+      const isAllowed =
+        ALLOWED_MIME_PREFIXES.some((p) => file.type.startsWith(p)) ||
+        ALLOWED_MIME_TYPES.has(file.type) ||
+        file.type === "";
+
+      if (!isAllowed) {
+        setUploadError(
+          "Only text-based files are supported (JSON, XML, CSV, YAML, TXT, etc.)."
+        );
+        return;
+      }
+
+      setUploadError(null);
       const reader = new FileReader();
-      reader.onload = (ev) => onInputChange(ev.target?.result as string);
+      reader.onload = (ev) => onInputChange((ev.target?.result as string) ?? "");
+      reader.onerror = () => setUploadError("Failed to read file. Please try again.");
       reader.readAsText(file);
     };
     input_el.click();
@@ -77,6 +116,7 @@ export function ToolShell({
 
   const handleClear = useCallback(() => {
     onInputChange("");
+    setUploadError(null);
     onClear?.();
   }, [onInputChange, onClear]);
 
@@ -101,10 +141,14 @@ export function ToolShell({
         </div>
 
         <button
-          onClick={() => {
-            navigator.clipboard.writeText(window.location.href);
-            setShared(true);
-            setTimeout(() => setShared(false), 1500);
+          onClick={async () => {
+            try {
+              await navigator.clipboard.writeText(window.location.href);
+              setShared(true);
+              setTimeout(() => setShared(false), 1500);
+            } catch {
+              setShared(false);
+            }
           }}
           className={`flex items-center gap-1.5 text-xs transition-colors ${
             shared
@@ -129,9 +173,9 @@ export function ToolShell({
       )}
 
       {/* Panes */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div className={`grid grid-cols-1 gap-4 ${hideInputPane ? "" : "lg:grid-cols-2"}`}>
         {/* Input */}
-        <div className="flex flex-col gap-2">
+        {!hideInputPane && <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between">
             <label className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">
               {inputLabel}
@@ -154,7 +198,7 @@ export function ToolShell({
           {error && (
             <p className="text-xs text-[#ef4444] leading-relaxed">{error}</p>
           )}
-        </div>
+        </div>}
 
         {/* Output */}
         <div className="flex flex-col gap-2">
@@ -178,6 +222,10 @@ export function ToolShell({
       </div>
 
       {/* Action bar */}
+      <div className="flex flex-col gap-2">
+        {uploadError && (
+          <p className="text-xs text-[#ef4444] leading-relaxed">{uploadError}</p>
+        )}
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <div className="flex items-center gap-2">
           {!hideFileActions && (
@@ -222,6 +270,7 @@ export function ToolShell({
             {copied ? "Copied ✓" : "Copy"}
           </button>
         </div>
+      </div>
       </div>
     </div>
   );

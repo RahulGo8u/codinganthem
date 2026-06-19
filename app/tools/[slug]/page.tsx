@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const tool = getToolBySlug(slug);
   if (!tool) return {};
 
-  const url = `https://codinganthem.com/tools/${tool.slug}`;
+  const url = `https://www.codinganthem.com/tools/${tool.slug}`;
   const title = `${tool.name} — Free Online Tool`;
 
   return {
@@ -50,7 +50,7 @@ export default async function ToolPage({ params }: Props) {
     "@type": "SoftwareApplication",
     name: tool.name,
     description: tool.description,
-    url: `https://codinganthem.com/tools/${tool.slug}`,
+    url: `https://www.codinganthem.com/tools/${tool.slug}`,
     applicationCategory: "DeveloperApplication",
     operatingSystem: "Web",
     offers: {

@@ -4,6 +4,9 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "About",
   description: "CodingAnthem is a collection of fast, free developer tools that run entirely in your browser.",
+  alternates: {
+    canonical: "https://www.codinganthem.com/about",
+  },
 };
 
 export default function AboutPage() {

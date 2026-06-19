@@ -18,12 +18,12 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "CodingAnthem — Developer Tools That Just Work",
+    default: "CodingAnthem — Free Online Developer Utilities & Tools",
     template: "%s | CodingAnthem",
   },
   description:
-    "Fast, free developer tools that run entirely in your browser. JSON formatter, Base64 encoder, UUID generator, regex tester, hash generator, and more. No signup required.",
-  metadataBase: new URL("https://codinganthem.com"),
+    "Fast, free developer tools for your browser and AI workflows. Format JSON, encode Base64, generate UUIDs, test regex, and more.",
+  metadataBase: new URL("https://www.codinganthem.com"),
   keywords: [
     "developer tools",
     "json formatter",
@@ -39,21 +39,24 @@ export const metadata: Metadata = {
     "free dev tools",
   ],
   alternates: {
-    canonical: "https://codinganthem.com",
+    canonical: "https://www.codinganthem.com",
+  },
+  icons: {
+    apple: "/apple-touch-icon.png",
   },
   openGraph: {
     siteName: "CodingAnthem",
     type: "website",
-    url: "https://codinganthem.com",
-    title: "CodingAnthem — Developer Tools That Just Work",
+    url: "https://www.codinganthem.com",
+    title: "CodingAnthem — Free Online Developer Utilities & Tools",
     description:
-      "Fast, free developer tools that run entirely in your browser. No signup required.",
+      "Fast, free developer tools for your browser and AI workflows. Format JSON, encode Base64, generate UUIDs, test regex, convert timestamps, and more.",
   },
   twitter: {
-    card: "summary",
-    title: "CodingAnthem — Developer Tools That Just Work",
+    card: "summary_large_image",
+    title: "CodingAnthem — Free Online Developer Utilities & Tools",
     description:
-      "Fast, free developer tools that run entirely in your browser. No signup required.",
+      "Fast, free developer tools for your browser and AI workflows. Format JSON, encode Base64, generate UUIDs, test regex, and more.",
   },
   robots: {
     index: true,
@@ -63,6 +66,29 @@ export const metadata: Metadata = {
       follow: true,
     },
   },
+};
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      name: "CodingAnthem",
+      url: "https://www.codinganthem.com",
+      logo: "https://www.codinganthem.com/apple-touch-icon.png",
+      sameAs: ["https://github.com/RahulGo8u/codinganthem"],
+    },
+    {
+      "@type": "WebSite",
+      name: "CodingAnthem",
+      url: "https://www.codinganthem.com",
+      potentialAction: {
+        "@type": "SearchAction",
+        target: "https://www.codinganthem.com/?q={search_term_string}",
+        "query-input": "required name=search_term_string",
+      },
+    },
+  ],
 };
 
 export default function RootLayout({
@@ -77,6 +103,10 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="flex flex-col min-h-screen">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
         <Providers>
           <Nav />
           <CommandPalette />
