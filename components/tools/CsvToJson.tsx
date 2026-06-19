@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import { ToolShell } from "@/components/ToolShell";
 import { getToolBySlug } from "@/lib/tools";
+import { HighlightedOutput } from "@/lib/highlight";
 
 const tool = getToolBySlug("csv-to-json")!;
 
@@ -75,6 +76,7 @@ export function CsvToJson() {
       outputLabel="JSON"
       inputPlaceholder={"name,age,city\nAlice,30,New York\nBob,25,London"}
       outputPlaceholder="JSON output will appear here..."
+      outputContent={output ? <HighlightedOutput code={output} /> : undefined}
     />
   );
 }

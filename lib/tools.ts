@@ -317,3 +317,14 @@ export function getToolBySlug(slug: string): Tool | undefined {
 export function getToolsByCategory(category: ToolCategory): Tool[] {
   return tools.filter((t) => t.category === category);
 }
+
+/**
+ * Pick related tools for a given tool: prefer same category, then fall back to
+ * other tools to fill up to `count`. Deterministic so it works with SSG.
+ */
+export function getRelatedTools(slug: string, category: ToolCategory, count = 4): Tool[] {
+  const sameCategory = tools.filter((t) => t.slug !== slug && t.category === category);
+  if (sameCategory.length >= count) return sameCategory.slice(0, count);
+  const others = tools.filter((t) => t.slug !== slug && t.category !== category);
+  return [...sameCategory, ...others].slice(0, count);
+}

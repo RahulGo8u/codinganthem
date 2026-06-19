@@ -112,6 +112,7 @@ export function ColorConverter() {
       output={output}
       onInputChange={setInput}
       error={error}
+      hideFileActions
       inputLabel="Color value"
       outputLabel="Conversions"
       inputPlaceholder="Enter a color: #6366f1, rgb(99,102,241), or hsl(239,84%,67%)"

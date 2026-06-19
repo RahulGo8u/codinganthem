@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import { ToolShell } from "@/components/ToolShell";
 import { getToolBySlug } from "@/lib/tools";
 import { stringify as yamlStringify } from "yaml";
+import { HighlightedOutput } from "@/lib/highlight";
 
 const tool = getToolBySlug("json-to-yaml")!;
 
@@ -31,6 +32,7 @@ export function JsonToYaml() {
       outputLabel="YAML"
       inputPlaceholder={'{\n  "name": "CodingAnthem",\n  "tools": ["JSON", "YAML"]\n}'}
       outputPlaceholder="YAML output will appear here..."
+      outputContent={output ? <HighlightedOutput code={output} lang="yaml" /> : undefined}
     />
   );
 }

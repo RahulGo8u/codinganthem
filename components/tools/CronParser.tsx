@@ -92,6 +92,7 @@ export function CronParser() {
       output={output}
       onInputChange={setInput}
       error={error}
+      hideFileActions
       inputLabel="Cron expression"
       outputLabel="Explanation"
       inputPlaceholder="*/5 * * * *"

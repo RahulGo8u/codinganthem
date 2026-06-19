@@ -1,10 +1,33 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { ToolShell } from "@/components/ToolShell";
 import { getToolBySlug } from "@/lib/tools";
+import Link from "next/link";
 
 const tool = getToolBySlug("regex-tester")!;
+
+const SAMPLE_PATTERN = "\\b\\w+@\\w+\\.\\w+\\b";
+const SAMPLE_TEXT = "Contact alice@example.com or bob@test.org for details.";
+
+function renderHighlighted(text: string, matches: RegExpExecArray[]): React.ReactNode[] {
+  if (matches.length === 0) return [text];
+  const nodes: React.ReactNode[] = [];
+  let last = 0;
+  const sorted = [...matches].sort((a, b) => a.index - b.index);
+  sorted.forEach((m, i) => {
+    const start = m.index;
+    const end = m.index + m[0].length;
+    if (start > last) nodes.push(<span key={`t${i}`}>{text.slice(last, start)}</span>);
+    nodes.push(
+      <mark key={`m${i}`} className="bg-[#6366f1]/30 text-[var(--text-primary)] rounded px-0.5">
+        {text.slice(start, end) || "∅"}
+      </mark>
+    );
+    last = Math.max(end, last);
+  });
+  if (last < text.length) nodes.push(<span key="tail">{text.slice(last)}</span>);
+  return nodes;
+}
 
 export function RegexTester() {
   const [pattern, setPattern] = useState("");
@@ -33,34 +56,35 @@ export function RegexTester() {
     }
   }, [pattern, flags, testString]);
 
-  const output = result
-    ? result.error
-      ? ""
-      : result.matches.length === 0
-      ? "No matches found."
-      : result.matches
-          .map((m, i) => {
-            const groups = m.slice(1).map((g, gi) => `  Group ${gi + 1}: ${g ?? "(no match)"}`);
-            return [`Match ${i + 1}: "${m[0]}" at index ${m.index}`, ...groups].join("\n");
-          })
-          .join("\n\n")
-    : "";
-
   const toggleFlag = (f: string) =>
     setFlags((prev) => (prev.includes(f) ? prev.replace(f, "") : prev + f));
+
+  const loadSample = () => {
+    setPattern(SAMPLE_PATTERN);
+    setFlags("g");
+    setTestString(SAMPLE_TEXT);
+  };
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-8 flex flex-col gap-6">
       {/* Header */}
-      <div className="flex items-center gap-3">
-        <a href="/" className="flex items-center gap-1.5 text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="15 18 9 12 15 6" />
-          </svg>
-          All tools
-        </a>
-        <span className="text-[var(--border)]">/</span>
-        <h1 className="text-sm font-medium text-[var(--text-primary)]">{tool.name}</h1>
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <Link href="/" className="flex items-center gap-1.5 text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="15 18 9 12 15 6" />
+            </svg>
+            All tools
+          </Link>
+          <span className="text-[var(--border)]">/</span>
+          <h1 className="text-sm font-medium text-[var(--text-primary)]">{tool.name}</h1>
+        </div>
+        <button
+          onClick={loadSample}
+          className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
+        >
+          Load sample
+        </button>
       </div>
 
       {/* Pattern input */}
@@ -88,9 +112,7 @@ export function RegexTester() {
             className="mono w-16 h-11 px-2 bg-transparent text-[#6366f1] text-sm focus:outline-none"
           />
         </div>
-        {result?.error && (
-          <p className="text-xs text-[#ef4444]">{result.error}</p>
-        )}
+        {result?.error && <p className="text-xs text-[#ef4444]">{result.error}</p>}
 
         {/* Flag toggles */}
         <div className="flex flex-wrap gap-2">
@@ -115,7 +137,7 @@ export function RegexTester() {
         </div>
       </div>
 
-      {/* Test string + results */}
+      {/* Test string + highlighted result */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div className="flex flex-col gap-2">
           <label className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">
@@ -141,17 +163,38 @@ export function RegexTester() {
               </span>
             )}
           </div>
-          <div className="min-h-[280px] p-4 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] overflow-auto">
-            {output ? (
-              <pre className="mono text-sm text-[var(--text-primary)] whitespace-pre-wrap leading-relaxed">{output}</pre>
+          <div className="mono min-h-[280px] p-4 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] overflow-auto text-sm leading-relaxed whitespace-pre-wrap break-words text-[var(--text-primary)]">
+            {result && !result.error && testString ? (
+              renderHighlighted(testString, result.matches)
             ) : (
-              <p className="text-sm text-[var(--text-muted)]">
+              <span className="text-[var(--text-muted)]">
                 {pattern && testString ? "No matches found." : "Enter a pattern and test string..."}
-              </p>
+              </span>
             )}
           </div>
         </div>
       </div>
+
+      {/* Capture groups (only when matches have groups) */}
+      {result && !result.error && result.matches.some((m) => m.length > 1) && (
+        <div className="flex flex-col gap-2">
+          <label className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">
+            Capture groups
+          </label>
+          <div className="rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] p-4 mono text-xs text-[var(--text-muted)] flex flex-col gap-2 overflow-auto">
+            {result.matches.map((m, i) => (
+              <div key={i}>
+                <span className="text-[var(--text-primary)]">Match {i + 1}:</span> &quot;{m[0]}&quot; at index {m.index}
+                {m.slice(1).map((g, gi) => (
+                  <div key={gi} className="pl-4">
+                    Group {gi + 1}: {g ?? "(no match)"}
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

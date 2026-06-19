@@ -3,7 +3,8 @@
 import { notFound } from "next/navigation";
 import dynamic from "next/dynamic";
 import { addRecentTool } from "@/components/CommandPalette";
-import { getToolBySlug } from "@/lib/tools";
+import { getToolBySlug, getRelatedTools } from "@/lib/tools";
+import { ToolCard } from "@/components/ToolCard";
 import { useEffect } from "react";
 
 const TOOL_MAP: Record<string, React.ComponentType> = {
@@ -105,6 +106,8 @@ export function ToolPageClient({ slug }: { slug: string }) {
   const ToolComponent = TOOL_MAP[slug];
   if (!ToolComponent) return notFound();
 
+  const related = getRelatedTools(slug, tool.category);
+
   return (
     <>
       <ToolComponent />
@@ -117,6 +120,21 @@ export function ToolPageClient({ slug }: { slug: string }) {
             <p className="text-sm text-[var(--text-muted)] leading-relaxed max-w-3xl whitespace-pre-line">
               {tool.explainer}
             </p>
+          </div>
+        </div>
+      )}
+
+      {related.length > 0 && (
+        <div className="max-w-7xl mx-auto px-6 pb-16">
+          <div className="border-t border-[var(--border)] pt-8">
+            <h2 className="text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)] mb-4">
+              Related tools
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+              {related.map((t) => (
+                <ToolCard key={t.slug} tool={t} />
+              ))}
+            </div>
           </div>
         </div>
       )}

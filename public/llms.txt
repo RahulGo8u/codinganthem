@@ -4,18 +4,54 @@
 
 CodingAnthem is a collection of free, browser-based developer utilities built for developers and AI-assisted workflows. All tools run entirely client-side — no data is sent to a server. No sign-up required.
 
-## Tools
+## Formatters
 
-- JSON Formatter — format, validate, and minify JSON: /tools/json-formatter
+- JSON Formatter — format, validate, and minify JSON with syntax highlighting: /tools/json-formatter
+- Markdown Previewer — live preview of Markdown as rendered HTML: /tools/markdown-preview
+- JSON Statistics — analyze node count, nesting depth, type distribution, and size: /tools/json-statistics
+- JSON Diff — compare two JSON documents and highlight changes: /tools/json-diff
+
+## Encoders
+
 - Base64 Encoder / Decoder — encode and decode text to and from Base64: /tools/base64
+- String Escape / Unescape — escape or unescape special characters in strings: /tools/string-escape
+
+## Generators
+
 - UUID Generator — generate version 4 UUIDs instantly: /tools/uuid-generator
-- Password Generator — create strong, random passwords with custom rules: /tools/password-generator
-- Hash Generator — compute MD5, SHA-1, SHA-256, and SHA-512 checksums: /tools/hash-generator
+- Lorem Ipsum Generator — generate placeholder text: /tools/lorem-ipsum
+
+## Converters
+
 - Unix Timestamp Converter — convert between Unix timestamps and human-readable dates: /tools/timestamp-converter
-- Color Converter — translate colors between HEX, RGB, and HSL formats: /tools/color-converter
-- Regex Tester — test regular expressions with live match results: /tools/regex-tester
+- Color Converter — translate colors between HEX, RGB, and HSL: /tools/color-converter
+- Number Base Converter — convert between binary, octal, decimal, and hex: /tools/base-converter
+- Cron Expression Parser — decode cron expressions into plain English: /tools/cron-parser
+- CSV to JSON — convert CSV data to a JSON array: /tools/csv-to-json
+- JSON to CSV — convert a JSON array to CSV: /tools/json-to-csv
+- YAML to JSON — convert YAML configuration to JSON: /tools/yaml-to-json
+- JSON to YAML — convert JSON to YAML: /tools/json-to-yaml
+
+## Text Utils
+
+- Regex Tester — test regular expressions with live inline match highlighting: /tools/regex-tester
 - Case Converter — switch between camelCase, snake_case, PascalCase, and more: /tools/case-converter
-- Text Diff — compare two blocks of text and highlight what changed: /tools/text-diff
+- Text Diff — compare two texts side by side and highlight differences: /tools/text-diff
+- Word Counter — count words, characters, sentences, and reading time: /tools/word-counter
+
+## Security
+
+- Hash Generator — compute MD5, SHA-1, SHA-256, and SHA-512 checksums: /tools/hash-generator
+- Password Generator — create strong, random passwords with custom rules: /tools/password-generator
+- JWT Decoder — decode and inspect JWT tokens (header, payload, signature): /tools/jwt-decoder
+- JWT Generator — create signed JWT tokens with HS256/384/512: /tools/jwt-generator
+
+## Web
+
+- URL Encoder / Decoder — encode and decode URLs and query parameters: /tools/url-encoder
+- URL Parser — break a URL into protocol, host, path, query params, and hash: /tools/url-parser
+- HTML Entities Encoder / Decoder — escape and unescape HTML entities: /tools/html-entities
+- Slug Generator — convert any text into a URL-friendly slug: /tools/slug-generator
 
 ## About
 

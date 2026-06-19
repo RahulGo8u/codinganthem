@@ -143,18 +143,6 @@ export function JsonDiff() {
           </button>
         </div>
       </div>
-
-      {/* Explainer */}
-      {tool.explainer && (
-        <div className="border-t border-[var(--border)] pt-8">
-          <h2 className="text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)] mb-3">
-            About {tool.name}
-          </h2>
-          <p className="text-sm text-[var(--text-muted)] leading-relaxed max-w-3xl whitespace-pre-line">
-            {tool.explainer}
-          </p>
-        </div>
-      )}
     </div>
   );
 }

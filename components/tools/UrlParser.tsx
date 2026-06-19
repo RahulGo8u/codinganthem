@@ -56,8 +56,17 @@ export function UrlParser() {
       output=""
       onInputChange={setInput}
       error={error}
+      hideFileActions
       inputLabel="URL"
       outputLabel="Components"
+      extraActions={
+        <button
+          onClick={() => setInput("https://www.example.com:8080/path/to/page?q=hello+world&page=2&sort=desc#section")}
+          className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
+        >
+          Load sample
+        </button>
+      }
       inputPlaceholder="https://www.example.com/path?q=hello&page=2#section"
       outputContent={
         parsed ? (

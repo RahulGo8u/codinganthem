@@ -106,6 +106,14 @@ export function JsonStatistics() {
       inputLabel="JSON"
       outputLabel="Statistics"
       inputPlaceholder="Paste your JSON here..."
+      extraActions={
+        <button
+          onClick={() => setInput('{"id":1,"name":"CodingAnthem","tags":["fast","free","private"],"active":true,"meta":{"stars":2400,"forks":680,"license":"MIT","contributors":[{"name":"Alice"},{"name":"Bob"}]},"score":null}')}
+          className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
+        >
+          Load sample
+        </button>
+      }
       outputContent={
         stats ? (
           <div className="p-4 flex flex-col gap-5">

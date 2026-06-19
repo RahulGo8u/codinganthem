@@ -3,28 +3,30 @@
 import { useState, useMemo } from "react";
 import { ToolShell } from "@/components/ToolShell";
 import { getToolBySlug } from "@/lib/tools";
+import { HighlightedOutput } from "@/lib/highlight";
 
 const tool = getToolBySlug("json-formatter")!;
 
+const SAMPLE = `{"id":1,"name":"CodingAnthem","tags":["fast","free"],"active":true,"meta":{"stars":2400,"license":"MIT"}}`;
+
 export function JsonFormatter() {
   const [input, setInput] = useState("");
-  const [indent, setIndent] = useState(2);
-  const [sortKeys, setSortKeys] = useState(false);
   const [minify, setMinify] = useState(false);
 
   const { output, error } = useMemo(() => {
     if (!input.trim()) return { output: "", error: undefined };
     try {
       const parsed = JSON.parse(input);
-      const sorted = sortKeys ? sortObject(parsed) : parsed;
       const result = minify
-        ? JSON.stringify(sorted)
-        : JSON.stringify(sorted, null, indent);
+        ? JSON.stringify(parsed)
+        : JSON.stringify(parsed, null, 2);
       return { output: result, error: undefined };
     } catch (e) {
       return { output: "", error: (e as Error).message };
     }
-  }, [input, indent, sortKeys, minify]);
+  }, [input, minify]);
+
+  const isValid = input.trim() !== "" && !error;
 
   return (
     <ToolShell
@@ -32,58 +34,62 @@ export function JsonFormatter() {
       input={input}
       output={output}
       onInputChange={setInput}
-      error={error}
-      inputPlaceholder='Paste your JSON here...\n\n{"name": "codinganthem", "type": "dev tools"}'
+      inputPlaceholder={'Paste your JSON here...\n\n{"name": "codinganthem", "type": "dev tools"}'}
       outputPlaceholder="Formatted JSON will appear here..."
+      extraActions={
+        <button
+          onClick={() => setInput(SAMPLE)}
+          className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
+        >
+          Load sample
+        </button>
+      }
       options={
-        <>
-          <label className="flex items-center gap-2 text-[var(--text-muted)]">
-            Indent
-            <select
-              value={indent}
-              onChange={(e) => setIndent(Number(e.target.value))}
-              disabled={minify}
-              className="bg-[var(--bg-elevated)] border border-[var(--border)] rounded px-2 py-1 text-xs text-[var(--text-primary)] disabled:opacity-40"
+        <div className="flex items-center justify-between w-full gap-3 flex-wrap">
+          <div className="flex rounded-lg border border-[var(--border)] overflow-hidden text-xs">
+            {([["Beautify", false], ["Minify", true]] as const).map(([label, val]) => (
+              <button
+                key={label}
+                onClick={() => setMinify(val)}
+                className={`px-3 py-1.5 transition-colors ${
+                  minify === val
+                    ? "bg-[#6366f1]/15 text-[#6366f1]"
+                    : "text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)]"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+
+          {input.trim() !== "" && (
+            <span
+              className={`flex items-center gap-1.5 text-xs font-medium ${
+                isValid ? "text-[#22c55e]" : "text-[#ef4444]"
+              }`}
             >
-              {[2, 4, 8].map((n) => (
-                <option key={n} value={n}>
-                  {n} spaces
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="flex items-center gap-2 text-[var(--text-muted)] cursor-pointer select-none">
-            <input
-              type="checkbox"
-              checked={sortKeys}
-              onChange={(e) => setSortKeys(e.target.checked)}
-              className="accent-[#6366f1]"
-            />
-            Sort keys
-          </label>
-          <label className="flex items-center gap-2 text-[var(--text-muted)] cursor-pointer select-none">
-            <input
-              type="checkbox"
-              checked={minify}
-              onChange={(e) => setMinify(e.target.checked)}
-              className="accent-[#6366f1]"
-            />
-            Minify
-          </label>
-        </>
+              <span>{isValid ? "●" : "✕"}</span>
+              {isValid ? "Valid JSON" : "Invalid JSON"}
+            </span>
+          )}
+        </div>
+      }
+      outputContent={
+        error ? (
+          <div className="flex flex-col">
+            <div className="flex items-start gap-2 px-4 py-2.5 bg-[#ef4444]/10 border-b border-[#ef4444]/30 text-xs text-[#ef4444] leading-relaxed">
+              <span className="shrink-0">⚠</span>
+              <span>{error}</span>
+            </div>
+          </div>
+        ) : output ? (
+          <HighlightedOutput code={output} />
+        ) : (
+          <p className="p-4 text-[var(--text-muted)] text-sm">
+            Formatted JSON will appear here...
+          </p>
+        )
       }
     />
   );
-}
-
-function sortObject(obj: unknown): unknown {
-  if (Array.isArray(obj)) return obj.map(sortObject);
-  if (obj !== null && typeof obj === "object") {
-    return Object.fromEntries(
-      Object.entries(obj as Record<string, unknown>)
-        .sort(([a], [b]) => a.localeCompare(b))
-        .map(([k, v]) => [k, sortObject(v)])
-    );
-  }
-  return obj;
 }

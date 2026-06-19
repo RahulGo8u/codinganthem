@@ -51,6 +51,7 @@ export function BaseConverter() {
       output={output}
       onInputChange={setInput}
       error={error}
+      hideFileActions
       inputLabel="Number"
       outputLabel="All bases"
       inputPlaceholder="Enter a number..."
