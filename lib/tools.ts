@@ -278,6 +278,36 @@ export const tools: Tool[] = [
     explainer:
       "Escape or unescape special characters in strings for use in code or JSON payloads.\n\n• Escape mode: converts newlines, tabs, quotes, and backslashes to their escaped equivalents\n• Unescape mode: reverses escaped sequences back to raw characters\n• Useful when embedding strings in JSON, debugging API responses, or copying code\n• Updates live as you type",
   },
+  {
+    slug: "jwt-generator",
+    name: "JWT Generator",
+    description: "Create signed JWT tokens with HS256, HS384, or HS512 using WebCrypto",
+    category: "security",
+    icon: "ShieldCheck",
+    keywords: ["jwt", "json web token", "generate", "sign", "hs256", "hmac", "token", "auth", "bearer"],
+    explainer:
+      "Generate signed JWT tokens for testing — entirely in your browser using the Web Crypto API.\n\n• Choose algorithm: HS256, HS384, or HS512\n• Edit the payload JSON — add any claims you need (sub, exp, iat, etc.)\n• Enter a secret key to sign the token\n• Output is a ready-to-use JWT — paste it into Postman, curl, or your app",
+  },
+  {
+    slug: "json-statistics",
+    name: "JSON Statistics",
+    description: "Analyze JSON structure — node count, depth, type distribution, and size",
+    category: "formatters",
+    icon: "BarChart2",
+    keywords: ["json", "statistics", "analyze", "stats", "count", "depth", "size", "structure"],
+    explainer:
+      "Analyze the structure and shape of any JSON document instantly.\n\n• Total node count, maximum nesting depth, and file size\n• Type distribution: how many strings, numbers, booleans, arrays, objects, and nulls\n• Key count for objects and length stats for arrays\n• Useful for understanding large API responses or validating data structure",
+  },
+  {
+    slug: "json-diff",
+    name: "JSON Diff",
+    description: "Compare two JSON documents and highlight every addition, removal, and change",
+    category: "formatters",
+    icon: "GitCompare",
+    keywords: ["json", "diff", "compare", "difference", "changes", "json diff", "compare json"],
+    explainer:
+      "Compare two JSON documents side by side — keys are sorted so formatting differences don't create noise.\n\n• Added keys shown in green, removed in red, unchanged in grey\n• JSON-aware: reorders keys before diffing so only real changes show\n• Useful for comparing API responses, config files, or database snapshots\n• Handles nested objects and arrays of any depth",
+  },
 ];
 
 export function getToolBySlug(slug: string): Tool | undefined {

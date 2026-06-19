@@ -82,6 +82,15 @@ const TOOL_MAP: Record<string, React.ComponentType> = {
   "string-escape": dynamic(() =>
     import("@/components/tools/StringEscape").then((m) => ({ default: m.StringEscape }))
   ),
+  "jwt-generator": dynamic(() =>
+    import("@/components/tools/JwtGenerator").then((m) => ({ default: m.JwtGenerator }))
+  ),
+  "json-statistics": dynamic(() =>
+    import("@/components/tools/JsonStatistics").then((m) => ({ default: m.JsonStatistics }))
+  ),
+  "json-diff": dynamic(() =>
+    import("@/components/tools/JsonDiff").then((m) => ({ default: m.JsonDiff }))
+  ),
 };
 
 export function ToolPageClient({ slug }: { slug: string }) {
