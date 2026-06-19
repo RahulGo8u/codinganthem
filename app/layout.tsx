@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 import { Providers } from "@/components/providers";
 import { Nav } from "@/components/Nav";
@@ -107,6 +108,29 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
+
+        {/* Google Analytics */}
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-HZ86NBTX6L"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-HZ86NBTX6L');
+          `}
+        </Script>
+
+        {/* Plausible Analytics */}
+        <Script
+          defer
+          data-domain="codinganthem.com"
+          src="https://plausible.io/js/script.js"
+          strategy="afterInteractive"
+        />
+
         <Providers>
           <Nav />
           <CommandPalette />
