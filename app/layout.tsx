@@ -89,11 +89,6 @@ const jsonLd = {
       "@type": "WebSite",
       name: "CodingAnthem",
       url: "https://www.codinganthem.com",
-      potentialAction: {
-        "@type": "SearchAction",
-        target: "https://www.codinganthem.com/?q={search_term_string}",
-        "query-input": "required name=search_term_string",
-      },
     },
   ],
 };

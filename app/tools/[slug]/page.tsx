@@ -72,7 +72,7 @@ export default async function ToolPage({ params }: Props) {
         .split("\n")
         .map((b) => b.replace(/^•\s*/, "").trim())
         .filter(Boolean)
-        .join(" ")
+        .join(". ")
     : null;
 
   const faqJsonLd = {

@@ -7,6 +7,19 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "https://www.codinganthem.com/about",
   },
+  openGraph: {
+    title: "About CodingAnthem",
+    description: "38 free browser-based developer tools. No sign-up, no backend — your data never leaves your machine.",
+    url: "https://www.codinganthem.com/about",
+    siteName: "CodingAnthem",
+    images: [{ url: "/opengraph-image", width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "About CodingAnthem",
+    description: "38 free browser-based developer tools. No sign-up, no backend — your data never leaves your machine.",
+    images: ["/opengraph-image"],
+  },
 };
 
 export default function AboutPage() {
