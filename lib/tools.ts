@@ -36,7 +36,7 @@ export const tools: Tool[] = [
     icon: "Braces",
     keywords: ["json", "format", "validate", "beautify", "minify", "pretty"],
     explainer:
-      "Format, validate, and transform JSON instantly — no setup, no server.\n\n• Paste messy JSON to get it properly indented and readable\n• Syntax errors are shown in plain English so you know exactly what's wrong\n• Sort keys alphabetically to normalize structure before diffing or storing\n• Minify to strip whitespace before sending payloads to an API",
+      "Format, validate, and transform JSON instantly — no setup, no server.\n\n• Paste messy JSON to get it properly indented and readable\n• Syntax errors are shown in plain English so you know exactly what's wrong\n• Live Valid / Invalid badge updates as you type\n• Minify to strip whitespace before sending payloads to an API",
   },
   {
     slug: "base64",
@@ -136,7 +136,7 @@ export const tools: Tool[] = [
     icon: "Link",
     keywords: ["url", "encode", "decode", "percent", "uri", "query", "string", "escape"],
     explainer:
-      "Encode and decode URLs instantly — no libraries, no server.\n\n• Encode special characters to percent-encoded format for safe use in URLs\n• Decode percent-encoded strings back to readable text\n• Handles full URLs and individual query parameter values\n• Essential when building APIs, query strings, or parsing redirect URLs",
+      "Encode and decode URLs with the right mode for every situation — no libraries, no server.\n\n• Encode value mode: encodes everything including / : ? & — use for query parameter values\n• Encode URL mode: preserves URL structure like / : ? — use for full URLs\n• Decode mode: reverses percent-encoded strings back to readable text\n• Each mode includes a hint explaining when to use it",
   },
   {
     slug: "jwt-decoder",
