@@ -4,61 +4,67 @@ The developer toolbox you always wanted — fast, free, and private. Growing col
 
 🔗 [www.codinganthem.com](https://www.codinganthem.com) &nbsp;·&nbsp; [![Buy Me a Coffee](https://img.shields.io/badge/Support-Buy%20Me%20a%20Coffee-6366f1?style=flat&logo=buy-me-a-coffee&logoColor=white)](https://buymeacoffee.com/codinganthem)
 
-All 38 tools run **100% client-side**. No backend, no database, no sign-up — your data never leaves your machine.
+All 42 tools run **100% client-side**. No backend, no database, no sign-up — your data never leaves your machine.
 
 ## Tools
 
-### Formatters
-- JSON Formatter — beautify, minify, and validate with syntax highlighting
-- SQL Formatter — format SQL queries with dialect-aware indentation
-- JavaScript Formatter — beautify minified or messy JS
-- HTML Formatter — beautify HTML markup
-- CSS Formatter — beautify minified CSS
-- Markdown Previewer — live rendered HTML preview
-- JSON Statistics — node count, depth, type distribution, and size
-- JSON Diff — compare two JSON documents (key-sorted, noise-free)
+### Converters
+- Color Converter (HEX ↔ RGB ↔ HSL)
+- Cron Expression Parser
+- CSV to JSON
+- JSON to CSV
+- JSON to TypeScript — generate interfaces from JSON
+- JSON to YAML
+- Number Base Converter (binary, octal, decimal, hex)
+- SQL IN Generator — turn a list of values into a SQL IN clause
+- Unix Timestamp Converter
+- YAML to JSON
 
 ### Encoders
 - Base64 Encoder / Decoder
 - Image to Base64 — convert any image to a Base64 data URL
 - String Escape / Unescape
 
+### Formatters
+- CSS Formatter — beautify minified CSS
+- HTML Formatter — beautify HTML markup
+- JavaScript Formatter — beautify minified or messy JS
+- JSON Diff — compare two JSON documents (key-sorted, noise-free)
+- JSON Formatter — beautify, minify, and validate with syntax highlighting
+- JSON Statistics — node count, depth, type distribution, and size
+- SQL Formatter — format SQL queries with dialect-aware indentation
+- XML Formatter — format and validate XML with syntax highlighting
+
 ### Generators
-- UUID Generator (v4)
 - Lorem Ipsum Generator
 - QR Code Generator — generate QR codes from any text or URL
-
-### Converters
-- Unix Timestamp Converter
-- Color Converter (HEX ↔ RGB ↔ HSL)
-- Number Base Converter (binary, octal, decimal, hex)
-- Cron Expression Parser
-- CSV to JSON
-- JSON to CSV
-- YAML to JSON
-- JSON to YAML
-- JSON to TypeScript — generate interfaces from JSON
-- SQL IN Generator — turn a list of values into a SQL IN clause
-
-### Text Utils
-- Regex Tester — live inline match highlighting
-- Case Converter (camelCase, snake_case, PascalCase, kebab-case, …)
-- Text Diff — side-by-side comparison
-- Word Counter — words, characters, sentences, reading time
+- UUID Generator (v4)
 
 ### Security
 - Hash Generator (MD5, SHA-1, SHA-256, SHA-512)
-- Password Generator — cryptographically secure
 - JWT Decoder — inspect header, payload, signature
 - JWT Generator — sign tokens with HS256/384/512
 - JWT Validator — verify JWT signature and expiry
+- Password Generator — cryptographically secure
+- TOTP / OTP Generator — RFC 6238 time-based one-time passwords
+
+### Text Utils
+- Case Converter (camelCase, snake_case, PascalCase, kebab-case, …)
+- Regex Tester — live inline match highlighting
+- Text Diff — side-by-side comparison
+- Word Counter — words, characters, sentences, reading time
+
+### Visualizers
+- Markdown Previewer — live rendered HTML preview
+- Mermaid Diagram Viewer — render flowcharts, sequence, ER, class, and Gantt diagrams with zoom, pan, and fullscreen
 
 ### Web
-- URL Encoder / Decoder
-- URL Parser — protocol, host, path, query params, hash
+- cURL to Fetch — convert a curl command to a JavaScript fetch() call
 - HTML Entities Encoder / Decoder
 - Slug Generator
-- cURL to Fetch — convert a curl command to a JavaScript fetch() call
+- URL Encoder / Decoder
+- URL Parser — protocol, host, path, query params, hash
+- User-Agent Parser — browser, engine, OS, and device detection
 
 ## Stack
 
@@ -67,9 +73,11 @@ All 38 tools run **100% client-side**. No backend, no database, no sign-up — y
 - [Lucide React](https://lucide.dev)
 - [cmdk](https://cmdk.paco.me) — ⌘K command palette
 - [yaml](https://eemeli.org/yaml/) and [marked](https://marked.js.org) for YAML / Markdown parsing
+- [mermaid](https://mermaid.js.org) for diagram rendering
 - [sql-formatter](https://sql-formatter-org.github.io/sql-formatter/) for SQL formatting
 - [js-beautify](https://github.com/beautifier/js-beautify) for JS / HTML / CSS formatting
 - [qrcode](https://www.npmjs.com/package/qrcode) for QR code generation
+- [@vercel/analytics](https://vercel.com/docs/analytics) for privacy-respecting usage analytics
 
 Tools are statically generated per route and code-split with `next/dynamic`, so each tool only loads its own bundle.
 
