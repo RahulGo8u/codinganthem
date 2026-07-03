@@ -3,11 +3,12 @@
 import { useState, useCallback } from "react";
 import { ToolShell } from "@/components/ToolShell";
 import { getToolBySlug } from "@/lib/tools";
+import { usePersistedState } from "@/lib/usePersistedState";
 
 const tool = getToolBySlug("uuid-generator")!;
 
 export function UuidGenerator() {
-  const [count, setCount] = useState(1);
+  const [count, setCount] = usePersistedState("ca_pref_uuid_count", 1);
   const [output, setOutput] = useState("");
 
   const generate = useCallback(() => {

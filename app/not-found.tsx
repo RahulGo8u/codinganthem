@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   description: "The page you're looking for doesn't exist. Browse all free developer tools on CodingAnthem.",
   robots: {
     index: false,
-    follow: false,
+    follow: true,
   },
 };
 

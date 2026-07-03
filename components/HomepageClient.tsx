@@ -3,7 +3,7 @@
 import { useState, useEffect, useTransition, memo } from "react";
 import { tools, CATEGORY_LABELS, CATEGORY_ORDER, sortToolsByName, type ToolCategory } from "@/lib/tools";
 import { ToolCard } from "@/components/ToolCard";
-import { getRecentToolSlugs } from "@/components/CommandPalette";
+import { getRecentToolSlugs, clearRecentTools } from "@/components/CommandPalette";
 import { HeroDemo } from "@/components/HeroDemo";
 
 const ALL = "all" as const;
@@ -43,7 +43,7 @@ export function HomepageClient() {
           {/* Heading */}
           <div className="flex flex-col gap-3 max-w-xl">
             <h1 className="text-4xl sm:text-5xl font-semibold tracking-tight" style={{ color: "var(--text-primary)" }}>
-              <span style={{ color: "#6366f1" }}>coding</span>anthem
+              <span style={{ color: "#6366f1" }}>coding</span>anthem{" "}
               <span className="block text-xl sm:text-2xl font-normal mt-2" style={{ color: "var(--text-muted)" }}>
                 Free Online Developer Utilities &amp; Tools
               </span>
@@ -86,8 +86,17 @@ export function HomepageClient() {
       {/* Recently used */}
       {recentTools.length > 0 && (
         <div className="max-w-7xl mx-auto px-6 pt-12">
-          <div className="flex items-baseline gap-2 mb-4">
+          <div className="flex items-baseline justify-between gap-2 mb-4">
             <h2 className="text-sm font-semibold">Recently used</h2>
+            <button
+              onClick={() => {
+                clearRecentTools();
+                setRecentSlugs([]);
+              }}
+              className="text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
+            >
+              Clear
+            </button>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {recentTools.map((tool) => (

@@ -36,6 +36,12 @@ export function getRecentToolSlugs(): string[] {
   return getRecent();
 }
 
+/** Wipes recently-used history — surfaced on the homepage for privacy-conscious users. */
+export function clearRecentTools() {
+  if (typeof window === "undefined") return;
+  localStorage.removeItem(RECENT_KEY);
+}
+
 export function CommandPalette() {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");

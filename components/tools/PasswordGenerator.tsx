@@ -3,6 +3,7 @@
 import { useState, useCallback } from "react";
 import { ToolShell } from "@/components/ToolShell";
 import { getToolBySlug } from "@/lib/tools";
+import { usePersistedState } from "@/lib/usePersistedState";
 
 const tool = getToolBySlug("password-generator")!;
 
@@ -29,11 +30,11 @@ function getStrength(password: string): { label: string; color: string; width: s
 }
 
 export function PasswordGenerator() {
-  const [length, setLength] = useState(16);
-  const [useUpper, setUseUpper] = useState(true);
-  const [useLower, setUseLower] = useState(true);
-  const [useNumbers, setUseNumbers] = useState(true);
-  const [useSymbols, setUseSymbols] = useState(true);
+  const [length, setLength] = usePersistedState("ca_pref_password_length", 16);
+  const [useUpper, setUseUpper] = usePersistedState("ca_pref_password_upper", true);
+  const [useLower, setUseLower] = usePersistedState("ca_pref_password_lower", true);
+  const [useNumbers, setUseNumbers] = usePersistedState("ca_pref_password_numbers", true);
+  const [useSymbols, setUseSymbols] = usePersistedState("ca_pref_password_symbols", true);
   const [count, setCount] = useState(1);
   const [output, setOutput] = useState("");
 
