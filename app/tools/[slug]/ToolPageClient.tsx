@@ -122,6 +122,18 @@ const TOOL_MAP: Record<string, React.ComponentType> = {
   "curl-to-fetch": dynamic(() =>
     import("@/components/tools/CurlToFetch").then((m) => ({ default: m.CurlToFetch }))
   ),
+  "mermaid-viewer": dynamic(() =>
+    import("@/components/tools/MermaidViewer").then((m) => ({ default: m.MermaidViewer }))
+  ),
+  "totp-generator": dynamic(() =>
+    import("@/components/tools/TotpGenerator").then((m) => ({ default: m.TotpGenerator }))
+  ),
+  "user-agent-parser": dynamic(() =>
+    import("@/components/tools/UserAgentParser").then((m) => ({ default: m.UserAgentParser }))
+  ),
+  "xml-formatter": dynamic(() =>
+    import("@/components/tools/XmlFormatter").then((m) => ({ default: m.XmlFormatter }))
+  ),
 };
 
 export function ToolPageClient({ slug }: { slug: string }) {
@@ -142,8 +154,8 @@ export function ToolPageClient({ slug }: { slug: string }) {
     <>
       <ToolComponent />
       {tool.explainer && (
-        <div className="max-w-7xl mx-auto px-6 pb-12">
-          <div className="border-t border-[var(--border)] pt-8">
+        <div className="max-w-7xl mx-auto px-6 pb-12 mt-10">
+          <div className="border-t border-[var(--border)] pt-10">
             <h2 className="text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)] mb-3">
               About {tool.name}
             </h2>

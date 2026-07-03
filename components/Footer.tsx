@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { GitHubStars } from "./GitHubStars";
 
 export function Footer() {
   return (
@@ -28,9 +29,10 @@ export function Footer() {
               href="https://github.com/RahulGo8u/codinganthem"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:text-[var(--text-primary)] transition-colors"
+              className="flex items-center gap-1.5 hover:text-[var(--text-primary)] transition-colors"
             >
               GitHub
+              <GitHubStars />
             </a>
             <a
               href="https://buymeacoffee.com/codinganthem"

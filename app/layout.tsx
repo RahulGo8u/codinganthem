@@ -43,6 +43,7 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "https://www.codinganthem.com",
   },
+  manifest: "/manifest.webmanifest",
   icons: {
     icon: [
       { url: "/icon.svg", type: "image/svg+xml" },

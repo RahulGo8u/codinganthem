@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { Command } from "cmdk";
 import { useRouter } from "next/navigation";
 import { ICON_MAP, type IconName } from "@/lib/icons";
-import { tools, CATEGORY_LABELS, type ToolCategory } from "@/lib/tools";
+import { tools, CATEGORY_LABELS, CATEGORY_ORDER, sortToolsByName } from "@/lib/tools";
 
 function ToolIcon({ name }: { name: string }) {
   const Icon = ICON_MAP[name as IconName] as React.ComponentType<{ size?: number; className?: string }> | undefined;
@@ -29,6 +29,11 @@ export function addRecentTool(slug: string) {
   const recent = getRecent().filter((s) => s !== slug);
   recent.unshift(slug);
   localStorage.setItem(RECENT_KEY, JSON.stringify(recent.slice(0, MAX_RECENT)));
+}
+
+/** Public helper so other components (e.g. the homepage) can show recently used tools. */
+export function getRecentToolSlugs(): string[] {
+  return getRecent();
 }
 
 export function CommandPalette() {
@@ -77,9 +82,7 @@ export function CommandPalette() {
     .map((slug) => tools.find((t) => t.slug === slug))
     .filter(Boolean);
 
-  const categories = Array.from(
-    new Set(tools.map((t) => t.category))
-  ) as ToolCategory[];
+  const categories = CATEGORY_ORDER;
 
   return (
     <>
@@ -173,7 +176,7 @@ export function CommandPalette() {
                 )}
 
                 {categories.map((cat) => {
-                  const catTools = tools.filter((t) => t.category === cat);
+                  const catTools = sortToolsByName(tools.filter((t) => t.category === cat));
                   return (
                     <Command.Group
                       key={cat}

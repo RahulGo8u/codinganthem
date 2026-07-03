@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 import { tools } from "@/lib/tools";
 
 const BASE = "https://www.codinganthem.com";
-const LAST_MODIFIED = "2026-06-19";
+const LAST_MODIFIED = new Date().toISOString();
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const staticPages: MetadataRoute.Sitemap = [

@@ -19,6 +19,7 @@ const ALLOWED_EXTENSIONS = new Set([
   "py", "rb", "go", "rs", "java", "c", "cpp", "h", "cs",
   "toml", "ini", "cfg", "conf", "env",
   "graphql", "gql", "sql",
+  "mmd", "mermaid",
 ]);
 
 const ALLOWED_MIME_PREFIXES = ["text/"];
@@ -41,12 +42,16 @@ interface ToolShellProps {
   inputPlaceholder?: string;
   outputPlaceholder?: string;
   onClear?: () => void;
+  /** Custom content to replace the standard input pane (e.g. a syntax-highlighted editor) */
+  inputContent?: React.ReactNode;
   /** Custom content to replace the standard output pane */
   outputContent?: React.ReactNode;
   /** Extra buttons for the action bar */
   extraActions?: React.ReactNode;
   /** Hide Upload file + Download buttons (e.g. generator tools) */
   hideFileActions?: boolean;
+  /** Hide only the default (.txt) Download button while keeping Upload — use when a tool provides its own download action via extraActions */
+  hideDownload?: boolean;
   /** Show Clear button even when hideFileActions is true (for tools with input but no file I/O) */
   showClear?: boolean;
   /** Hide the input pane entirely — output takes full width (e.g. UUID / password generators) */
@@ -65,9 +70,11 @@ export function ToolShell({
   inputPlaceholder = "Paste your input here...",
   outputPlaceholder = "Output will appear here...",
   onClear,
+  inputContent,
   outputContent,
   extraActions,
   hideFileActions = false,
+  hideDownload = false,
   showClear = false,
   hideInputPane = false,
 }: ToolShellProps) {
@@ -100,7 +107,7 @@ export function ToolShell({
   const handleUpload = useCallback(() => {
     const input_el = document.createElement("input");
     input_el.type = "file";
-    input_el.accept = "text/*,.json,.jsonl,.xml,.yaml,.yml,.csv,.tsv,.md,.mdx,.toml,.ini,.cfg,.conf,.graphql,.gql,.sql";
+    input_el.accept = "text/*,.json,.jsonl,.xml,.yaml,.yml,.csv,.tsv,.md,.mdx,.toml,.ini,.cfg,.conf,.graphql,.gql,.sql,.mmd,.mermaid";
     input_el.onchange = (e) => {
       const file = (e.target as HTMLInputElement).files?.[0];
       if (!file) return;
@@ -214,13 +221,17 @@ export function ToolShell({
             )}
           </div>
           <div className={`relative flex-1 rounded-lg border ${error ? "border-[#ef4444]" : "border-[var(--border)]"} bg-[var(--bg-surface)] overflow-hidden`}>
-            <textarea
-              value={input}
-              onChange={(e) => onInputChange(e.target.value)}
-              placeholder={inputPlaceholder}
-              spellCheck={false}
-              className="mono w-full min-h-[320px] h-full p-4 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] bg-transparent resize-none focus:outline-none leading-relaxed"
-            />
+            {inputContent ? (
+              <div className="w-full min-h-[320px] h-full">{inputContent}</div>
+            ) : (
+              <textarea
+                value={input}
+                onChange={(e) => onInputChange(e.target.value)}
+                placeholder={inputPlaceholder}
+                spellCheck={false}
+                className="mono w-full min-h-[320px] h-full p-4 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] bg-transparent resize-none focus:outline-none leading-relaxed"
+              />
+            )}
           </div>
           {error && (
             <p className="text-xs text-[#ef4444] leading-relaxed">{error}</p>
@@ -229,9 +240,27 @@ export function ToolShell({
 
         {/* Output */}
         <div className="flex flex-col gap-2">
-          <label className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">
-            {outputLabel}
-          </label>
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">
+              {outputLabel}
+            </label>
+            {(!outputContent || output !== "") && (
+              <button
+                onClick={handleCopy}
+                disabled={!output}
+                title="Copy to clipboard"
+                className={`flex items-center gap-1 text-xs transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${
+                  copied ? "text-[#22c55e]" : "text-[var(--text-muted)] hover:text-[var(--text-primary)]"
+                }`}
+              >
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                </svg>
+                {copied ? "Copied" : "Copy"}
+              </button>
+            )}
+          </div>
           <div className="relative flex-1 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] overflow-hidden">
             {outputContent ? (
               <div className="w-full min-h-[320px] p-4">{outputContent}</div>
@@ -276,7 +305,7 @@ export function ToolShell({
         </div>
 
         <div className="flex items-center gap-2">
-          {!hideFileActions && (
+          {!hideFileActions && !hideDownload && (
             <button
               onClick={handleDownload}
               disabled={!output}

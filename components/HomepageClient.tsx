@@ -1,17 +1,19 @@
 "use client";
 
-import { useState, useTransition, memo } from "react";
-import { tools, CATEGORY_LABELS, type ToolCategory } from "@/lib/tools";
+import { useState, useEffect, useTransition, memo } from "react";
+import { tools, CATEGORY_LABELS, CATEGORY_ORDER, sortToolsByName, type ToolCategory } from "@/lib/tools";
 import { ToolCard } from "@/components/ToolCard";
+import { getRecentToolSlugs } from "@/components/CommandPalette";
+import { HeroDemo } from "@/components/HeroDemo";
 
 const ALL = "all" as const;
 type Filter = ToolCategory | typeof ALL;
 
 const CATEGORIES: { id: Filter; label: string }[] = [
   { id: ALL, label: "All" },
-  ...Object.entries(CATEGORY_LABELS).map(([id, label]) => ({
-    id: id as ToolCategory,
-    label,
+  ...CATEGORY_ORDER.map((id) => ({
+    id,
+    label: CATEGORY_LABELS[id],
   })),
 ];
 
@@ -20,7 +22,17 @@ const MemoToolCard = memo(ToolCard);
 export function HomepageClient() {
   const [filter, setFilter] = useState<Filter>(ALL);
   const [isPending, startTransition] = useTransition();
-  const filtered = filter === ALL ? tools : tools.filter((t) => t.category === filter);
+  const [recentSlugs, setRecentSlugs] = useState<string[]>([]);
+  const filtered = sortToolsByName(filter === ALL ? tools : tools.filter((t) => t.category === filter));
+
+  useEffect(() => {
+    setRecentSlugs(getRecentToolSlugs());
+  }, []);
+
+  const recentTools = recentSlugs
+    .map((slug) => tools.find((t) => t.slug === slug))
+    .filter((t): t is (typeof tools)[number] => Boolean(t))
+    .slice(0, 4);
 
   return (
     <div>
@@ -37,8 +49,9 @@ export function HomepageClient() {
               </span>
             </h1>
             <p className="text-[var(--text-muted)] text-base sm:text-lg leading-relaxed">
-              Fast, free developer tools. Everything runs in your browser —
-              your data never leaves your machine.
+              {tools.length} developer tools that never phone home. Paste JSON from ChatGPT,
+              decode a JWT from a bug report, or format SQL from Copilot — instantly, with
+              nothing ever leaving this tab.
             </p>
           </div>
 
@@ -64,8 +77,25 @@ export function HomepageClient() {
             <span className="flex-1 text-left text-sm">Search tools...</span>
           </button>
 
+          {/* Live demo */}
+          <HeroDemo />
+
         </div>
       </div>
+
+      {/* Recently used */}
+      {recentTools.length > 0 && (
+        <div className="max-w-7xl mx-auto px-6 pt-12">
+          <div className="flex items-baseline gap-2 mb-4">
+            <h2 className="text-sm font-semibold">Recently used</h2>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            {recentTools.map((tool) => (
+              <MemoToolCard key={tool.slug} tool={tool} />
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Tools section */}
       <div className="max-w-7xl mx-auto px-6 py-12">
