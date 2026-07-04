@@ -7,13 +7,13 @@ CodingAnthem is a collection of free, browser-based developer utilities built fo
 ## Formatters
 
 - JSON Formatter — format, validate, and minify JSON with syntax highlighting: /tools/json-formatter
-- Markdown Previewer — live preview of Markdown as rendered HTML: /tools/markdown-preview
 - JSON Statistics — analyze node count, nesting depth, type distribution, and size: /tools/json-statistics
 - JSON Diff — compare two JSON documents and highlight changes: /tools/json-diff
 - SQL Formatter — format and beautify SQL queries with dialect-aware indentation: /tools/sql-formatter
 - JavaScript Formatter — format and beautify JavaScript code: /tools/js-formatter
 - HTML Formatter — format and beautify HTML markup: /tools/html-formatter
 - CSS Formatter — format and beautify CSS stylesheets: /tools/css-formatter
+- XML Formatter — format, validate, and beautify XML markup: /tools/xml-formatter
 
 ## Encoders
 
@@ -54,6 +54,7 @@ CodingAnthem is a collection of free, browser-based developer utilities built fo
 - JWT Decoder — decode and inspect JWT tokens (header, payload, signature): /tools/jwt-decoder
 - JWT Generator — create signed JWT tokens with HS256/384/512: /tools/jwt-generator
 - JWT Validator — verify a JWT token's signature and check its expiry: /tools/jwt-validator
+- TOTP / OTP Generator — generate time-based one-time passwords (RFC 6238) from a secret key: /tools/totp-generator
 
 ## Web
 
@@ -62,6 +63,12 @@ CodingAnthem is a collection of free, browser-based developer utilities built fo
 - HTML Entities Encoder / Decoder — escape and unescape HTML entities: /tools/html-entities
 - Slug Generator — convert any text into a URL-friendly slug: /tools/slug-generator
 - cURL to Fetch — convert a cURL command into a JavaScript fetch() call: /tools/curl-to-fetch
+- User-Agent Parser — parse a User-Agent string into browser, OS, and device details: /tools/user-agent-parser
+
+## Visualizers
+
+- Markdown Previewer — live preview of Markdown as rendered HTML: /tools/markdown-preview
+- Mermaid Diagram Viewer — render Mermaid diagram code into flowcharts, sequence diagrams, and more: /tools/mermaid-viewer
 
 ## About
 
