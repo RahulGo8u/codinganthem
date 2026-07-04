@@ -46,8 +46,10 @@ interface ToolShellProps {
   inputContent?: React.ReactNode;
   /** Custom content to replace the standard output pane */
   outputContent?: React.ReactNode;
-  /** Extra buttons for the action bar */
+  /** Extra buttons for the action bar (left side, next to Clear/Upload) */
   extraActions?: React.ReactNode;
+  /** Extra buttons for the action bar (right side, next to Download/Copy) */
+  extraRightActions?: React.ReactNode;
   /** Hide Upload file + Download buttons (e.g. generator tools) */
   hideFileActions?: boolean;
   /** Hide only the default (.txt) Download button while keeping Upload — use when a tool provides its own download action via extraActions */
@@ -73,6 +75,7 @@ export function ToolShell({
   inputContent,
   outputContent,
   extraActions,
+  extraRightActions,
   hideFileActions = false,
   hideDownload = false,
   showClear = false,
@@ -249,9 +252,7 @@ export function ToolShell({
                 onClick={handleCopy}
                 disabled={!output}
                 title="Copy to clipboard"
-                className={`flex items-center gap-1 text-xs transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${
-                  copied ? "text-[#22c55e]" : "text-[var(--text-muted)] hover:text-[var(--text-primary)]"
-                }`}
+                className="flex items-center gap-1 text-xs text-[#22c55e] hover:text-[#16a34a] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
@@ -288,7 +289,7 @@ export function ToolShell({
             <button
               onClick={handleClear}
               disabled={!input}
-              className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[#ef4444]/40 bg-[#ef4444]/10 text-[#ef4444] hover:bg-[#ef4444]/20 hover:border-[#ef4444]/60 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
               Clear
             </button>
@@ -305,6 +306,7 @@ export function ToolShell({
         </div>
 
         <div className="flex items-center gap-2">
+          {extraRightActions}
           {!hideFileActions && !hideDownload && (
             <button
               onClick={handleDownload}
@@ -318,11 +320,7 @@ export function ToolShell({
           <button
             onClick={handleCopy}
             disabled={!output}
-            className={`px-4 py-1.5 rounded-lg text-xs font-medium border transition-all ${
-              copied
-                ? "bg-[#22c55e]/10 border-[#22c55e]/40 text-[#22c55e]"
-                : "border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] disabled:opacity-40 disabled:cursor-not-allowed"
-            }`}
+            className="px-4 py-1.5 rounded-lg text-xs font-medium border border-[#22c55e]/40 bg-[#22c55e]/10 text-[#22c55e] hover:bg-[#22c55e]/20 hover:border-[#22c55e]/60 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
           >
             {copied ? "Copied ✓" : "Copy"}
           </button>

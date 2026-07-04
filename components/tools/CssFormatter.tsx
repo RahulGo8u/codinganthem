@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import { css as beautifyCss } from "js-beautify";
 import { ToolShell } from "@/components/ToolShell";
 import { getToolBySlug } from "@/lib/tools";
+import { HighlightedOutput } from "@/lib/highlight";
 
 const tool = getToolBySlug("css-formatter")!;
 
@@ -32,6 +33,13 @@ export function CssFormatter() {
       outputLabel="Formatted"
       inputPlaceholder="Paste minified or messy CSS here..."
       outputPlaceholder="Formatted CSS will appear here..."
+      outputContent={
+        output ? (
+          <HighlightedOutput code={output} lang="css" />
+        ) : (
+          <p className="p-4 text-[var(--text-muted)] text-sm">Formatted CSS will appear here...</p>
+        )
+      }
       extraActions={
         <button
           onClick={() => setInput(SAMPLE)}

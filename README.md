@@ -4,9 +4,12 @@ The developer toolbox you always wanted — fast, free, and private. Growing col
 
 🔗 [www.codinganthem.com](https://www.codinganthem.com) &nbsp;·&nbsp; [![Buy Me a Coffee](https://img.shields.io/badge/Support-Buy%20Me%20a%20Coffee-6366f1?style=flat&logo=buy-me-a-coffee&logoColor=white)](https://buymeacoffee.com/codinganthem)
 
-All 42 tools run **100% client-side**. No backend, no database, no sign-up — your data never leaves your machine.
+All 43 tools run **100% client-side**. No backend, no database, no sign-up — your data never leaves your machine.
 
 ## Tools
+
+### AI
+- Prompt Template Filler — fill in {{variables}} in a prompt template and open the result directly in ChatGPT
 
 ### Converters
 - Color Converter (HEX ↔ RGB ↔ HSL)

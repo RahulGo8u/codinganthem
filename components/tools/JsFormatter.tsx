@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import { js as beautifyJs } from "js-beautify";
 import { ToolShell } from "@/components/ToolShell";
 import { getToolBySlug } from "@/lib/tools";
+import { HighlightedOutput } from "@/lib/highlight";
 
 const tool = getToolBySlug("js-formatter")!;
 
@@ -32,6 +33,13 @@ export function JsFormatter() {
       outputLabel="Formatted"
       inputPlaceholder="Paste minified or messy JavaScript here..."
       outputPlaceholder="Formatted JavaScript will appear here..."
+      outputContent={
+        output ? (
+          <HighlightedOutput code={output} lang="js" />
+        ) : (
+          <p className="p-4 text-[var(--text-muted)] text-sm">Formatted JavaScript will appear here...</p>
+        )
+      }
       extraActions={
         <button
           onClick={() => setInput(SAMPLE)}

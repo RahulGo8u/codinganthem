@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import { ToolShell } from "@/components/ToolShell";
 import { getToolBySlug } from "@/lib/tools";
+import { HighlightedOutput } from "@/lib/highlight";
 
 const tool = getToolBySlug("json-to-typescript")!;
 
@@ -99,6 +100,13 @@ export function JsonToTypeScript() {
       outputLabel="TypeScript"
       inputPlaceholder="Paste your JSON here..."
       outputPlaceholder="TypeScript interfaces will appear here..."
+      outputContent={
+        output ? (
+          <HighlightedOutput code={output} lang="js" />
+        ) : (
+          <p className="p-4 text-[var(--text-muted)] text-sm">TypeScript interfaces will appear here...</p>
+        )
+      }
       extraActions={
         <button
           onClick={() => setInput(SAMPLE)}

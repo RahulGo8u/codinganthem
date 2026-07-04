@@ -70,6 +70,10 @@ CodingAnthem is a collection of free, browser-based developer utilities built fo
 - Markdown Previewer — live preview of Markdown as rendered HTML: /tools/markdown-preview
 - Mermaid Diagram Viewer — render Mermaid diagram code into flowcharts, sequence diagrams, and more: /tools/mermaid-viewer
 
+## AI
+
+- Prompt Template Filler — fill in {{variables}} in a prompt template and get the resolved text instantly: /tools/prompt-template-filler
+
 ## About
 
 - All tools are free and require no account or sign-up.

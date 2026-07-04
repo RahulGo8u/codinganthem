@@ -134,6 +134,9 @@ const TOOL_MAP: Record<string, React.ComponentType> = {
   "xml-formatter": dynamic(() =>
     import("@/components/tools/XmlFormatter").then((m) => ({ default: m.XmlFormatter }))
   ),
+  "prompt-template-filler": dynamic(() =>
+    import("@/components/tools/PromptTemplateFiller").then((m) => ({ default: m.PromptTemplateFiller }))
+  ),
 };
 
 export function ToolPageClient({ slug }: { slug: string }) {

@@ -6,7 +6,8 @@ export type ToolCategory =
   | "text"
   | "security"
   | "web"
-  | "visualizers";
+  | "visualizers"
+  | "ai";
 
 export type Tool = {
   slug: string;
@@ -27,6 +28,7 @@ export const CATEGORY_LABELS: Record<ToolCategory, string> = {
   security: "Security",
   web: "Web",
   visualizers: "Visualizers",
+  ai: "AI",
 };
 
 export const tools: Tool[] = [
@@ -449,6 +451,16 @@ export const tools: Tool[] = [
     keywords: ["xml", "format", "beautify", "validate", "prettify", "indent", "markup"],
     explainer:
       "Format and validate XML instantly — no setup, no server.\n\n• Paste minified or messy XML to get it properly indented and readable\n• Well-formedness errors are shown in plain English so you know exactly what's wrong\n• Handles nested elements, attributes, and namespaces\n• Useful for SOAP payloads, RSS feeds, config files, and API responses",
+  },
+  {
+    slug: "prompt-template-filler",
+    name: "Prompt Template Filler",
+    description: "Fill in {{variables}} in a prompt template and get the resolved text instantly",
+    category: "ai",
+    icon: "Sparkles",
+    keywords: ["prompt", "template", "variables", "placeholder", "ai", "llm", "fill", "chatgpt", "prompt engineering"],
+    explainer:
+      "Fill in {{variables}} in any prompt template instantly — no setup, no server.\n\n• Paste a template with {{placeholders}} and a field appears for each one automatically\n• Output updates live as you fill in values\n• Unfilled variables stay visible in the output so you never send an incomplete prompt\n• Open the resolved prompt directly in ChatGPT with one click — nothing is sent automatically, it just pre-fills the input box",
   },
 ];
 

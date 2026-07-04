@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import { ToolShell } from "@/components/ToolShell";
 import { getToolBySlug } from "@/lib/tools";
+import { HighlightedOutput } from "@/lib/highlight";
 
 const tool = getToolBySlug("curl-to-fetch")!;
 
@@ -113,6 +114,13 @@ export function CurlToFetch() {
       outputLabel="fetch() call"
       inputPlaceholder={"curl -X POST https://api.example.com \\\n  -H 'Content-Type: application/json' \\\n  -d '{\"key\":\"value\"}'"}
       outputPlaceholder="JavaScript fetch() code will appear here..."
+      outputContent={
+        output ? (
+          <HighlightedOutput code={output} lang="js" />
+        ) : (
+          <p className="p-4 text-[var(--text-muted)] text-sm">JavaScript fetch() code will appear here...</p>
+        )
+      }
       extraActions={
         <button
           onClick={() => setInput(SAMPLE)}

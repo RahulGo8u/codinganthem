@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { ToolShell } from "@/components/ToolShell";
 import { getToolBySlug } from "@/lib/tools";
+import { HighlightedOutput } from "@/lib/highlight";
 
 const tool = getToolBySlug("jwt-validator")!;
 
@@ -54,32 +55,44 @@ export function JwtValidator() {
   const [algo, setAlgo] = useState<Algo>("HS256");
   const [showSecret, setShowSecret] = useState(false);
   const [output, setOutput] = useState("");
+  const [statusLines, setStatusLines] = useState<string[]>([]);
+  const [header, setHeader] = useState<Record<string, unknown> | null>(null);
+  const [payload, setPayload] = useState<Record<string, unknown> | null>(null);
   const [error, setError] = useState<string | undefined>();
   const reqRef = useRef(0);
 
   useEffect(() => {
-    if (!token.trim() || !secret) { setOutput(""); setError(undefined); return; }
+    if (!token.trim() || !secret) {
+      setOutput("");
+      setStatusLines([]);
+      setHeader(null);
+      setPayload(null);
+      setError(undefined);
+      return;
+    }
     const id = ++reqRef.current;
     verifyJwt(token, secret, algo)
-      .then(({ valid, expired, payload, header }) => {
+      .then(({ valid, expired, payload: p, header: h }) => {
         if (id !== reqRef.current) return;
-        const lines = [
+        const status = [
           `Signature: ${valid ? "✓ VALID" : "✕ INVALID"}`,
           ...(valid && expired ? ["Expiry:    ✕ TOKEN EXPIRED"] : []),
-          ...(valid && !expired && payload.exp ? ["Expiry:    ✓ valid"] : []),
-          "",
-          "Header:",
-          JSON.stringify(header, null, 2),
-          "",
-          "Payload:",
-          JSON.stringify(payload, null, 2),
+          ...(valid && !expired && p.exp ? ["Expiry:    ✓ valid"] : []),
         ];
-        setOutput(lines.join("\n"));
+        setStatusLines(status);
+        setHeader(h);
+        setPayload(p);
+        setOutput(
+          [...status, "", "Header:", JSON.stringify(h, null, 2), "", "Payload:", JSON.stringify(p, null, 2)].join("\n")
+        );
         setError(undefined);
       })
       .catch((e: unknown) => {
         if (id !== reqRef.current) return;
         setOutput("");
+        setStatusLines([]);
+        setHeader(null);
+        setPayload(null);
         setError((e as Error).message);
       });
   }, [token, secret, algo]);
@@ -97,6 +110,27 @@ export function JwtValidator() {
       outputLabel="Validation Result"
       inputPlaceholder="Paste your JWT here (eyJ...)"
       outputPlaceholder="Validation result will appear here..."
+      outputContent={
+        header && payload ? (
+          <div className="flex flex-col">
+            <div className="px-4 py-2 border-b border-[var(--border)] flex flex-col gap-0.5">
+              {statusLines.map((line) => (
+                <p key={line} className={`text-xs mono ${line.includes("INVALID") || line.includes("EXPIRED") ? "text-[#ef4444]" : "text-[#22c55e]"}`}>
+                  {line}
+                </p>
+              ))}
+            </div>
+            <div className="px-4 pt-3">
+              <p className="text-[10px] font-medium uppercase tracking-wider text-[var(--text-muted)]">Header</p>
+            </div>
+            <HighlightedOutput code={JSON.stringify(header, null, 2)} />
+            <div className="px-4 pt-1 border-t border-[var(--border)]">
+              <p className="text-[10px] font-medium uppercase tracking-wider text-[var(--text-muted)] pt-2">Payload</p>
+            </div>
+            <HighlightedOutput code={JSON.stringify(payload, null, 2)} />
+          </div>
+        ) : undefined
+      }
       extraActions={
         <button
           onClick={() => { setToken(SAMPLE_TOKEN); setSecret(SAMPLE_SECRET); }}

@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import { html as beautifyHtml } from "js-beautify";
 import { ToolShell } from "@/components/ToolShell";
 import { getToolBySlug } from "@/lib/tools";
+import { HighlightedOutput } from "@/lib/highlight";
 
 const tool = getToolBySlug("html-formatter")!;
 
@@ -32,6 +33,13 @@ export function HtmlFormatter() {
       outputLabel="Formatted"
       inputPlaceholder="Paste minified or messy HTML here..."
       outputPlaceholder="Formatted HTML will appear here..."
+      outputContent={
+        output ? (
+          <HighlightedOutput code={output} lang="xml" />
+        ) : (
+          <p className="p-4 text-[var(--text-muted)] text-sm">Formatted HTML will appear here...</p>
+        )
+      }
       extraActions={
         <button
           onClick={() => setInput(SAMPLE)}

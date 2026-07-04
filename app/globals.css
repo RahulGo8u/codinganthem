@@ -34,6 +34,13 @@
   --border: #1f1f1f;
   --text-primary: #ededed;
   --text-muted: #888888;
+
+  /* Syntax highlighting (code output panes) — light pastels for dark backgrounds */
+  --syntax-key: #a5b4fc;
+  --syntax-string: #86efac;
+  --syntax-number: #fdba74;
+  --syntax-boolean: #93c5fd;
+  --syntax-null: #fca5a5;
 }
 
 /* Light mode */
@@ -44,6 +51,13 @@
   --border: #e5e7eb;
   --text-primary: #111111;
   --text-muted: #6b7280;
+
+  /* Syntax highlighting (code output panes) — darker/saturated for readability on light backgrounds */
+  --syntax-key: #4338ca;
+  --syntax-string: #15803d;
+  --syntax-number: #c2410c;
+  --syntax-boolean: #1d4ed8;
+  --syntax-null: #b91c1c;
 }
 
 * {

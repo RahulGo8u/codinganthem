@@ -1,11 +1,11 @@
 import React from "react";
 
 const COLORS = {
-  key: "#a5b4fc",
-  string: "#86efac",
-  number: "#fdba74",
-  boolean: "#93c5fd",
-  null: "#fca5a5",
+  key: "var(--syntax-key)",
+  string: "var(--syntax-string)",
+  number: "var(--syntax-number)",
+  boolean: "var(--syntax-boolean)",
+  null: "var(--syntax-null)",
   punct: "var(--text-muted)",
 };
 
@@ -72,9 +72,15 @@ export function HighlightedOutput({
   lang = "json",
 }: {
   code: string;
-  lang?: "json" | "yaml" | "xml";
+  lang?: "json" | "yaml" | "xml" | "css" | "js" | "sql";
 }) {
-  const nodes = lang === "yaml" ? highlightYaml(code) : lang === "xml" ? highlightXml(code) : highlightJson(code);
+  const nodes =
+    lang === "yaml" ? highlightYaml(code) :
+    lang === "xml" ? highlightXml(code) :
+    lang === "css" ? highlightCss(code) :
+    lang === "js" ? highlightJs(code) :
+    lang === "sql" ? highlightSql(code) :
+    highlightJson(code);
   return (
     <pre className="mono w-full min-h-[320px] p-4 text-sm whitespace-pre-wrap break-words leading-relaxed overflow-auto text-[var(--text-primary)]">
       {nodes}
@@ -160,6 +166,188 @@ export function highlightXml(xml: string): React.ReactNode[] {
 
   if (lastIndex < xml.length) {
     nodes.push(<span key={k++}>{xml.slice(lastIndex)}</span>);
+  }
+  return nodes;
+}
+
+/**
+ * Tokenize already-formatted (beautified) CSS line by line — selectors,
+ * property names, values, and comments each get a distinct color. Assumes
+ * one selector/declaration/brace per line, which matches js-beautify's output.
+ */
+export function highlightCss(css: string): React.ReactNode[] {
+  const nodes: React.ReactNode[] = [];
+  const lines = css.split("\n");
+  let k = 0;
+
+  lines.forEach((line, i) => {
+    if (i > 0) nodes.push(<span key={`nl-${k++}`}>{"\n"}</span>);
+
+    const commentMatch = line.match(/^(\s*)(\/\*[\s\S]*?\*\/)(\s*)$/);
+    if (commentMatch) {
+      const [, lead, comment, trail] = commentMatch;
+      nodes.push(<span key={k++}>{lead}</span>);
+      nodes.push(
+        <span key={k++} style={{ color: "var(--text-muted)", fontStyle: "italic" }}>
+          {comment}
+        </span>
+      );
+      nodes.push(<span key={k++}>{trail}</span>);
+      return;
+    }
+
+    const selectorMatch = line.match(/^(\s*)([^{]+?)(\s*\{)\s*$/);
+    if (selectorMatch) {
+      const [, lead, selector, brace] = selectorMatch;
+      nodes.push(<span key={k++}>{lead}</span>);
+      nodes.push(<span key={k++} style={{ color: COLORS.key }}>{selector}</span>);
+      nodes.push(<span key={k++} style={{ color: COLORS.punct }}>{brace}</span>);
+      return;
+    }
+
+    const declMatch = line.match(/^(\s*)([a-zA-Z-][a-zA-Z0-9-]*)(\s*:\s*)([^;]+?)(;?)(\s*)$/);
+    if (declMatch) {
+      const [, lead, property, colon, value, semi, trail] = declMatch;
+      nodes.push(<span key={k++}>{lead}</span>);
+      nodes.push(<span key={k++} style={{ color: COLORS.boolean }}>{property}</span>);
+      nodes.push(<span key={k++} style={{ color: COLORS.punct }}>{colon}</span>);
+      nodes.push(<span key={k++} style={{ color: COLORS.string }}>{value}</span>);
+      nodes.push(<span key={k++} style={{ color: COLORS.punct }}>{semi}</span>);
+      nodes.push(<span key={k++}>{trail}</span>);
+      return;
+    }
+
+    // Closing brace, blank line, or anything else — render as-is
+    nodes.push(<span key={k++}>{line}</span>);
+  });
+
+  return nodes;
+}
+
+const JS_KEYWORDS = [
+  "const", "let", "var", "function", "return", "if", "else", "for", "while", "do",
+  "class", "new", "async", "await", "import", "export", "from", "default", "try",
+  "catch", "finally", "throw", "typeof", "instanceof", "this", "extends", "super",
+  "static", "get", "set", "yield", "of", "in", "switch", "case", "break", "continue",
+  "null", "undefined", "true", "false", "void", "delete",
+  // TypeScript-ish additions (JSON to TypeScript output reuses this same tokenizer)
+  "interface", "type", "string", "number", "boolean", "unknown", "any", "readonly",
+];
+
+const JS_KEYWORD_PATTERN = [...JS_KEYWORDS]
+  .sort((a, b) => b.length - a.length)
+  .join("|");
+
+const JS_REGEX = new RegExp(
+  `(//[^\\n]*)` + // 1: line comment
+    `|(/\\*[\\s\\S]*?\\*/)` + // 2: block comment
+    `|('(?:\\\\.|[^'\\\\])*'|"(?:\\\\.|[^"\\\\])*"|\`(?:\\\\.|[^\`\\\\])*\`)` + // 3: string (single/double/template)
+    `|\\b(${JS_KEYWORD_PATTERN})\\b` + // 4: keyword
+    `|\\b(\\d+(?:\\.\\d+)?)\\b`, // 5: number
+  "g"
+);
+
+/**
+ * Tokenize JavaScript (and TypeScript-interface-shaped) code into colored
+ * spans — keywords, strings, comments, and numbers each get a distinct
+ * color. Approximate, not a full parser — good enough for formatted output.
+ */
+export function highlightJs(code: string): React.ReactNode[] {
+  const nodes: React.ReactNode[] = [];
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+  let k = 0;
+
+  JS_REGEX.lastIndex = 0;
+  while ((match = JS_REGEX.exec(code)) !== null) {
+    if (match.index > lastIndex) {
+      nodes.push(<span key={k++}>{code.slice(lastIndex, match.index)}</span>);
+    }
+    const [full, lineComment, blockComment, str, keyword, num] = match;
+    if (lineComment !== undefined || blockComment !== undefined) {
+      nodes.push(
+        <span key={k++} style={{ color: "var(--text-muted)", fontStyle: "italic" }}>
+          {full}
+        </span>
+      );
+    } else if (str !== undefined) {
+      nodes.push(<span key={k++} style={{ color: COLORS.string }}>{str}</span>);
+    } else if (keyword !== undefined) {
+      nodes.push(<span key={k++} style={{ color: COLORS.boolean }}>{full}</span>);
+    } else if (num !== undefined) {
+      nodes.push(<span key={k++} style={{ color: COLORS.number }}>{full}</span>);
+    } else {
+      nodes.push(<span key={k++}>{full}</span>);
+    }
+    lastIndex = JS_REGEX.lastIndex;
+    if (match[0].length === 0) JS_REGEX.lastIndex++;
+  }
+
+  if (lastIndex < code.length) {
+    nodes.push(<span key={k++}>{code.slice(lastIndex)}</span>);
+  }
+  return nodes;
+}
+
+const SQL_KEYWORDS = [
+  "SELECT", "FROM", "WHERE", "INSERT", "INTO", "VALUES", "UPDATE", "SET", "DELETE",
+  "CREATE", "TABLE", "ALTER", "DROP", "JOIN", "INNER", "LEFT", "RIGHT", "OUTER", "FULL",
+  "ON", "GROUP", "BY", "ORDER", "HAVING", "LIMIT", "OFFSET", "AND", "OR", "NOT", "NULL",
+  "IS", "IN", "LIKE", "BETWEEN", "AS", "DISTINCT", "UNION", "ALL", "CASE", "WHEN", "THEN",
+  "ELSE", "END", "EXISTS", "PRIMARY", "KEY", "FOREIGN", "REFERENCES", "DEFAULT", "UNIQUE",
+  "INDEX", "VIEW", "WITH", "ASC", "DESC", "COUNT", "SUM", "AVG", "MIN", "MAX",
+];
+
+const SQL_KEYWORD_PATTERN = [...SQL_KEYWORDS]
+  .sort((a, b) => b.length - a.length)
+  .join("|");
+
+const SQL_REGEX = new RegExp(
+  `(--[^\\n]*)` + // 1: line comment
+    `|(/\\*[\\s\\S]*?\\*/)` + // 2: block comment
+    `|('(?:''|[^'])*')` + // 3: string ('' = escaped quote)
+    `|\\b(${SQL_KEYWORD_PATTERN})\\b` + // 4: keyword
+    `|\\b(\\d+(?:\\.\\d+)?)\\b`, // 5: number
+  "gi"
+);
+
+/**
+ * Tokenize SQL into colored spans — keywords (case-insensitive), strings,
+ * comments, and numbers each get a distinct color.
+ */
+export function highlightSql(sql: string): React.ReactNode[] {
+  const nodes: React.ReactNode[] = [];
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+  let k = 0;
+
+  SQL_REGEX.lastIndex = 0;
+  while ((match = SQL_REGEX.exec(sql)) !== null) {
+    if (match.index > lastIndex) {
+      nodes.push(<span key={k++}>{sql.slice(lastIndex, match.index)}</span>);
+    }
+    const [full, lineComment, blockComment, str, keyword, num] = match;
+    if (lineComment !== undefined || blockComment !== undefined) {
+      nodes.push(
+        <span key={k++} style={{ color: "var(--text-muted)", fontStyle: "italic" }}>
+          {full}
+        </span>
+      );
+    } else if (str !== undefined) {
+      nodes.push(<span key={k++} style={{ color: COLORS.string }}>{str}</span>);
+    } else if (keyword !== undefined) {
+      nodes.push(<span key={k++} style={{ color: COLORS.boolean }}>{full}</span>);
+    } else if (num !== undefined) {
+      nodes.push(<span key={k++} style={{ color: COLORS.number }}>{full}</span>);
+    } else {
+      nodes.push(<span key={k++}>{full}</span>);
+    }
+    lastIndex = SQL_REGEX.lastIndex;
+    if (match[0].length === 0) SQL_REGEX.lastIndex++;
+  }
+
+  if (lastIndex < sql.length) {
+    nodes.push(<span key={k++}>{sql.slice(lastIndex)}</span>);
   }
   return nodes;
 }

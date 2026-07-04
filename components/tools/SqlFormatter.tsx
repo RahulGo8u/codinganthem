@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import { format, type SqlLanguage } from "sql-formatter";
 import { ToolShell } from "@/components/ToolShell";
 import { getToolBySlug } from "@/lib/tools";
+import { HighlightedOutput } from "@/lib/highlight";
 
 const tool = getToolBySlug("sql-formatter")!;
 
@@ -43,6 +44,13 @@ export function SqlFormatter() {
       outputLabel="Formatted SQL"
       inputPlaceholder="Paste your SQL query here..."
       outputPlaceholder="Formatted SQL will appear here..."
+      outputContent={
+        output ? (
+          <HighlightedOutput code={output} lang="sql" />
+        ) : (
+          <p className="p-4 text-[var(--text-muted)] text-sm">Formatted SQL will appear here...</p>
+        )
+      }
       extraActions={
         <button
           onClick={() => setInput(SAMPLE)}

@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { tools } from "@/lib/tools";
+
+const ogDescription = `${tools.length} free browser-based developer tools. No sign-up, no backend — your data never leaves your machine.`;
 
 export const metadata: Metadata = {
   title: "About",
@@ -9,7 +12,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: "About CodingAnthem",
-    description: "38 free browser-based developer tools. No sign-up, no backend — your data never leaves your machine.",
+    description: ogDescription,
     url: "https://www.codinganthem.com/about",
     siteName: "CodingAnthem",
     images: [{ url: "/opengraph-image", width: 1200, height: 630 }],
@@ -17,7 +20,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "About CodingAnthem",
-    description: "38 free browser-based developer tools. No sign-up, no backend — your data never leaves your machine.",
+    description: ogDescription,
     images: ["/opengraph-image"],
   },
 };
