@@ -20,7 +20,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const title = `${tool.name} — Free Online Tool`;
 
   return {
-    title: tool.name,
+    title,
     description: tool.description,
     keywords: tool.keywords,
     alternates: {

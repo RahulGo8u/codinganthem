@@ -2,7 +2,9 @@ import type { MetadataRoute } from "next";
 import { tools } from "@/lib/tools";
 
 const BASE = "https://www.codinganthem.com";
-const LAST_MODIFIED = new Date().toISOString();
+// Bump this only when tool content/pages meaningfully change, so the sitemap's
+// lastmod stays a truthful freshness signal instead of resetting on every deploy.
+const LAST_MODIFIED = "2026-07-04";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const staticPages: MetadataRoute.Sitemap = [
