@@ -25,6 +25,17 @@ Before running `git commit` or `git push`, verify the following files are in syn
 - `components/HomepageClient.tsx` hero copy — uses `tools.length`
 - Homepage category filter and ⌘K command palette — auto-derive from `CATEGORY_ORDER` / `tools`
 
+## When installing a new npm dependency
+
+Always run `npx pnpm@10 install` (NOT just `npm install`) after adding any package. Vercel uses pnpm for production builds and checks `pnpm-lock.yaml` with `--frozen-lockfile`. If only `package-lock.json` is updated, the Vercel build will fail with `ERR_PNPM_OUTDATED_LOCKFILE`.
+
+```bash
+# Correct workflow for new dependencies
+npm install some-package          # installs and updates package-lock.json
+npx pnpm@10 install               # syncs pnpm-lock.yaml — MUST do this too
+git add package.json package-lock.json pnpm-lock.yaml
+```
+
 ## Quick sanity check before committing
 
 ```bash
