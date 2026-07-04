@@ -19,7 +19,9 @@ const CATEGORIES: { id: Filter; label: string }[] = [
 
 const MemoToolCard = memo(ToolCard);
 
-export function HomepageClient() {
+type Faq = { question: string; answer: string };
+
+export function HomepageClient({ faqs = [] }: { faqs?: Faq[] }) {
   const [filter, setFilter] = useState<Filter>(ALL);
   const [isPending, startTransition] = useTransition();
   const [recentSlugs, setRecentSlugs] = useState<string[]>([]);
@@ -151,7 +153,7 @@ export function HomepageClient() {
 
       {/* Features section */}
       <div className="border-t border-[var(--border)]">
-        <div className="max-w-7xl mx-auto px-6 py-16">
+        <div className="max-w-7xl mx-auto px-6 py-14">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px border border-[var(--border)] rounded-xl overflow-hidden">
 
             {[
@@ -186,6 +188,31 @@ export function HomepageClient() {
           </div>
         </div>
       </div>
+
+      {/* FAQ */}
+      {faqs.length > 0 && (
+        <div className="border-t border-[var(--border)]">
+          <div className="max-w-3xl mx-auto px-6 pt-10 pb-16">
+            <h2 className="text-sm font-semibold mb-6">Frequently asked questions</h2>
+            <div className="flex flex-col gap-2">
+              {faqs.map(({ question, answer }) => (
+                <details
+                  key={question}
+                  className="group rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] px-4 py-3 open:bg-[var(--bg-elevated)] transition-colors"
+                >
+                  <summary className="flex items-center justify-between gap-3 text-sm font-medium text-[var(--text-primary)] cursor-pointer list-none">
+                    {question}
+                    <span className="text-[var(--text-muted)] transition-transform duration-150 group-open:rotate-45 shrink-0">
+                      +
+                    </span>
+                  </summary>
+                  <p className="text-xs text-[var(--text-muted)] leading-relaxed mt-3">{answer}</p>
+                </details>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

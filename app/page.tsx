@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { HomepageClient } from "@/components/HomepageClient";
+import { tools } from "@/lib/tools";
 
 export const metadata: Metadata = {
   title: "CodingAnthem — Free Online Developer Utilities & Tools",
@@ -10,6 +11,52 @@ export const metadata: Metadata = {
   },
 };
 
+const HOMEPAGE_FAQS = [
+  {
+    question: "Is my data safe when I use these tools?",
+    answer:
+      "Yes. Every tool runs entirely in your browser using JavaScript and the Web Crypto API. Nothing you paste, type, or upload is ever sent to a server.",
+  },
+  {
+    question: "Do I need to create an account or sign up?",
+    answer: "No. All tools are free to use immediately — no sign-up, no login, no email required.",
+  },
+  {
+    question: "Are the tools actually free, or is there a paid tier?",
+    answer: "Completely free, with no paywalls or premium features. CodingAnthem is free forever.",
+  },
+  {
+    question: "How many tools does CodingAnthem offer?",
+    answer: `${tools.length} tools across formatters, encoders, generators, converters, security, and more — all free, all instant.`,
+  },
+  {
+    question: "Can I use CodingAnthem alongside AI tools like ChatGPT or GitHub Copilot?",
+    answer:
+      "Yes. Paste JSON, JWTs, SQL, or any AI-generated output directly into a tool to validate, format, or convert it — nothing leaves your browser in the process.",
+  },
+];
+
+const faqJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: HOMEPAGE_FAQS.map(({ question, answer }) => ({
+    "@type": "Question",
+    name: question,
+    acceptedAnswer: {
+      "@type": "Answer",
+      text: answer,
+    },
+  })),
+};
+
 export default function HomePage() {
-  return <HomepageClient />;
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
+      <HomepageClient faqs={HOMEPAGE_FAQS} />
+    </>
+  );
 }
