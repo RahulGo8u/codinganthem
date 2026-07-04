@@ -143,6 +143,12 @@ const TOOL_MAP: Record<string, React.ComponentType> = {
   "token-counter": dynamic(() =>
     import("@/components/tools/TokenCounter").then((m) => ({ default: m.TokenCounter }))
   ),
+  "xml-to-json": dynamic(() =>
+    import("@/components/tools/XmlToJson").then((m) => ({ default: m.XmlToJson }))
+  ),
+  "color-contrast-checker": dynamic(() =>
+    import("@/components/tools/ColorContrastChecker").then((m) => ({ default: m.ColorContrastChecker }))
+  ),
 };
 
 export function ToolPageClient({ slug }: { slug: string }) {

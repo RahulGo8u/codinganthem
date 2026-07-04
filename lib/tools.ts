@@ -482,6 +482,26 @@ export const tools: Tool[] = [
     explainer:
       "Count tokens and estimate API cost before you send a single request — entirely in your browser.\n\n• Exact counts for GPT-4o, GPT-4.1, and GPT-3.5 via OpenAI's real tiktoken tokenizer\n• Character-based estimates for Claude and Gemini, since those providers don't publish a public tokenizer\n• Shows how much of the model's context window your text uses, plus estimated cost for this prompt\n• Tokenizer data loads on first use — nothing you paste is ever sent to a server",
   },
+  {
+    slug: "xml-to-json",
+    name: "XML to JSON",
+    description: "Convert XML markup to a JSON object instantly",
+    category: "converters",
+    icon: "FileJson",
+    keywords: ["xml", "json", "convert", "parse", "transform", "xml to json", "soap", "rss"],
+    explainer:
+      "Convert XML to JSON instantly — no setup, no server.\n\n• Paste any well-formed XML and get a clean JSON object\n• Attributes are preserved with an @ prefix, repeated sibling tags become arrays\n• Well-formedness errors are shown in plain English\n• Useful for SOAP responses, RSS feeds, and legacy XML APIs",
+  },
+  {
+    slug: "color-contrast-checker",
+    name: "Color Contrast Checker",
+    description: "Check WCAG contrast ratio between two colors for accessibility",
+    category: "converters",
+    icon: "Eye",
+    keywords: ["contrast checker", "wcag", "accessibility", "color contrast", "a11y", "aa", "aaa", "text contrast"],
+    explainer:
+      "Check WCAG contrast ratio between any two colors — entirely in your browser.\n\n• Enter a text color and background color to see the exact contrast ratio\n• Instantly see Pass/Fail for WCAG AA and AAA at normal and large text sizes\n• Live preview shows how real text looks at that contrast\n• Useful for accessible web design, design systems, and color palette audits",
+  },
 ];
 
 export function getToolBySlug(slug: string): Tool | undefined {

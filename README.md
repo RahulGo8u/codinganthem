@@ -4,7 +4,7 @@ The developer toolbox you always wanted — fast, free, and private. Growing col
 
 🔗 [www.codinganthem.com](https://www.codinganthem.com) &nbsp;·&nbsp; [![Buy Me a Coffee](https://img.shields.io/badge/Support-Buy%20Me%20a%20Coffee-6366f1?style=flat&logo=buy-me-a-coffee&logoColor=white)](https://buymeacoffee.com/codinganthem)
 
-All 45 tools run **100% client-side**. No backend, no database, no sign-up — your data never leaves your machine.
+All 47 tools run **100% client-side**. No backend, no database, no sign-up — your data never leaves your machine.
 
 ## Tools
 
@@ -13,6 +13,7 @@ All 45 tools run **100% client-side**. No backend, no database, no sign-up — y
 - Token Counter & Estimator — count tokens and estimate API cost for GPT, Claude, and Gemini models
 
 ### Converters
+- Color Contrast Checker — check WCAG contrast ratio between two colors for accessibility
 - Color Converter (HEX ↔ RGB ↔ HSL)
 - Cron Expression Parser
 - CSV to JSON
@@ -22,6 +23,7 @@ All 45 tools run **100% client-side**. No backend, no database, no sign-up — y
 - Number Base Converter (binary, octal, decimal, hex)
 - SQL IN Generator — turn a list of values into a SQL IN clause
 - Unix Timestamp Converter
+- XML to JSON
 - YAML to JSON
 
 ### Encoders

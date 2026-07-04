@@ -40,6 +40,8 @@ CodingAnthem is a collection of free, browser-based developer utilities built fo
 - JSON to YAML — convert JSON to YAML: /tools/json-to-yaml
 - JSON to TypeScript — generate TypeScript interfaces from a JSON object: /tools/json-to-typescript
 - SQL IN Generator — turn a list of values into a SQL IN clause: /tools/sql-in-generator
+- XML to JSON — convert XML markup to a JSON object: /tools/xml-to-json
+- Color Contrast Checker — check WCAG contrast ratio between two colors for accessibility: /tools/color-contrast-checker
 
 ## Text Utils
 
