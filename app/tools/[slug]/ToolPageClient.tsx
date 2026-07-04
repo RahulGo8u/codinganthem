@@ -137,6 +137,9 @@ const TOOL_MAP: Record<string, React.ComponentType> = {
   "prompt-template-filler": dynamic(() =>
     import("@/components/tools/PromptTemplateFiller").then((m) => ({ default: m.PromptTemplateFiller }))
   ),
+  "mock-data-generator": dynamic(() =>
+    import("@/components/tools/MockDataGenerator").then((m) => ({ default: m.MockDataGenerator }))
+  ),
 };
 
 export function ToolPageClient({ slug }: { slug: string }) {

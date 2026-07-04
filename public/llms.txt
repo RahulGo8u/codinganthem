@@ -26,6 +26,7 @@ CodingAnthem is a collection of free, browser-based developer utilities built fo
 - UUID Generator — generate version 4 UUIDs instantly: /tools/uuid-generator
 - Lorem Ipsum Generator — generate placeholder text: /tools/lorem-ipsum
 - QR Code Generator — generate a QR code for any text or URL: /tools/qr-code-generator
+- Mock Data Generator — generate realistic fake data for testing (names, emails, addresses, and more): /tools/mock-data-generator
 
 ## Converters
 

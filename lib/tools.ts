@@ -462,6 +462,16 @@ export const tools: Tool[] = [
     explainer:
       "Fill in {{variables}} in any prompt template instantly — no setup, no server.\n\n• Paste a template with {{placeholders}} and a field appears for each one automatically\n• Output updates live as you fill in values\n• Unfilled variables stay visible in the output so you never send an incomplete prompt\n• Open the resolved prompt directly in ChatGPT with one click — nothing is sent automatically, it just pre-fills the input box",
   },
+  {
+    slug: "mock-data-generator",
+    name: "Mock Data Generator",
+    description: "Generate realistic fake data for testing — names, emails, addresses, and more",
+    category: "generators",
+    icon: "Database",
+    keywords: ["fake data", "mock data", "test data", "faker", "generate", "random", "dummy", "seed", "json", "csv"],
+    explainer:
+      "Generate realistic mock data for testing APIs, seeding databases, or populating UI prototypes — entirely in your browser.\n\n• Pick exactly which fields you need: names, emails, addresses, UUIDs, and more\n• Generate up to 100 rows at once and export as JSON or CSV\n• Powered by the industry-standard faker.js library, loaded locally — nothing is sent to a server\n• Copy the output directly into Postman, your database seed script, or your test fixtures",
+  },
 ];
 
 export function getToolBySlug(slug: string): Tool | undefined {
