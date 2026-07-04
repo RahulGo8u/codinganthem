@@ -472,6 +472,16 @@ export const tools: Tool[] = [
     explainer:
       "Generate realistic mock data for testing APIs, seeding databases, or populating UI prototypes — entirely in your browser.\n\n• Pick exactly which fields you need: names, emails, addresses, UUIDs, and more\n• Generate up to 100 rows at once and export as JSON or CSV\n• Powered by the industry-standard faker.js library, loaded locally — nothing is sent to a server\n• Copy the output directly into Postman, your database seed script, or your test fixtures",
   },
+  {
+    slug: "token-counter",
+    name: "Token Counter & Estimator",
+    description: "Count tokens and estimate API cost for GPT, Claude, and Gemini models",
+    category: "ai",
+    icon: "Calculator",
+    keywords: ["token counter", "gpt tokenizer", "tiktoken", "llm tokens", "context window", "ai cost calculator", "claude tokens", "gemini tokens"],
+    explainer:
+      "Count tokens and estimate API cost before you send a single request — entirely in your browser.\n\n• Exact counts for GPT-4o, GPT-4.1, and GPT-3.5 via OpenAI's real tiktoken tokenizer\n• Character-based estimates for Claude and Gemini, since those providers don't publish a public tokenizer\n• Shows how much of the model's context window your text uses, plus estimated cost for this prompt\n• Tokenizer data loads on first use — nothing you paste is ever sent to a server",
+  },
 ];
 
 export function getToolBySlug(slug: string): Tool | undefined {

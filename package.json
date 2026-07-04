@@ -18,6 +18,7 @@
     "diff": "^9.0.0",
     "geist": "^1.7.2",
     "js-beautify": "^1.15.4",
+    "js-tiktoken": "^1.0.21",
     "lucide-react": "^1.21.0",
     "marked": "^18.0.5",
     "mermaid": "^11.16.0",

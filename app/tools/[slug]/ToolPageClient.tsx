@@ -140,6 +140,9 @@ const TOOL_MAP: Record<string, React.ComponentType> = {
   "mock-data-generator": dynamic(() =>
     import("@/components/tools/MockDataGenerator").then((m) => ({ default: m.MockDataGenerator }))
   ),
+  "token-counter": dynamic(() =>
+    import("@/components/tools/TokenCounter").then((m) => ({ default: m.TokenCounter }))
+  ),
 };
 
 export function ToolPageClient({ slug }: { slug: string }) {

@@ -74,6 +74,7 @@ CodingAnthem is a collection of free, browser-based developer utilities built fo
 ## AI
 
 - Prompt Template Filler — fill in {{variables}} in a prompt template and get the resolved text instantly: /tools/prompt-template-filler
+- Token Counter & Estimator — count tokens and estimate API cost for GPT, Claude, and Gemini models: /tools/token-counter
 
 ## About
 
