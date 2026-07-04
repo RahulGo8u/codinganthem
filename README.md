@@ -4,7 +4,7 @@ The developer toolbox you always wanted — fast, free, and private. Growing col
 
 🔗 [www.codinganthem.com](https://www.codinganthem.com) &nbsp;·&nbsp; [![Buy Me a Coffee](https://img.shields.io/badge/Support-Buy%20Me%20a%20Coffee-6366f1?style=flat&logo=buy-me-a-coffee&logoColor=white)](https://buymeacoffee.com/codinganthem)
 
-All 43 tools run **100% client-side**. No backend, no database, no sign-up — your data never leaves your machine.
+All 44 tools run **100% client-side**. No backend, no database, no sign-up — your data never leaves your machine.
 
 ## Tools
 
@@ -40,6 +40,7 @@ All 43 tools run **100% client-side**. No backend, no database, no sign-up — y
 
 ### Generators
 - Lorem Ipsum Generator
+- Mock Data Generator — generate realistic fake data (names, emails, addresses, and more)
 - QR Code Generator — generate QR codes from any text or URL
 - UUID Generator (v4)
 
