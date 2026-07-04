@@ -6,6 +6,8 @@ import { getToolBySlug } from "@/lib/tools";
 
 const tool = getToolBySlug("cron-parser")!;
 
+const SAMPLE = "*/15 9-17 * * 1-5";
+
 interface FieldDef { name: string; min: number; max: number; labels?: string[]; }
 
 const FIELDS_5: FieldDef[] = [
@@ -151,6 +153,14 @@ export function CronParser() {
       outputLabel="Explanation"
       inputPlaceholder="*/5 * * * *"
       outputPlaceholder="Plain-English explanation will appear here..."
+      extraActions={
+        <button
+          onClick={() => setInput(SAMPLE)}
+          className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
+        >
+          Load sample
+        </button>
+      }
     />
   );
 }

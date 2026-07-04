@@ -10,6 +10,8 @@ const tool = getToolBySlug("qr-code-generator")!;
 const SIZES = [128, 256, 512] as const;
 type Size = typeof SIZES[number];
 
+const SAMPLE = "https://www.codinganthem.com";
+
 export function QrCodeGenerator() {
   const [input, setInput] = useState("");
   const [size, setSize] = useState<Size>(256);
@@ -46,13 +48,21 @@ export function QrCodeGenerator() {
       outputLabel="QR Code"
       inputPlaceholder={"Enter any text or URL...\n\nhttps://www.codinganthem.com"}
       extraActions={
-        <button
-          onClick={handleDownload}
-          disabled={!dataUrl}
-          className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-        >
-          Download PNG
-        </button>
+        <>
+          <button
+            onClick={() => setInput(SAMPLE)}
+            className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
+          >
+            Load sample
+          </button>
+          <button
+            onClick={handleDownload}
+            disabled={!dataUrl}
+            className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          >
+            Download PNG
+          </button>
+        </>
       }
       options={
         <label className="flex items-center gap-2 text-[var(--text-muted)] text-xs">

@@ -20,6 +20,12 @@ const MODE_HINTS: Record<Mode, string> = {
   "decode": "Decodes %XX percent-encoded sequences back to text",
 };
 
+const SAMPLES: Record<Mode, string> = {
+  "encode-component": "hello world & more",
+  "encode-uri": "https://example.com/path?q=hello world&lang=en",
+  "decode": "hello%20world%20%26%20more",
+};
+
 export function UrlEncoderDecoder() {
   const [input, setInput] = useState("");
   const [mode, setMode] = useState<Mode>("encode-component");
@@ -63,6 +69,14 @@ export function UrlEncoderDecoder() {
           : "Enter percent-encoded string to decode..."
       }
       outputPlaceholder="Output will appear here..."
+      extraActions={
+        <button
+          onClick={() => setInput(SAMPLES[mode])}
+          className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
+        >
+          Load sample
+        </button>
+      }
       options={
         <div className="flex flex-col gap-1.5">
           <div className="flex rounded-lg border border-[var(--border)] overflow-hidden text-xs">

@@ -7,6 +7,8 @@ import { HighlightedOutput } from "@/lib/highlight";
 
 const tool = getToolBySlug("csv-to-json")!;
 
+const SAMPLE = "name,age,city\nAlice,30,New York\nBob,25,London";
+
 function parseCsv(csv: string): Record<string, string>[] {
   const allLines = csv.split(/\r?\n/);
   const lines = allLines.filter((l) => l.trim() !== "");
@@ -81,6 +83,14 @@ export function CsvToJson() {
       inputPlaceholder={"name,age,city\nAlice,30,New York\nBob,25,London"}
       outputPlaceholder="JSON output will appear here..."
       outputContent={output ? <HighlightedOutput code={output} /> : undefined}
+      extraActions={
+        <button
+          onClick={() => setInput(SAMPLE)}
+          className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
+        >
+          Load sample
+        </button>
+      }
     />
   );
 }

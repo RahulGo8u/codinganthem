@@ -14,6 +14,13 @@ const BASES: { value: Base; label: string; prefix: string }[] = [
   { value: 16, label: "Hex (16)",        prefix: "0x" },
 ];
 
+const SAMPLES: Record<Base, string> = {
+  2: "11111111",
+  8: "377",
+  10: "255",
+  16: "FF",
+};
+
 const VALID: Record<Base, RegExp> = {
   2:  /^[01]+$/,
   8:  /^[0-7]+$/,
@@ -57,6 +64,14 @@ export function BaseConverter() {
       outputLabel="All bases"
       inputPlaceholder="Enter a number..."
       outputPlaceholder="Conversions will appear here..."
+      extraActions={
+        <button
+          onClick={() => setInput(SAMPLES[fromBase])}
+          className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
+        >
+          Load sample
+        </button>
+      }
       options={
         <label className="flex items-center gap-2 text-[var(--text-muted)] text-xs">
           From base

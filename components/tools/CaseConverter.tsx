@@ -8,6 +8,8 @@ const tool = getToolBySlug("case-converter")!;
 
 type CaseType = "camel" | "pascal" | "snake" | "kebab" | "upper" | "lower" | "title" | "dot";
 
+const SAMPLE = "hello world example\nmy variable name";
+
 const CASES: { id: CaseType; label: string; example: string }[] = [
   { id: "camel", label: "camelCase", example: "helloWorld" },
   { id: "pascal", label: "PascalCase", example: "HelloWorld" },
@@ -65,6 +67,14 @@ export function CaseConverter() {
       onInputChange={setInput}
       inputPlaceholder={"Enter text to convert...\nSupports multiple lines."}
       outputPlaceholder="Converted text will appear here..."
+      extraActions={
+        <button
+          onClick={() => setInput(SAMPLE)}
+          className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
+        >
+          Load sample
+        </button>
+      }
       options={
         <div className="flex flex-wrap gap-1.5">
           {CASES.map(({ id, label }) => (

@@ -8,6 +8,8 @@ import { HighlightedOutput } from "@/lib/highlight";
 
 const tool = getToolBySlug("yaml-to-json")!;
 
+const SAMPLE = "name: CodingAnthem\ntools:\n  - JSON Formatter\n  - Base64";
+
 export function YamlToJson() {
   const [input, setInput] = useState("");
 
@@ -33,6 +35,14 @@ export function YamlToJson() {
       inputPlaceholder={"name: CodingAnthem\ntools:\n  - JSON Formatter\n  - Base64"}
       outputPlaceholder="JSON output will appear here..."
       outputContent={output ? <HighlightedOutput code={output} /> : undefined}
+      extraActions={
+        <button
+          onClick={() => setInput(SAMPLE)}
+          className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
+        >
+          Load sample
+        </button>
+      }
     />
   );
 }

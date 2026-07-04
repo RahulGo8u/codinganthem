@@ -10,6 +10,8 @@ type HashAlgo = "MD5" | "SHA-1" | "SHA-256" | "SHA-512";
 
 const ALGOS: HashAlgo[] = ["MD5", "SHA-1", "SHA-256", "SHA-512"];
 
+const SAMPLE = "Hello, CodingAnthem!";
+
 // Simple MD5 implementation (no external dependency)
 function md5(str: string): string {
   function safeAdd(x: number, y: number) {
@@ -133,6 +135,14 @@ export function HashGenerator() {
       outputLabel={`${algo} Hash`}
       inputPlaceholder="Enter text to hash..."
       outputPlaceholder="Hash will appear here..."
+      extraActions={
+        <button
+          onClick={() => setInput(SAMPLE)}
+          className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
+        >
+          Load sample
+        </button>
+      }
       options={
         <div className="flex rounded-lg border border-[var(--border)] overflow-hidden text-xs">
           {ALGOS.map((a) => (

@@ -6,6 +6,11 @@ import { getToolBySlug } from "@/lib/tools";
 
 const tool = getToolBySlug("string-escape")!;
 
+const SAMPLES = {
+  escape: 'He said "hello"\nNew line here\tTabbed',
+  unescape: 'He said \\"hello\\"\\nNew line here\\tTabbed',
+};
+
 function escapeString(str: string): string {
   return str
     .replace(/\\/g, "\\\\")
@@ -54,6 +59,14 @@ export function StringEscape() {
           : 'He said \\"hello\\"\\nNew line here\\tTabbed'
       }
       outputPlaceholder="Output will appear here..."
+      extraActions={
+        <button
+          onClick={() => setInput(SAMPLES[mode])}
+          className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
+        >
+          Load sample
+        </button>
+      }
       options={
         <div className="flex rounded-lg border border-[var(--border)] overflow-hidden text-xs">
           {(["escape", "unescape"] as const).map((m) => (

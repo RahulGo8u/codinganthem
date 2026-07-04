@@ -6,6 +6,9 @@ import { getToolBySlug } from "@/lib/tools";
 
 const tool = getToolBySlug("user-agent-parser")!;
 
+const SAMPLE =
+  "Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Mobile Safari/537.36";
+
 interface ParsedUA {
   browser: string;
   browserVersion: string;
@@ -135,6 +138,14 @@ export function UserAgentParser() {
       inputLabel="User-Agent String"
       outputLabel="Parsed Details"
       inputPlaceholder="Paste a User-Agent string, or your browser's is loaded by default..."
+      extraActions={
+        <button
+          onClick={() => setInput(SAMPLE)}
+          className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
+        >
+          Load sample
+        </button>
+      }
       outputContent={
         parsed ? (
           <div className="w-full min-h-[320px] flex flex-col rounded-lg overflow-hidden">

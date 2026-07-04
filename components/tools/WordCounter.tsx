@@ -6,6 +6,9 @@ import { getToolBySlug } from "@/lib/tools";
 
 const tool = getToolBySlug("word-counter")!;
 
+const SAMPLE =
+  "CodingAnthem offers 43 free developer tools that run entirely in your browser. Nothing you type is ever sent to a server.";
+
 interface Stats {
   words: number;
   charsWithSpaces: number;
@@ -48,6 +51,14 @@ export function WordCounter() {
       inputLabel="Text"
       outputLabel="Stats"
       inputPlaceholder="Paste or type your text here..."
+      extraActions={
+        <button
+          onClick={() => setInput(SAMPLE)}
+          className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
+        >
+          Load sample
+        </button>
+      }
       outputContent={
         <div className="p-4 flex flex-col gap-2">
           {STATS.map(({ label, key }) => (

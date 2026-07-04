@@ -7,6 +7,9 @@ import Link from "next/link";
 
 const tool = getToolBySlug("json-diff")!;
 
+const SAMPLE_LEFT = '{\n  "name": "Alice",\n  "age": 30,\n  "city": "London"\n}';
+const SAMPLE_RIGHT = '{\n  "name": "Alice",\n  "age": 31,\n  "city": "Paris",\n  "active": true\n}';
+
 function normalizeJson(input: string): string {
   const parsed = JSON.parse(input);
   return JSON.stringify(parsed, sortReplacer, 2);
@@ -190,6 +193,12 @@ export function JsonDiff() {
           className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
         >
           Swap
+        </button>
+        <button
+          onClick={() => { setLeft(SAMPLE_LEFT); setRight(SAMPLE_RIGHT); setLeftError(undefined); setRightError(undefined); }}
+          className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
+        >
+          Load sample
         </button>
       </div>
     </div>

@@ -31,6 +31,11 @@ const DECODE_MAP: Record<string, string> = {
   "&raquo;":"»",
 };
 
+const SAMPLES = {
+  encode: `<div class="box">Tom & Jerry's "Great" Adventure</div>`,
+  decode: "&lt;div&gt; Tom &amp; Jerry&#39;s &quot;Great&quot; Adventure &lt;/div&gt;",
+};
+
 function encodeHtml(str: string): string {
   return str.replace(/[&<>"']/g, (ch) => ENCODE_MAP[ch] ?? ch);
 }
@@ -65,6 +70,14 @@ export function HtmlEntities() {
           : "Enter text with &lt;entities&gt; to decode..."
       }
       outputPlaceholder="Output will appear here..."
+      extraActions={
+        <button
+          onClick={() => setInput(SAMPLES[mode])}
+          className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
+        >
+          Load sample
+        </button>
+      }
       options={
         <div className="flex rounded-lg border border-[var(--border)] overflow-hidden text-xs">
           {(["encode", "decode"] as const).map((m) => (

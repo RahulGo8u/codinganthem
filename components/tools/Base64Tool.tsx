@@ -6,6 +6,11 @@ import { getToolBySlug } from "@/lib/tools";
 
 const tool = getToolBySlug("base64")!;
 
+const SAMPLES = {
+  encode: "Hello, CodingAnthem!",
+  decode: "SGVsbG8sIENvZGluZ0FudGhlbSE=",
+};
+
 export function Base64Tool() {
   const [input, setInput] = useState("");
   const [mode, setMode] = useState<"encode" | "decode">("encode");
@@ -44,6 +49,14 @@ export function Base64Tool() {
       }
       outputPlaceholder={
         mode === "encode" ? "Encoded output..." : "Decoded output..."
+      }
+      extraActions={
+        <button
+          onClick={() => setInput(SAMPLES[mode])}
+          className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
+        >
+          Load sample
+        </button>
       }
       options={
         <div className="flex rounded-lg border border-[var(--border)] overflow-hidden text-xs">

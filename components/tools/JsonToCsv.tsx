@@ -6,6 +6,8 @@ import { getToolBySlug } from "@/lib/tools";
 
 const tool = getToolBySlug("json-to-csv")!;
 
+const SAMPLE = '[\n  {"name": "Alice", "age": 30},\n  {"name": "Bob", "age": 25}\n]';
+
 function toCsv(data: unknown): string {
   if (!Array.isArray(data)) throw new Error("Input must be a JSON array of objects.");
   if (data.length === 0) throw new Error("Array is empty — nothing to convert.");
@@ -63,6 +65,14 @@ export function JsonToCsv() {
       outputLabel="CSV"
       inputPlaceholder={'[\n  {"name": "Alice", "age": 30},\n  {"name": "Bob", "age": 25}\n]'}
       outputPlaceholder="CSV output will appear here..."
+      extraActions={
+        <button
+          onClick={() => setInput(SAMPLE)}
+          className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
+        >
+          Load sample
+        </button>
+      }
     />
   );
 }

@@ -170,7 +170,13 @@ export function JwtGenerator() {
       </div>
 
       {/* Action bar */}
-      <div className="flex items-center justify-end gap-2">
+      <div className="flex items-center justify-between gap-2">
+        <button
+          onClick={() => { setPayload(DEFAULT_PAYLOAD); setSecret("your-256-bit-secret"); }}
+          className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
+        >
+          Load sample
+        </button>
         <button
           onClick={handleCopy}
           disabled={!output}

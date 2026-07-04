@@ -6,6 +6,8 @@ import { getToolBySlug } from "@/lib/tools";
 
 const tool = getToolBySlug("timestamp-converter")!;
 
+const SAMPLE_TIMESTAMP = "1718822400";
+
 export function TimestampConverter() {
   const [input, setInput] = useState("");
   const [mode, setMode] = useState<"to-date" | "to-unix">("to-date");
@@ -115,6 +117,12 @@ export function TimestampConverter() {
             className="px-3 py-1.5 rounded-lg text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] border border-[var(--border)] hover:bg-[var(--bg-elevated)] transition-colors"
           >
             Use current time
+          </button>
+          <button
+            onClick={() => { setMode("to-date"); setInput(SAMPLE_TIMESTAMP); }}
+            className="px-3 py-1.5 rounded-lg text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] border border-[var(--border)] hover:bg-[var(--bg-elevated)] transition-colors"
+          >
+            Load sample
           </button>
         </>
       }

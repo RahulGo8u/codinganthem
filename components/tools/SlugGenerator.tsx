@@ -6,6 +6,8 @@ import { getToolBySlug } from "@/lib/tools";
 
 const tool = getToolBySlug("slug-generator")!;
 
+const SAMPLE = "Hello World!\nMy Blog Post Title\nThe Quick Brown Fox";
+
 function toSlug(text: string, separator: "-" | "_"): string {
   return text
     .normalize("NFD")
@@ -39,6 +41,14 @@ export function SlugGenerator() {
       outputLabel="Slug"
       inputPlaceholder={"Hello World!\nMy Blog Post Title\nThe Quick Brown Fox"}
       outputPlaceholder="Slugs will appear here..."
+      extraActions={
+        <button
+          onClick={() => setInput(SAMPLE)}
+          className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
+        >
+          Load sample
+        </button>
+      }
       options={
         <div className="flex rounded-lg border border-[var(--border)] overflow-hidden text-xs">
           {(["-", "_"] as const).map((sep) => (

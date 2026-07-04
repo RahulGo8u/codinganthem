@@ -7,6 +7,9 @@ import Link from "next/link";
 
 const tool = getToolBySlug("text-diff")!;
 
+const SAMPLE_LEFT = "The quick brown fox jumps over the lazy dog.\nThis line stays the same.\nOld line to be removed.";
+const SAMPLE_RIGHT = "The quick brown fox leaps over the lazy dog.\nThis line stays the same.\nNew line that was added.";
+
 type RowKind = "same" | "change";
 interface Row {
   left: string | null;
@@ -192,6 +195,12 @@ export function TextDiff() {
             className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
             Swap
+          </button>
+          <button
+            onClick={() => { setLeft(SAMPLE_LEFT); setRight(SAMPLE_RIGHT); }}
+            className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
+          >
+            Load sample
           </button>
         </div>
       </div>

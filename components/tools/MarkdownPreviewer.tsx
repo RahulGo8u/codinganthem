@@ -9,6 +9,8 @@ const tool = getToolBySlug("markdown-preview")!;
 
 marked.setOptions({ async: false });
 
+const SAMPLE = `# Hello\n\nThis is **bold**, this is *italic*, and here's a [link](https://codinganthem.com).\n\n- Item one\n- Item two\n\n\`\`\`js\nconst x = 42;\n\`\`\``;
+
 export function MarkdownPreviewer() {
   const [input, setInput] = useState("");
 
@@ -26,6 +28,14 @@ export function MarkdownPreviewer() {
       inputLabel="Markdown"
       outputLabel="Preview"
       inputPlaceholder={"# Hello\n\nWrite **Markdown** here and see a live preview."}
+      extraActions={
+        <button
+          onClick={() => setInput(SAMPLE)}
+          className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
+        >
+          Load sample
+        </button>
+      }
       outputContent={
         rendered ? (
           <div

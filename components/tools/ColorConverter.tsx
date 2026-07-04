@@ -6,6 +6,8 @@ import { getToolBySlug } from "@/lib/tools";
 
 const tool = getToolBySlug("color-converter")!;
 
+const SAMPLE = "#6366f1";
+
 type RGB = { r: number; g: number; b: number };
 type HSL = { h: number; s: number; l: number };
 
@@ -119,6 +121,14 @@ export function ColorConverter() {
       outputLabel="Conversions"
       inputPlaceholder="Enter a color: #6366f1, rgb(99,102,241), or hsl(239,84%,67%)"
       outputPlaceholder="Converted values will appear here..."
+      extraActions={
+        <button
+          onClick={() => setInput(SAMPLE)}
+          className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
+        >
+          Load sample
+        </button>
+      }
       outputContent={
         result ? (
           <div className="flex flex-col gap-4">
