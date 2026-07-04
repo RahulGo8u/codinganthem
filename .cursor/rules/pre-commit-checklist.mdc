@@ -1,0 +1,34 @@
+---
+description: Checklist to run before every git commit or push in this project
+alwaysApply: true
+---
+
+# Pre-Commit / Pre-Push Checklist
+
+Before running `git commit` or `git push`, verify the following files are in sync with the current tool count and new tools added.
+
+## When a new tool is added to `lib/tools.ts`
+
+1. **`README.md`** — bump the tool count ("All N tools run 100% client-side") and add the new tool under the correct category section.
+
+2. **`public/llms.txt`** — add the new tool under the correct category section with its slug path. This file is manually maintained and does NOT auto-sync.
+
+3. **`app/sitemap.ts`** — bump `LAST_MODIFIED` to today's date (`YYYY-MM-DD`). This is the only part of the sitemap that requires manual updates; the URL list auto-syncs from `tools`.
+
+4. **`app/tools/[slug]/ToolPageClient.tsx`** — register the new tool slug in `TOOL_MAP` with a `next/dynamic` import.
+
+## Files that auto-sync (no manual update needed)
+
+- `app/sitemap.ts` URL list — auto-maps over `tools`
+- `app/page.tsx` FAQ answer — uses `tools.length`
+- `app/about/page.tsx` OG description — uses `tools.length`
+- `components/HomepageClient.tsx` hero copy — uses `tools.length`
+- Homepage category filter and ⌘K command palette — auto-derive from `CATEGORY_ORDER` / `tools`
+
+## Quick sanity check before committing
+
+```bash
+# Confirm README count matches actual tool count
+grep "All [0-9]* tools" README.md
+grep -c "  {$" lib/tools.ts   # should match the number above
+```
