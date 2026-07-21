@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { getToolBySlug, tools } from "@/lib/tools";
+import { getToolBySlug, getIsFreeFaqAnswer, tools } from "@/lib/tools";
 import { ToolPageClient } from "./ToolPageClient";
 
 interface Props {
@@ -123,7 +123,7 @@ export default async function ToolPage({ params }: Props) {
         name: `Is ${tool.name} free?`,
         acceptedAnswer: {
           "@type": "Answer",
-          text: `Yes, ${tool.name} is completely free. No account or sign-up required, and all processing happens in your browser — nothing is sent to a server.`,
+          text: getIsFreeFaqAnswer(tool),
         },
       },
     ],

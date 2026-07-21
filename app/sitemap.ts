@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { tools } from "@/lib/tools";
+import { tools, CATEGORY_ORDER } from "@/lib/tools";
 
 const BASE = "https://www.codinganthem.com";
 // Bump this only when tool content/pages meaningfully change, so the sitemap's
@@ -28,6 +28,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   ];
 
+  const categoryPages: MetadataRoute.Sitemap = CATEGORY_ORDER.map((category) => ({
+    url: `${BASE}/category/${category}`,
+    lastModified: LAST_MODIFIED,
+    changeFrequency: "weekly" as const,
+    priority: 0.7,
+  }));
+
   const toolPages: MetadataRoute.Sitemap = tools.map((tool) => ({
     url: `${BASE}/tools/${tool.slug}`,
     lastModified: LAST_MODIFIED,
@@ -35,5 +42,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.9,
   }));
 
-  return [...staticPages, ...toolPages];
+  return [...staticPages, ...categoryPages, ...toolPages];
 }

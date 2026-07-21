@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Coffee } from "lucide-react";
 import { GitHubStars } from "./GitHubStars";
+import { CATEGORY_LABELS, CATEGORY_ORDER } from "@/lib/tools";
 
 export function Footer() {
   return (
@@ -50,6 +51,19 @@ export function Footer() {
           </nav>
 
         </div>
+
+        {/* Category links — site-wide crawl paths to hub pages */}
+        <nav aria-label="Tool categories" className="mt-6 pt-5 border-t border-[var(--border)] flex flex-wrap gap-x-4 gap-y-2 text-xs text-[var(--text-muted)]">
+          {CATEGORY_ORDER.map((id) => (
+            <Link
+              key={id}
+              href={`/category/${id}`}
+              className="hover:text-[var(--text-primary)] transition-colors"
+            >
+              {CATEGORY_LABELS[id]}
+            </Link>
+          ))}
+        </nav>
 
         {/* Bottom line */}
         <div className="mt-6 pt-5 border-t border-[var(--border)] text-xs text-[var(--text-muted)]">

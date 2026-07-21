@@ -53,14 +53,22 @@ export function GitHubStars() {
     };
   }, []);
 
-  if (stars === null) return null;
-
+  // Reserve a stable slot sized for the full loaded badge (12px icon + gap +
+  // up to ~4 chars like "1.2k"), so revealing it never pushes surrounding
+  // footer links around (avoids layout shift / CLS).
   return (
-    <span className="inline-flex items-center gap-1 text-[var(--text-muted)]">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" className="text-[#f59e0b]">
-        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-      </svg>
-      {formatCount(stars)}
+    <span
+      className="inline-flex items-center justify-start gap-1 text-[var(--text-muted)] w-[3.75rem] tabular-nums"
+      aria-hidden={stars === null}
+    >
+      {stars !== null && (
+        <>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" className="text-[#f59e0b] shrink-0">
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+          </svg>
+          {formatCount(stars)}
+        </>
+      )}
     </span>
   );
 }

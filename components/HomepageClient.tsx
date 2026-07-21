@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useTransition, memo } from "react";
+import Link from "next/link";
 import { tools, CATEGORY_LABELS, CATEGORY_ORDER, sortToolsByName, type ToolCategory } from "@/lib/tools";
 import { ToolCard } from "@/components/ToolCard";
 import { getRecentToolSlugs, clearRecentTools } from "@/components/CommandPalette";
@@ -201,6 +202,24 @@ export function HomepageClient({ faqs = [] }: { faqs?: Faq[] }) {
               {filtered.map((tool) => (
                 <MemoToolCard key={tool.slug} tool={tool} />
               ))}
+            </div>
+
+            {/* Browse by category — crawlable links to hub pages */}
+            <div className="mt-10 pt-8 border-t border-[var(--border)]">
+              <h2 className="text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)] mb-4">
+                Browse by category
+              </h2>
+              <div className="flex flex-wrap gap-2">
+                {CATEGORY_ORDER.map((id) => (
+                  <Link
+                    key={id}
+                    href={`/category/${id}`}
+                    className="px-3 py-1.5 rounded-full text-xs font-medium border border-[var(--border)] bg-[var(--bg-surface)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:border-[#6366f1]/40 transition-colors"
+                  >
+                    {CATEGORY_LABELS[id]}
+                  </Link>
+                ))}
+              </div>
             </div>
           </div>
         </div>

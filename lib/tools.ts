@@ -9,6 +9,18 @@ export type ToolCategory =
   | "visualizers"
   | "ai";
 
+/**
+ * Where a tool's data is processed.
+ * - "client": everything happens in the browser; nothing is sent to a server.
+ * - "server": the tool sends input to a backend or third-party API to work
+ *   (e.g. URL Shortener → our DB, AI tools → Google's Gemini API).
+ *
+ * This drives honest, per-tool copy (FAQ answers, structured data) so we never
+ * claim "nothing is sent to a server" on a tool that actually does. Defaults to
+ * "client" when omitted, since the large majority of tools are client-only.
+ */
+export type ToolDataFlow = "client" | "server";
+
 export type Tool = {
   slug: string;
   name: string;
@@ -17,6 +29,8 @@ export type Tool = {
   icon: string; // lucide-react icon name
   keywords: string[];
   explainer: string; // short SEO paragraph shown below the tool
+  /** Data-processing model. Omit for client-only tools (the default). */
+  dataFlow?: ToolDataFlow;
 };
 
 export const CATEGORY_LABELS: Record<ToolCategory, string> = {
@@ -29,6 +43,72 @@ export const CATEGORY_LABELS: Record<ToolCategory, string> = {
   web: "Web",
   visualizers: "Visualizers",
   ai: "AI",
+};
+
+/**
+ * Per-category metadata for the /category/[category] hub pages.
+ * `title` and `intro` give each hub unique, non-thin content (avoids being seen
+ * as a duplicate of the homepage filter), and target the head keyword for the
+ * cluster. Keep these human-written, not templated.
+ */
+export const CATEGORY_META: Record<
+  ToolCategory,
+  { title: string; tagline: string; intro: string }
+> = {
+  formatters: {
+    title: "Code & Data Formatters",
+    tagline: "Format, beautify, and validate code and data",
+    intro:
+      "Free online formatters for JSON, SQL, HTML, CSS, JavaScript, and XML. Paste messy or minified code and get clean, readable output instantly — with validation and syntax highlighting. Everything runs in your browser, so nothing you paste is sent to a server.",
+  },
+  encoders: {
+    title: "Encoders & Decoders",
+    tagline: "Encode and decode text, strings, and images",
+    intro:
+      "Free online encoders and decoders for Base64, string escaping, and images. Convert data to and from Base64, escape special characters, and turn images into data URLs — instantly and privately in your browser.",
+  },
+  generators: {
+    title: "Generators",
+    tagline: "Generate UUIDs, passwords, QR codes, and mock data",
+    intro:
+      "Free online generators for UUIDs, placeholder text, QR codes, and realistic mock data. Create test fixtures, seed data, and unique identifiers on demand — no sign-up, and everything runs locally in your browser.",
+  },
+  converters: {
+    title: "Data Converters",
+    tagline: "Convert between JSON, CSV, YAML, XML, and more",
+    intro:
+      "Free online converters for JSON, CSV, YAML, XML, TypeScript, colors, timestamps, and number bases. Transform data from one format to another instantly — great for wrangling API responses, config files, and exports right in your browser.",
+  },
+  text: {
+    title: "Text Utilities",
+    tagline: "Compare, count, and transform text",
+    intro:
+      "Free online text tools to test regular expressions, convert case, diff two texts, and count words and characters. Fast, browser-based utilities for everyday writing, coding, and content work.",
+  },
+  security: {
+    title: "Security & Crypto Tools",
+    tagline: "Hashes, passwords, JWTs, and one-time passwords",
+    intro:
+      "Free online security tools to generate hashes (MD5, SHA-256, and more), create strong passwords, work with JWTs, and generate TOTP codes. All cryptography runs in your browser via the Web Crypto API — no secrets ever leave your machine.",
+  },
+  web: {
+    title: "Web Developer Tools",
+    tagline: "URLs, HTML entities, slugs, and cURL",
+    intro:
+      "Free online web development tools to encode and parse URLs, escape HTML entities, generate slugs, convert cURL commands to fetch(), parse User-Agent strings, and shorten links. Everyday utilities for frontend and backend work.",
+  },
+  visualizers: {
+    title: "Visualizers & Previewers",
+    tagline: "Preview Markdown and render diagrams",
+    intro:
+      "Free online visualizers to preview Markdown as rendered HTML and turn Mermaid code into flowcharts, sequence diagrams, and more. See your content and diagrams come to life instantly in your browser.",
+  },
+  ai: {
+    title: "AI Developer Tools",
+    tagline: "Prompt tooling, token counting, and AI code help",
+    intro:
+      "Free AI-powered developer tools: fill in prompt templates, count tokens and estimate API cost for GPT, Claude, and Gemini, and get AI explanations for code, SQL, and error messages. Some tools send your input to an AI API to work — see each tool's description and our Privacy Policy for details.",
+  },
 };
 
 export const tools: Tool[] = [
@@ -508,6 +588,7 @@ export const tools: Tool[] = [
     description: "Shorten any URL online and get a free, shareable codinganthem.com/r/ link instantly. Optional link expiry and click tracking — no sign-up needed.",
     category: "web",
     icon: "Link",
+    dataFlow: "server",
     keywords: ["url", "shorten", "short link", "link", "redirect", "tiny url"],
     explainer:
       "Paste any long URL to generate a short, shareable link at codinganthem.com/r/[code], with a randomly generated 5-character code. Links can have an optional expiry (1 hour, 24 hours, 7 days, or 30 days). Click counts are tracked so you can see how many times your link was visited.",
@@ -518,6 +599,7 @@ export const tools: Tool[] = [
     description: "Paste any code snippet and get a plain-English explanation instantly, powered by AI. Free tool for understanding unfamiliar code in any language.",
     category: "ai",
     icon: "Sparkles",
+    dataFlow: "server",
     keywords: ["ai", "code explainer", "explain code", "gemini", "understand code", "code review"],
     explainer:
       "Paste any code snippet — in any language — and get a plain-English summary plus a breakdown of what each part does, powered by Google's Gemini AI. Useful for understanding unfamiliar code, reviewing a pull request, or learning from an example. Your code is sent to Google's Gemini API to generate the explanation — see the Privacy Policy for details.",
@@ -528,6 +610,7 @@ export const tools: Tool[] = [
     description: "Describe the query you need in plain English and get a ready-to-use SQL statement, powered by AI. Free tool with dialect support.",
     category: "ai",
     icon: "Database",
+    dataFlow: "server",
     keywords: ["ai", "sql generator", "text to sql", "natural language to sql", "gemini", "query generator"],
     explainer:
       "Describe what you want to query in plain English — for example, \"top 5 customers by total order value this year\" — and get back a ready-to-use SQL statement plus a plain-English explanation of what it does, powered by Google's Gemini AI. Supports MySQL, PostgreSQL, and SQLite dialects. Your description is sent to Google's Gemini API to generate the query — see the Privacy Policy for details.",
@@ -538,6 +621,7 @@ export const tools: Tool[] = [
     description: "Paste any error message or stack trace and get a plain-English diagnosis with a suggested fix, powered by AI. Free, no sign-up.",
     category: "ai",
     icon: "AlertTriangle",
+    dataFlow: "server",
     keywords: ["ai", "error explainer", "stack trace", "debug", "gemini", "fix error"],
     explainer:
       "Paste any cryptic error message or stack trace and get a plain-English diagnosis of what went wrong, its likely cause, and a suggested fix, powered by Google's Gemini AI. Works across languages and environments — just select the closest match if you know it. Your error message is sent to Google's Gemini API to generate the explanation — see the Privacy Policy for details.",
@@ -550,6 +634,13 @@ export function getToolBySlug(slug: string): Tool | undefined {
 
 export function getToolsByCategory(category: ToolCategory): Tool[] {
   return tools.filter((t) => t.category === category);
+}
+
+/** Type guard: is `value` a valid tool category slug? */
+export function isToolCategory(value: string): value is ToolCategory {
+  // Object.hasOwn (not `in`) so inherited keys like "__proto__"/"constructor"
+  // aren't accepted as categories, which would bypass notFound() on bad URLs.
+  return Object.hasOwn(CATEGORY_LABELS, value);
 }
 
 /** Returns a new array of tools sorted alphabetically by name. */
@@ -571,4 +662,21 @@ export function getRelatedTools(slug: string, category: ToolCategory, count = 4)
   if (sameCategory.length >= count) return sameCategory.slice(0, count);
   const others = tools.filter((t) => t.slug !== slug && t.category !== category);
   return [...sameCategory, ...others].slice(0, count);
+}
+
+/** True when the tool processes everything locally and sends nothing to a server. */
+export function isClientSideOnly(tool: Tool): boolean {
+  return (tool.dataFlow ?? "client") === "client";
+}
+
+/**
+ * Honest answer to "Is {tool} free?" that also states the data-flow model, so
+ * the copy (and the FAQ structured data built from it) never contradicts a
+ * tool that actually sends data to a backend or third-party API.
+ */
+export function getIsFreeFaqAnswer(tool: Tool): string {
+  if (isClientSideOnly(tool)) {
+    return `Yes, ${tool.name} is completely free. No account or sign-up required, and all processing happens in your browser — nothing is sent to a server.`;
+  }
+  return `Yes, ${tool.name} is completely free — no account or sign-up required. This tool sends your input to a backend service to work (see the tool description and our Privacy Policy for exactly what's sent and why).`;
 }

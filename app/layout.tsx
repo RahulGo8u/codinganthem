@@ -120,10 +120,17 @@ export default function RootLayout({
           strategy="afterInteractive"
         />
 
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:px-4 focus:py-2 focus:rounded-lg focus:bg-[#6366f1] focus:text-white focus:text-sm focus:font-medium"
+        >
+          Skip to content
+        </a>
+
         <Providers>
           <Nav />
           <CommandPalette />
-          <main className="flex-1">{children}</main>
+          <main id="main-content" tabIndex={-1} className="flex-1 outline-none">{children}</main>
           <Footer />
         </Providers>
         <Analytics />
