@@ -11,6 +11,19 @@ function formatCount(n: number): string {
   return String(n);
 }
 
+function scheduleIdle(cb: () => void): () => void {
+  const w = window as Window & {
+    requestIdleCallback?: (cb: IdleRequestCallback, opts?: IdleRequestOptions) => number;
+    cancelIdleCallback?: (id: number) => void;
+  };
+  if (typeof w.requestIdleCallback === "function") {
+    const id = w.requestIdleCallback(cb, { timeout: 4000 });
+    return () => w.cancelIdleCallback?.(id);
+  }
+  const id = setTimeout(cb, 2000);
+  return () => clearTimeout(id);
+}
+
 export function GitHubStars({ className = "" }: { className?: string }) {
   const [stars, setStars] = useState<number | null>(null);
 
@@ -30,26 +43,31 @@ export function GitHubStars({ className = "" }: { className?: string }) {
       // ignore malformed cache
     }
 
-    fetch(`https://api.github.com/repos/${REPO}`)
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data) => {
-        if (cancelled || !data || typeof data.stargazers_count !== "number") return;
-        setStars(data.stargazers_count);
-        try {
-          localStorage.setItem(
-            CACHE_KEY,
-            JSON.stringify({ count: data.stargazers_count, ts: Date.now() })
-          );
-        } catch {
-          // ignore quota errors
-        }
-      })
-      .catch(() => {
-        // silently ignore — badge just won't render
-      });
+    // Defer network until the browser is idle so api.github.com stays off the LCP path
+    const cancelIdle = scheduleIdle(() => {
+      if (cancelled) return;
+      fetch(`https://api.github.com/repos/${REPO}`)
+        .then((res) => (res.ok ? res.json() : null))
+        .then((data) => {
+          if (cancelled || !data || typeof data.stargazers_count !== "number") return;
+          setStars(data.stargazers_count);
+          try {
+            localStorage.setItem(
+              CACHE_KEY,
+              JSON.stringify({ count: data.stargazers_count, ts: Date.now() })
+            );
+          } catch {
+            // ignore quota errors
+          }
+        })
+        .catch(() => {
+          // silently ignore — badge just won't render
+        });
+    });
 
     return () => {
       cancelled = true;
+      cancelIdle();
     };
   }, []);
 

@@ -64,8 +64,8 @@
   --border: #e5e7eb;
   --text-primary: #111111;
   --text-muted: #6b7280;
-  /* #4338ca on white ≈ 7:1 — passes AA for small text (logo, NEW badges, pills) */
-  --accent-text: #4338ca;
+  /* indigo-800 — AA on white and indigo-tinted pills/NEW badges */
+  --accent-text: #3730a3;
 
   /* Syntax highlighting (code output panes) — darker/saturated for readability on light backgrounds */
   --syntax-key: #4338ca;
