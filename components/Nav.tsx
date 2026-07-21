@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { Coffee } from "lucide-react";
 import { ThemeToggle } from "./ThemeToggle";
 
 export function Nav() {
@@ -51,6 +52,28 @@ export function Nav() {
               <line x1="21" y1="21" x2="16.65" y2="16.65" />
             </svg>
           </button>
+
+          {/* Buy me a coffee — desktop */}
+          <a
+            href="https://buymeacoffee.com/codinganthem"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hidden sm:flex items-center gap-1.5 px-3 h-8 rounded-lg border border-[#f59e0b]/40 bg-[#f59e0b]/10 text-[#f59e0b] hover:bg-[#f59e0b]/20 transition-colors text-xs font-medium"
+          >
+            <Coffee size={13} />
+            Buy me a coffee
+          </a>
+
+          {/* Buy me a coffee — mobile icon only */}
+          <a
+            href="https://buymeacoffee.com/codinganthem"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="sm:hidden w-8 h-8 flex items-center justify-center rounded-lg text-[#f59e0b] hover:bg-[#f59e0b]/10 transition-colors"
+            aria-label="Buy me a coffee"
+          >
+            <Coffee size={16} />
+          </a>
 
           <ThemeToggle />
         </div>

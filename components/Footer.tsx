@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Coffee } from "lucide-react";
 import { GitHubStars } from "./GitHubStars";
 
 export function Footer() {
@@ -41,9 +42,10 @@ export function Footer() {
               href="https://buymeacoffee.com/codinganthem"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:text-[var(--text-primary)] transition-colors"
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-[#f59e0b]/40 bg-[#f59e0b]/10 text-[#f59e0b] hover:bg-[#f59e0b]/20 transition-colors font-medium"
             >
-              Support ☕
+              <Coffee size={12} />
+              Buy me a coffee
             </a>
           </nav>
 
