@@ -185,17 +185,19 @@ export function FaviconGenerator() {
         ))}
       </div>
 
-      <button
-        onClick={() => void downloadAll()}
-        disabled={Object.keys(previews).length === 0}
-        className="self-start px-4 py-2 rounded-lg text-sm font-medium border border-[#6366f1]/40 bg-[#6366f1]/10 text-[#6366f1] hover:bg-[#6366f1]/20 disabled:opacity-40"
-      >
-        Download all sizes
-      </button>
-      <p className="text-xs text-[var(--text-muted)]">
-        Tip: use <code className="mono">favicon-32x32.png</code> as <code className="mono">favicon.ico</code> replacement, and{" "}
-        <code className="mono">apple-touch-icon.png</code> for iOS home screens.
-      </p>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <p className="text-xs text-[var(--text-muted)]">
+          Tip: use <code className="mono">favicon-32x32.png</code> as <code className="mono">favicon.ico</code> replacement, and{" "}
+          <code className="mono">apple-touch-icon.png</code> for iOS home screens.
+        </p>
+        <button
+          onClick={() => void downloadAll()}
+          disabled={Object.keys(previews).length === 0}
+          className="self-end shrink-0 px-4 py-2 rounded-lg text-sm font-medium border border-[#6366f1]/40 bg-[#6366f1]/10 text-[#6366f1] hover:bg-[#6366f1]/20 disabled:opacity-40"
+        >
+          Download all sizes
+        </button>
+      </div>
     </div>
   );
 }

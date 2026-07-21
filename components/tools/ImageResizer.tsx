@@ -164,27 +164,26 @@ export function ImageResizer() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] p-4">
+            <div className="rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] p-4 flex flex-col gap-2">
               <span className="text-xs uppercase tracking-wider text-[var(--text-muted)]">Original</span>
-              {preview && <img src={preview} alt="Original" className="max-h-64 object-contain mx-auto mt-2" />}
+              {preview && <img src={preview} alt="Original" className="max-h-64 object-contain mx-auto" />}
             </div>
-            <div className="rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] p-4">
+            <div className="rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] p-4 flex flex-col gap-2">
               <span className="text-xs uppercase tracking-wider text-[var(--text-muted)]">Resized · {width}×{height}</span>
-              {resultUrl && <img src={resultUrl} alt="Resized" className="max-h-64 object-contain mx-auto mt-2" />}
+              {resultUrl && <img src={resultUrl} alt="Resized" className="max-h-64 object-contain mx-auto" />}
+              <button
+                disabled={!resultBlob.current}
+                onClick={() => {
+                  if (!resultBlob.current || !file) return;
+                  const ext = file.name.split(".").pop() || "jpg";
+                  downloadBlob(resultBlob.current, `${file.name.replace(/\.[^.]+$/, "")}-${width}x${height}.${ext}`);
+                }}
+                className="self-end mt-1 px-4 py-2 rounded-lg text-sm font-medium border border-[#6366f1]/40 bg-[#6366f1]/10 text-[#6366f1] hover:bg-[#6366f1]/20 disabled:opacity-40"
+              >
+                Download resized image
+              </button>
             </div>
           </div>
-
-          <button
-            disabled={!resultBlob.current}
-            onClick={() => {
-              if (!resultBlob.current || !file) return;
-              const ext = file.name.split(".").pop() || "jpg";
-              downloadBlob(resultBlob.current, `${file.name.replace(/\.[^.]+$/, "")}-${width}x${height}.${ext}`);
-            }}
-            className="self-start px-4 py-2 rounded-lg text-sm font-medium border border-[#6366f1]/40 bg-[#6366f1]/10 text-[#6366f1] hover:bg-[#6366f1]/20 disabled:opacity-40"
-          >
-            Download resized image
-          </button>
         </>
       )}
     </div>
