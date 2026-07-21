@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useTransition, memo } from "react";
-import Link from "next/link";
 import { tools, CATEGORY_LABELS, CATEGORY_ORDER, sortToolsByName, type ToolCategory } from "@/lib/tools";
 import { ToolCard } from "@/components/ToolCard";
 import { getRecentToolSlugs, clearRecentTools } from "@/components/CommandPalette";
@@ -45,16 +44,16 @@ export function HomepageClient({ faqs = [] }: { faqs?: Faq[] }) {
 
           {/* Heading */}
           <div className="flex flex-col gap-3 max-w-2xl">
+            <span className="text-sm font-semibold tracking-tight" style={{ color: "var(--text-muted)" }}>
+              <span style={{ color: "#6366f1" }}>coding</span>anthem
+            </span>
             <h1 className="text-4xl sm:text-5xl font-semibold tracking-tight" style={{ color: "var(--text-primary)" }}>
-              <span style={{ color: "#6366f1" }}>coding</span>anthem{" "}
-              <span className="block text-xl sm:text-2xl font-normal mt-3" style={{ color: "var(--text-muted)" }}>
-                Free Online Developer Utilities &amp; Tools
-              </span>
+              {tools.length} Free Developer Tools
             </h1>
             <p className="text-base sm:text-lg leading-relaxed" style={{ color: "var(--text-muted)" }}>
-              {tools.length} developer tools, most running entirely in your browser. Paste JSON
-              from ChatGPT, decode a JWT from a bug report, or format SQL from Copilot —
-              instantly, no sign-up required.
+              Built for developers, students, and AI engineers. No login, no ads — just instant
+              results. Paste JSON from ChatGPT, decode a JWT from a bug report, or format SQL
+              from Copilot, most tools running entirely in your browser.
             </p>
           </div>
 
@@ -202,24 +201,6 @@ export function HomepageClient({ faqs = [] }: { faqs?: Faq[] }) {
               {filtered.map((tool) => (
                 <MemoToolCard key={tool.slug} tool={tool} />
               ))}
-            </div>
-
-            {/* Browse by category — crawlable links to hub pages */}
-            <div className="mt-10 pt-8 border-t border-[var(--border)]">
-              <h2 className="text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)] mb-4">
-                Browse by category
-              </h2>
-              <div className="flex flex-wrap gap-2">
-                {CATEGORY_ORDER.map((id) => (
-                  <Link
-                    key={id}
-                    href={`/category/${id}`}
-                    className="px-3 py-1.5 rounded-full text-xs font-medium border border-[var(--border)] bg-[var(--bg-surface)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:border-[#6366f1]/40 transition-colors"
-                  >
-                    {CATEGORY_LABELS[id]}
-                  </Link>
-                ))}
-              </div>
             </div>
           </div>
         </div>
