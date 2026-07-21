@@ -21,7 +21,7 @@ const SECTIONS = [
   },
   {
     title: "Server-side tools",
-    body: "A small number of tools require a backend to function — currently, URL Shortener. When you use this tool, the URL you submit and the generated short code are stored in a database so the redirect can work. No account or personal information is collected or required to use it.",
+    body: "A small number of tools require a backend to function — currently, URL Shortener. When you use this tool, the URL you submit and the generated short code are stored in a database so the redirect can work. No account or personal information is collected or required to use it. Separately, AI-powered tools send your input to Google's Gemini API (see the next section) — that is a third-party data flow, not our database.",
   },
   {
     title: "AI-powered tools",

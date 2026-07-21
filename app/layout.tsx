@@ -62,6 +62,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
+    site: "@CodingAnthem",
     title: "CodingAnthem — Free Online Developer Utilities & Tools",
     description:
       "Fast, free developer tools for your browser and AI workflows. Format JSON, encode Base64, generate UUIDs, test regex, and more.",
@@ -90,7 +91,11 @@ const jsonLd = {
       name: "CodingAnthem",
       url: "https://www.codinganthem.com",
       logo: "https://www.codinganthem.com/apple-touch-icon.png",
-      sameAs: ["https://github.com/RahulGo8u/codinganthem"],
+      sameAs: [
+        "https://github.com/RahulGo8u/codinganthem",
+        "https://x.com/codinganthem",
+        "https://www.youtube.com/@codinganthem",
+      ],
     },
     {
       "@type": "WebSite",

@@ -61,7 +61,7 @@ export default function AboutPage() {
               },
               {
                 title: "Shareable",
-                desc: "Tool state is encoded in the URL — share a pre-filled tool with one link.",
+                desc: "Every tool has a stable URL you can copy and share — open the same tool instantly, no account required.",
               },
             ].map(({ title, desc }) => (
               <div key={title} className="flex gap-4 p-4 rounded-xl border border-[var(--border)] bg-[var(--bg-surface)]">

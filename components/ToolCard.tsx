@@ -15,14 +15,21 @@ export function ToolCard({ tool }: { tool: Tool }) {
       href={`/tools/${tool.slug}`}
       className="group relative flex flex-col gap-4 p-5 rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] hover:border-[#6366f1]/40 hover:bg-[var(--bg-elevated)] transition-all duration-150"
     >
-      {/* Top row: icon + category tag */}
+      {/* Top row: icon + category / New tag */}
       <div className="flex items-start justify-between gap-2">
         <div className="w-10 h-10 flex items-center justify-center rounded-lg bg-[#6366f1]/10 group-hover:bg-[#6366f1]/20 transition-colors duration-150">
           <ToolIcon name={tool.icon} />
         </div>
-        <span className="text-[10px] font-medium text-[var(--text-muted)] group-hover:text-[#6366f1] transition-colors duration-150 capitalize">
-          {CATEGORY_LABELS[tool.category]}
-        </span>
+        <div className="flex items-center gap-1.5">
+          {tool.isNew && (
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-[#6366f1] bg-[#6366f1]/10 px-1.5 py-0.5 rounded">
+              New
+            </span>
+          )}
+          <span className="text-[10px] font-medium text-[var(--text-muted)] group-hover:text-[#6366f1] transition-colors duration-150 capitalize">
+            {CATEGORY_LABELS[tool.category]}
+          </span>
+        </div>
       </div>
 
       {/* Text */}

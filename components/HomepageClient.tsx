@@ -5,6 +5,7 @@ import { tools, CATEGORY_LABELS, CATEGORY_ORDER, sortToolsByName, type ToolCateg
 import { ToolCard } from "@/components/ToolCard";
 import { getRecentToolSlugs, clearRecentTools } from "@/components/CommandPalette";
 import { HeroDemo } from "@/components/HeroDemo";
+import { GitHubStars } from "@/components/GitHubStars";
 
 const ALL = "all" as const;
 type Filter = ToolCategory | typeof ALL;
@@ -56,6 +57,20 @@ export function HomepageClient({ faqs = [] }: { faqs?: Faq[] }) {
               from Copilot, most tools running entirely in your browser.
             </p>
           </div>
+
+          {/* GitHub social proof */}
+          <a
+            href="https://github.com/RahulGo8u/codinganthem"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full border border-[var(--border)] bg-[var(--bg-surface)] text-sm text-[var(--text-muted)] hover:border-[#6366f1]/40 hover:text-[var(--text-primary)] transition-colors"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="shrink-0">
+              <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />
+            </svg>
+            <span className="font-medium text-[var(--text-primary)]">Star on GitHub</span>
+            <GitHubStars />
+          </a>
 
           {/* Search bar */}
           <button
@@ -153,15 +168,18 @@ export function HomepageClient({ faqs = [] }: { faqs?: Faq[] }) {
               href="https://github.com/RahulGo8u/codinganthem"
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-2 flex flex-col gap-1.5 p-4 rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] hover:border-[#6366f1]/40 transition-colors"
+              className="mt-2 flex flex-col gap-2 p-4 rounded-xl border border-[#6366f1]/30 bg-[#6366f1]/5 hover:border-[#6366f1]/50 hover:bg-[#6366f1]/10 transition-colors"
             >
-              <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--text-muted)]">
-                Open Source
-              </span>
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-[#6366f1]">
+                  Open Source
+                </span>
+                <GitHubStars />
+              </div>
               <span className="text-xs text-[var(--text-muted)] leading-relaxed">
-                codinganthem is fully open source. Contribute your own tools.
+                Fully open source. Star the repo or contribute a tool.
               </span>
-              <span className="text-xs font-medium text-[#6366f1] mt-1">View GitHub →</span>
+              <span className="text-xs font-medium text-[#6366f1]">Star on GitHub →</span>
             </a>
           </aside>
 

@@ -15,6 +15,12 @@ import {
 
 const tool = getToolBySlug("image-resizer")!;
 
+const SIZE_PRESETS = [
+  { label: "1920×1080", w: 1920, h: 1080 },
+  { label: "1200×630", w: 1200, h: 630 },
+  { label: "512×512", w: 512, h: 512 },
+] as const;
+
 export function ImageResizer() {
   const [file, setFile] = useState<File | null>(null);
   const [imgEl, setImgEl] = useState<HTMLImageElement | null>(null);
@@ -92,6 +98,13 @@ export function ImageResizer() {
     if (imgEl && file) void resize(imgEl, lock ? w : width, h, file);
   };
 
+  const applyPreset = (w: number, h: number) => {
+    setLock(false);
+    setWidth(w);
+    setHeight(h);
+    if (imgEl && file) void resize(imgEl, w, h, file);
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-6 py-8 flex flex-col gap-6 pb-24">
       <div className="flex flex-col gap-3">
@@ -131,36 +144,55 @@ export function ImageResizer() {
 
       {file && imgEl && (
         <>
-          <div className="flex flex-wrap items-end gap-4 px-4 py-3 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)]">
-            <label className="flex flex-col gap-1 text-xs text-[var(--text-muted)]">
-              Width (px)
-              <input
-                type="number"
-                min={1}
-                max={8000}
-                value={width}
-                onChange={(e) => applyWidth(Number(e.target.value) || 1)}
-                className="mono w-28 rounded border border-[var(--border)] bg-[var(--bg-elevated)] px-2 py-1.5 text-sm text-[var(--text-primary)]"
-              />
-            </label>
-            <label className="flex flex-col gap-1 text-xs text-[var(--text-muted)]">
-              Height (px)
-              <input
-                type="number"
-                min={1}
-                max={8000}
-                value={height}
-                onChange={(e) => applyHeight(Number(e.target.value) || 1)}
-                className="mono w-28 rounded border border-[var(--border)] bg-[var(--bg-elevated)] px-2 py-1.5 text-sm text-[var(--text-primary)]"
-              />
-            </label>
-            <label className="flex items-center gap-2 text-xs text-[var(--text-muted)] pb-1.5">
-              <input type="checkbox" checked={lock} onChange={(e) => setLock(e.target.checked)} />
-              Lock aspect ratio
-            </label>
-            <span className="text-xs text-[var(--text-muted)] pb-1.5">
-              Original {imgEl.naturalWidth}×{imgEl.naturalHeight} · {formatBytes(file.size)} → {formatBytes(resultSize)}
-            </span>
+          <div className="flex flex-col gap-3 px-4 py-3 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)]">
+            <div className="flex flex-wrap items-end gap-4">
+              <label className="flex flex-col gap-1 text-xs text-[var(--text-muted)]">
+                Width (px)
+                <input
+                  type="number"
+                  min={1}
+                  max={8000}
+                  value={width}
+                  onChange={(e) => applyWidth(Number(e.target.value) || 1)}
+                  className="mono w-28 rounded border border-[var(--border)] bg-[var(--bg-elevated)] px-2 py-1.5 text-sm text-[var(--text-primary)]"
+                />
+              </label>
+              <label className="flex flex-col gap-1 text-xs text-[var(--text-muted)]">
+                Height (px)
+                <input
+                  type="number"
+                  min={1}
+                  max={8000}
+                  value={height}
+                  onChange={(e) => applyHeight(Number(e.target.value) || 1)}
+                  className="mono w-28 rounded border border-[var(--border)] bg-[var(--bg-elevated)] px-2 py-1.5 text-sm text-[var(--text-primary)]"
+                />
+              </label>
+              <label className="flex items-center gap-2 text-xs text-[var(--text-muted)] pb-1.5">
+                <input type="checkbox" checked={lock} onChange={(e) => setLock(e.target.checked)} />
+                Lock aspect ratio
+              </label>
+              <span className="text-xs text-[var(--text-muted)] pb-1.5">
+                Original {imgEl.naturalWidth}×{imgEl.naturalHeight} · {formatBytes(file.size)} → {formatBytes(resultSize)}
+              </span>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-[10px] uppercase tracking-wider text-[var(--text-muted)]">Presets</span>
+              {SIZE_PRESETS.map((p) => (
+                <button
+                  key={p.label}
+                  type="button"
+                  onClick={() => applyPreset(p.w, p.h)}
+                  className={`px-2.5 py-1 rounded-md text-xs font-medium border transition-colors ${
+                    width === p.w && height === p.h
+                      ? "border-[#6366f1]/50 bg-[#6366f1]/15 text-[#6366f1]"
+                      : "border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)]"
+                  }`}
+                >
+                  {p.label}
+                </button>
+              ))}
+            </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

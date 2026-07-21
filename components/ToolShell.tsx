@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import type { Tool } from "@/lib/tools";
 import { Breadcrumb } from "@/components/Breadcrumb";
 
@@ -50,7 +50,7 @@ interface ToolShellProps {
   extraActions?: React.ReactNode;
   /** Extra buttons for the action bar (right side, next to Download/Copy) */
   extraRightActions?: React.ReactNode;
-  /** Right-aligned badges shown in the header next to the title (e.g. "Client-side", "WCAG 2.1") */
+  /** Right-aligned badges shown in the header next to the title (e.g. "WCAG 2.1 Ready") */
   badges?: React.ReactNode;
   /** Hide Upload file + Download buttons (e.g. generator tools) */
   hideFileActions?: boolean;
@@ -86,7 +86,12 @@ export function ToolShell({
 }: ToolShellProps) {
   const [copied, setCopied] = useState(false);
   const [shared, setShared] = useState(false);
+  const [canNativeShare, setCanNativeShare] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setCanNativeShare(typeof navigator !== "undefined" && typeof navigator.share === "function");
+  }, []);
 
   const handleCopy = useCallback(async () => {
     if (!output) return;
@@ -98,6 +103,36 @@ export function ToolShell({
       setCopied(false);
     }
   }, [output]);
+
+  const handleCopyUrl = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      setShared(true);
+      setTimeout(() => setShared(false), 1500);
+    } catch {
+      setShared(false);
+    }
+  }, []);
+
+  const handleShareX = useCallback(() => {
+    const url = window.location.href;
+    const text = `${tool.name} — free online developer tool`;
+    const intent = `https://x.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
+    window.open(intent, "_blank", "noopener,noreferrer");
+  }, [tool.name]);
+
+  const handleNativeShare = useCallback(async () => {
+    if (typeof navigator === "undefined" || !navigator.share) return;
+    try {
+      await navigator.share({
+        title: tool.name,
+        text: tool.description,
+        url: window.location.href,
+      });
+    } catch {
+      // user cancelled or share failed — ignore
+    }
+  }, [tool.name, tool.description]);
 
   const handleDownload = useCallback(() => {
     if (!output) return;
@@ -288,18 +323,35 @@ export function ToolShell({
               {extraActions}
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               {extraRightActions}
               <button
-                onClick={async () => {
-                  try {
-                    await navigator.clipboard.writeText(window.location.href);
-                    setShared(true);
-                    setTimeout(() => setShared(false), 1500);
-                  } catch {
-                    setShared(false);
-                  }
-                }}
+                onClick={handleShareX}
+                title="Share on X"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
+              >
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.227-8.26L1.99 2.25h7.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                </svg>
+                <span className="hidden sm:inline">Share</span>
+              </button>
+              {canNativeShare && (
+                <button
+                  onClick={handleNativeShare}
+                  title="Share via device"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
+                >
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <circle cx="18" cy="5" r="3" />
+                    <circle cx="6" cy="12" r="3" />
+                    <circle cx="18" cy="19" r="3" />
+                    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+                    <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+                  </svg>
+                </button>
+              )}
+              <button
+                onClick={handleCopyUrl}
                 title="Copy link to this tool"
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
                   shared
@@ -313,6 +365,22 @@ export function ToolShell({
                 </svg>
                 {shared ? "Copied!" : "Copy URL"}
               </button>
+              <a
+                href="https://buymeacoffee.com/codinganthem"
+                target="_blank"
+                rel="noopener noreferrer"
+                title="Support CodingAnthem"
+                className="flex items-center gap-1.5 px-2 py-1.5 text-xs text-[var(--text-muted)] hover:text-[#f59e0b] transition-colors"
+              >
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M18 8h1a4 4 0 0 1 0 8h-1" />
+                  <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z" />
+                  <line x1="6" y1="1" x2="6" y2="4" />
+                  <line x1="10" y1="1" x2="10" y2="4" />
+                  <line x1="14" y1="1" x2="14" y2="4" />
+                </svg>
+                <span className="hidden sm:inline">Coffee</span>
+              </a>
               {!hideFileActions && !hideDownload && (
                 <button
                   onClick={handleDownload}

@@ -43,6 +43,8 @@ export type Tool = {
    * when omitted.
    */
   seoTitle?: string;
+  /** Highlight recently shipped tools on cards / homepage. Remove when no longer “new”. */
+  isNew?: boolean;
 };
 
 export const CATEGORY_LABELS: Record<ToolCategory, string> = {
@@ -718,6 +720,7 @@ export const tools: Tool[] = [
     category: "web3",
     icon: "Coins",
     keywords: ["eth", "wei", "gwei", "ether", "ethereum", "unit converter", "gas price", "web3"],
+    isNew: true,
     explainer:
       "Convert between Wei, Kwei, Mwei, Gwei, Szabo, Finney, and Ether instantly — all seven fields stay in sync as you type.\n\n• Uses BigInt arithmetic, not floating-point, so large values (like 1 ETH = 1,000,000,000,000,000,000 Wei) are always exact\n• Quick-fill chips for common values: 1 ETH, a typical 20 Gwei gas price, and the 21000 Wei base gas cost of a simple transfer\n• Useful for reading gas estimates, RPC logs, and contract values that come back in raw Wei\n• Runs entirely in your browser — never paste a private key or seed phrase into this or any online tool",
   },
@@ -729,6 +732,7 @@ export const tools: Tool[] = [
     category: "images",
     icon: "Minimize2",
     keywords: ["image compressor", "compress jpg", "compress png", "webp compressor", "reduce image size", "optimize image"],
+    isNew: true,
     explainer:
       "Shrink image file size without leaving your browser. Upload a JPG, PNG, WebP, or GIF, tune quality, pick an output format, and download the result.\n\n• Before/after preview with exact byte savings\n• JPEG, WebP, and PNG output\n• Everything runs locally via the Canvas API — your images are never uploaded",
   },
@@ -740,6 +744,7 @@ export const tools: Tool[] = [
     category: "images",
     icon: "Scaling",
     keywords: ["image resizer", "resize image", "resize photo", "change image size", "scale image online"],
+    isNew: true,
     explainer:
       "Set exact width and height, lock aspect ratio if you want, and download a resized copy instantly.\n\n• Works with PNG, JPG, WebP, and GIF\n• Live preview of original vs resized\n• No uploads — resizing happens on your device",
   },
@@ -751,6 +756,7 @@ export const tools: Tool[] = [
     category: "images",
     icon: "AppWindow",
     keywords: ["favicon generator", "favicon maker", "apple touch icon", "create favicon", "favicon from text"],
+    isNew: true,
     explainer:
       "Create a favicon pack from initials/text or a source image. Download 16×16, 32×32, 48×48, and 180×180 (Apple Touch) PNGs ready for your site.\n\n• Text mode with background and foreground colors\n• Image mode with cover-crop to square\n• Fully client-side — nothing is uploaded",
   },
@@ -762,6 +768,7 @@ export const tools: Tool[] = [
     category: "css",
     icon: "Blend",
     keywords: ["css gradient generator", "linear gradient", "radial gradient", "conic gradient", "css background gradient"],
+    isNew: true,
     explainer:
       "Build linear, radial, or conic gradients with up to six color stops, live preview, and one-click copy of the CSS background rule.\n\n• Angle control for linear and conic gradients\n• Editable hex colors and stop positions\n• Perfect for hero backgrounds, buttons, and UI accents",
   },
@@ -773,6 +780,7 @@ export const tools: Tool[] = [
     category: "web",
     icon: "Tags",
     keywords: ["meta tag generator", "open graph generator", "og tags", "twitter card generator", "seo meta tags"],
+    isNew: true,
     explainer:
       "Fill in title, description, URL, and image — get complete <title>, description, canonical, Open Graph, and Twitter Card tags.\n\n• Live Google SERP preview and social card preview\n• Character-length hints for title and description\n• Copy the full HTML snippet in one click",
   },
@@ -784,6 +792,7 @@ export const tools: Tool[] = [
     category: "security",
     icon: "LockKeyhole",
     keywords: ["bcrypt generator", "bcrypt hash", "bcrypt verifier", "password hash", "bcrypt online"],
+    isNew: true,
     explainer:
       "Hash passwords with bcrypt and verify existing hashes. Choose cost rounds (4–14); 10–12 is typical for production.\n\n• Generate and verify in one page\n• Uses bcryptjs — your password never leaves the browser\n• Useful for testing fixtures and checking hashes from logs (never paste production secrets into any online tool if you can avoid it)",
   },
@@ -795,6 +804,7 @@ export const tools: Tool[] = [
     category: "generators",
     icon: "FileCog",
     keywords: ["chmod calculator", "unix permissions", "file permissions", "chmod 755", "chmod generator"],
+    isNew: true,
     explainer:
       "Toggle read/write/execute for owner, group, and public — instantly see octal (e.g. 755), symbolic (rwxr-xr-x), and a ready-to-paste chmod command.\n\n• Presets for 644, 755, 600, 700, and 777\n• Optional setuid, setgid, and sticky bit\n• Edit octal directly to update the checkboxes",
   },

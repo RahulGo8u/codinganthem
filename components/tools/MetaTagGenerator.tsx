@@ -114,12 +114,12 @@ export function MetaTagGenerator() {
         </div>
 
         <div className="flex flex-col gap-4">
-          <div className="rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] p-4 flex flex-col gap-3">
-            <span className="text-xs uppercase tracking-wider text-[var(--text-muted)]">Google preview</span>
+          <div className="rounded-lg border border-[var(--border)] bg-white p-4 flex flex-col gap-3">
+            <span className="text-xs uppercase tracking-wider text-zinc-500">Google preview</span>
             <div className="flex flex-col gap-1">
               <span className="text-sm text-[#1a0dab] truncate">{title || "Page title"}</span>
               <span className="text-xs text-[#006621] truncate">{url || "https://example.com"}</span>
-              <span className="text-xs text-[var(--text-muted)] leading-relaxed line-clamp-2">
+              <span className="text-xs text-zinc-600 leading-relaxed line-clamp-2">
                 {description || "Meta description appears here."}
               </span>
             </div>

@@ -1,10 +1,27 @@
-# codinganthem
+# CodingAnthem — Free Online Developer Tools
 
-The developer toolbox you always wanted — fast, free, and private. Growing collection of tools.
+[![Live](https://img.shields.io/badge/Live-codinganthem.com-6366f1?style=flat)](https://www.codinganthem.com)
+[![GitHub stars](https://img.shields.io/github/stars/RahulGo8u/codinganthem?style=flat&color=6366f1)](https://github.com/RahulGo8u/codinganthem)
+[![Buy Me a Coffee](https://img.shields.io/badge/Support-Buy%20Me%20a%20Coffee-6366f1?style=flat&logo=buy-me-a-coffee&logoColor=white)](https://buymeacoffee.com/codinganthem)
 
-🔗 [www.codinganthem.com](https://www.codinganthem.com) &nbsp;·&nbsp; [![Buy Me a Coffee](https://img.shields.io/badge/Support-Buy%20Me%20a%20Coffee-6366f1?style=flat&logo=buy-me-a-coffee&logoColor=white)](https://buymeacoffee.com/codinganthem)
+**CodingAnthem** is a free online developer toolbox — JSON formatter, Base64 encoder/decoder, JWT decoder, UUID generator, regex tester, image compressor, bcrypt hash generator, and 50+ more utilities. No sign-up, no ads. Most tools run **100% client-side** in your browser.
 
-Most tools run **100% client-side** in your browser. A few (like URL Shortener) use a lightweight backend to store data, and the AI tools send input to Google's Gemini API to generate a response — always noted on the tool page. No sign-up required for any tool.
+🔗 [www.codinganthem.com](https://www.codinganthem.com) · [X / Twitter](https://x.com/codinganthem) · [YouTube](https://www.youtube.com/@codinganthem)
+
+A few tools (like URL Shortener) use a lightweight backend, and AI tools send input to Google's Gemini API — always noted on the tool page.
+
+## Top tools
+
+| Tool | What it does |
+|------|----------------|
+| [JSON Formatter](https://www.codinganthem.com/tools/json-formatter) | Beautify, minify, and validate JSON |
+| [Base64 Encoder / Decoder](https://www.codinganthem.com/tools/base64) | Encode and decode Base64 strings |
+| [JWT Decoder](https://www.codinganthem.com/tools/jwt-decoder) | Inspect header, payload, and signature |
+| [Image Compressor](https://www.codinganthem.com/tools/image-compressor) | Compress JPG, PNG, and WebP in-browser |
+| [Password Generator](https://www.codinganthem.com/tools/password-generator) | Cryptographically secure passwords |
+| [Meta Tag Generator](https://www.codinganthem.com/tools/meta-tag-generator) | SEO, Open Graph, and Twitter Card tags |
+| [Bcrypt Generator](https://www.codinganthem.com/tools/bcrypt-generator) | Hash and verify bcrypt passwords |
+| [Word Counter](https://www.codinganthem.com/tools/word-counter) | Words, characters, reading time |
 
 ## Tools
 
@@ -100,7 +117,7 @@ Most tools run **100% client-side** in your browser. A few (like URL Shortener) 
 - [yaml](https://eemeli.org/yaml/) and [marked](https://marked.js.org) for YAML / Markdown parsing
 - [mermaid](https://mermaid.js.org) for diagram rendering
 - [sql-formatter](https://sql-formatter-org.github.io/sql-formatter/) for SQL formatting
-- [js-beautify](https://github.com/beautifier/js-beautify) for JS / HTML / CSS formatting
+- [js-beautify](https://www.npmjs.com/package/js-beautify) for JS / HTML / CSS formatting
 - [qrcode](https://www.npmjs.com/package/qrcode) for QR code generation
 - [bcryptjs](https://www.npmjs.com/package/bcryptjs) for client-side bcrypt hashing
 - [Mongoose](https://mongoosejs.com) + MongoDB Atlas for the URL Shortener backend and AI usage tracking
