@@ -512,6 +512,36 @@ export const tools: Tool[] = [
     explainer:
       "Paste any long URL to generate a short, shareable link at codinganthem.com/r/[code], with a randomly generated 5-character code. Links can have an optional expiry (1 hour, 24 hours, 7 days, or 30 days). Click counts are tracked so you can see how many times your link was visited.",
   },
+  {
+    slug: "ai-code-explainer",
+    name: "AI Code Explainer",
+    description: "Paste any code snippet and get a plain-English explanation instantly, powered by AI. Free tool for understanding unfamiliar code in any language.",
+    category: "ai",
+    icon: "Sparkles",
+    keywords: ["ai", "code explainer", "explain code", "gemini", "understand code", "code review"],
+    explainer:
+      "Paste any code snippet — in any language — and get a plain-English summary plus a breakdown of what each part does, powered by Google's Gemini AI. Useful for understanding unfamiliar code, reviewing a pull request, or learning from an example. Your code is sent to Google's Gemini API to generate the explanation — see the Privacy Policy for details.",
+  },
+  {
+    slug: "ai-sql-generator",
+    name: "AI Text-to-SQL Generator",
+    description: "Describe the query you need in plain English and get a ready-to-use SQL statement, powered by AI. Free tool with dialect support.",
+    category: "ai",
+    icon: "Database",
+    keywords: ["ai", "sql generator", "text to sql", "natural language to sql", "gemini", "query generator"],
+    explainer:
+      "Describe what you want to query in plain English — for example, \"top 5 customers by total order value this year\" — and get back a ready-to-use SQL statement plus a plain-English explanation of what it does, powered by Google's Gemini AI. Supports MySQL, PostgreSQL, and SQLite dialects. Your description is sent to Google's Gemini API to generate the query — see the Privacy Policy for details.",
+  },
+  {
+    slug: "ai-error-explainer",
+    name: "AI Error Message Explainer",
+    description: "Paste any error message or stack trace and get a plain-English diagnosis with a suggested fix, powered by AI. Free, no sign-up.",
+    category: "ai",
+    icon: "AlertTriangle",
+    keywords: ["ai", "error explainer", "stack trace", "debug", "gemini", "fix error"],
+    explainer:
+      "Paste any cryptic error message or stack trace and get a plain-English diagnosis of what went wrong, its likely cause, and a suggested fix, powered by Google's Gemini AI. Works across languages and environments — just select the closest match if you know it. Your error message is sent to Google's Gemini API to generate the explanation — see the Privacy Policy for details.",
+  },
 ];
 
 export function getToolBySlug(slug: string): Tool | undefined {

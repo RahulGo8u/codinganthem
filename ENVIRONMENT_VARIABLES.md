@@ -10,7 +10,8 @@ Locally, these live in `.env.local` (gitignored, never committed).
 
 | Variable | Description | Example |
 |---|---|---|
-| `MONGODB_URI` | MongoDB Atlas connection string, used by the URL Shortener backend (`lib/mongodb.ts`). Must point to the `codinganthem` database. | `mongodb+srv://<user>:<password>@<cluster>.mongodb.net/codinganthem?retryWrites=true&w=majority&appName=<cluster>` |
+| `MONGODB_URI` | MongoDB Atlas connection string, used by the URL Shortener backend (`lib/mongodb.ts`) and the AI global usage counter (`lib/aiUsage.ts`). Must point to the `codinganthem` database. | `mongodb+srv://<user>:<password>@<cluster>.mongodb.net/codinganthem?retryWrites=true&w=majority&appName=<cluster>` |
+| `GEMINI_API_KEY` | Google Gemini API key, used by all AI tools (`lib/gemini.ts`) — AI Code Explainer, AI Text-to-SQL Generator, AI Error Message Explainer. Server-only, never exposed to the browser. Get one at [aistudio.google.com/apikey](https://aistudio.google.com/apikey). | `AIza...` |
 
 ---
 
@@ -19,6 +20,7 @@ Locally, these live in `.env.local` (gitignored, never committed).
 | Variable | Description | Default if unset |
 |---|---|---|
 | `NEXT_PUBLIC_BASE_URL` | Base URL used to build short links returned by `/api/shorten`. | `https://codinganthem.com` |
+| `AI_TOOLS_ENABLED` | Kill switch for all AI tools. Set to `false` in the Vercel dashboard to instantly disable every AI route (no deploy needed) if costs spike or abuse is detected. | `true` (enabled) |
 
 ---
 

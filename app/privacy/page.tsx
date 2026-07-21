@@ -24,6 +24,10 @@ const SECTIONS = [
     body: "A small number of tools require a backend to function — currently, URL Shortener. When you use this tool, the URL you submit and the generated short code are stored in a database so the redirect can work. No account or personal information is collected or required to use it.",
   },
   {
+    title: "AI-powered tools",
+    body: "Tools in the AI category (such as the Code Explainer, Text-to-SQL Generator, and Error Message Explainer) send your input to Google's Gemini API to generate a response — this is a distinct, third-party data flow, separate from both the client-side and server-side tools above. On Gemini's free tier, Google's terms permit human review of prompts and responses for up to three years. We do not store your inputs to these tools ourselves. Avoid pasting secrets, credentials, or personal data into any AI tool.",
+  },
+  {
     title: "Local storage",
     body: "CodingAnthem uses your browser's localStorage to remember your theme preference and your recently used tools. This data stays on your device — it is never sent to us or any third party, and you can clear it at any time by clearing your browser's site data.",
   },

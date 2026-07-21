@@ -1,4 +1,5 @@
 import {
+  AlertTriangle,
   AlignLeft,
   ArrowLeftRight,
   ArrowRight,
@@ -39,6 +40,7 @@ import type { LucideProps } from "lucide-react";
 export type { LucideProps };
 
 export const ICON_MAP = {
+  AlertTriangle,
   AlignLeft,
   ArrowLeftRight,
   ArrowRight,

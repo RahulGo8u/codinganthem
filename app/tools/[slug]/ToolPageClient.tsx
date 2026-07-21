@@ -152,6 +152,15 @@ const TOOL_MAP: Record<string, React.ComponentType> = {
   "url-shortener": dynamic(() =>
     import("@/components/tools/UrlShortener").then((m) => ({ default: m.UrlShortener }))
   ),
+  "ai-code-explainer": dynamic(() =>
+    import("@/components/tools/AiCodeExplainer").then((m) => ({ default: m.AiCodeExplainer }))
+  ),
+  "ai-sql-generator": dynamic(() =>
+    import("@/components/tools/AiSqlGenerator").then((m) => ({ default: m.AiSqlGenerator }))
+  ),
+  "ai-error-explainer": dynamic(() =>
+    import("@/components/tools/AiErrorExplainer").then((m) => ({ default: m.AiErrorExplainer }))
+  ),
 };
 
 export function ToolPageClient({ slug }: { slug: string }) {
