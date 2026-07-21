@@ -112,7 +112,7 @@ export async function POST(req: NextRequest) {
   const MAX_AUTO_ATTEMPTS = 5;
 
   for (let attempt = 0; ; attempt++) {
-    if (!finalSlug) finalSlug = generateSlug(8);
+    if (!finalSlug) finalSlug = generateSlug(5);
 
     try {
       await ShortUrl.create({

@@ -510,7 +510,7 @@ export const tools: Tool[] = [
     icon: "Link",
     keywords: ["url", "shorten", "short link", "link", "redirect", "tiny url"],
     explainer:
-      "Paste any long URL to generate a short, shareable link at codinganthem.com/r/[alias]. You can set a custom alias or let one be auto-generated. Links can have an optional expiry (1 hour, 24 hours, 7 days, or 30 days). Click counts are tracked so you can see how many times your link was visited.",
+      "Paste any long URL to generate a short, shareable link at codinganthem.com/r/[code], with a randomly generated 5-character code. Links can have an optional expiry (1 hour, 24 hours, 7 days, or 30 days). Click counts are tracked so you can see how many times your link was visited.",
   },
 ];
 

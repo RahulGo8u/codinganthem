@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Link, Loader2, CheckCircle, Copy, ExternalLink, AlertCircle } from "lucide-react";
-import { validateUrl, validateSlug } from "@/lib/urlValidation";
+import { validateUrl } from "@/lib/urlValidation";
 
 const EXPIRY_OPTIONS = [
   { value: "never", label: "Never expires" },
@@ -20,11 +20,9 @@ interface ShortenResult {
 
 export function UrlShortener() {
   const [url, setUrl] = useState("");
-  const [customSlug, setCustomSlug] = useState("");
   const [expiry, setExpiry] = useState("never");
   const [loading, setLoading] = useState(false);
   const [urlError, setUrlError] = useState("");
-  const [aliasError, setAliasError] = useState("");
   const [error, setError] = useState("");
   const [result, setResult] = useState<ShortenResult | null>(null);
   const [copied, setCopied] = useState(false);
@@ -39,22 +37,11 @@ export function UrlShortener() {
     setUrlError(res.valid ? "" : (res.error ?? ""));
   }
 
-  function handleAliasBlur() {
-    const trimmed = customSlug.trim();
-    if (!trimmed) {
-      setAliasError("");
-      return;
-    }
-    const res = validateSlug(trimmed);
-    setAliasError(res.valid ? "" : (res.error ?? ""));
-  }
-
   async function handleShorten() {
     setError("");
     setResult(null);
 
     const trimmedUrl = url.trim();
-    const trimmedSlug = customSlug.trim();
 
     if (!trimmedUrl) {
       setUrlError("Please enter a URL.");
@@ -69,14 +56,7 @@ export function UrlShortener() {
       return;
     }
 
-    const slugCheck = validateSlug(trimmedSlug);
-    if (!slugCheck.valid) {
-      setAliasError(slugCheck.error ?? "Invalid alias.");
-      return;
-    }
-
     setUrlError("");
-    setAliasError("");
     setLoading(true);
     try {
       const res = await fetch("/api/shorten", {
@@ -84,7 +64,6 @@ export function UrlShortener() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           url: trimmedUrl,
-          slug: trimmedSlug || undefined,
           expiry,
         }),
       });
@@ -113,10 +92,8 @@ export function UrlShortener() {
 
   function handleReset() {
     setUrl("");
-    setCustomSlug("");
     setExpiry("never");
     setUrlError("");
-    setAliasError("");
     setError("");
     setResult(null);
     setCopied(false);
@@ -144,10 +121,10 @@ export function UrlShortener() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Input panel */}
         <div className="flex flex-col gap-4">
-          {/* Long URL */}
+          {/* URL to shorten */}
           <div className="flex flex-col gap-2">
             <label className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">
-              Long URL
+              Paste the URL to be shortened
             </label>
             <div className={`flex items-center gap-2 rounded-lg border ${urlError ? "border-[#ef4444]" : "border-[var(--border)]"} bg-[var(--bg-surface)] px-3`}>
               <Link size={14} className="text-[var(--text-muted)] shrink-0" />
@@ -164,34 +141,6 @@ export function UrlShortener() {
             </div>
             {urlError && (
               <p className="text-xs text-[#ef4444] leading-relaxed">{urlError}</p>
-            )}
-          </div>
-
-          {/* Custom alias */}
-          <div className="flex flex-col gap-2">
-            <label className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">
-              Custom Alias <span className="normal-case font-normal">(optional)</span>
-            </label>
-            <div className={`flex items-center gap-0 rounded-lg border ${aliasError ? "border-[#ef4444]" : "border-[var(--border)]"} bg-[var(--bg-surface)] overflow-hidden`}>
-              <span className="mono text-xs text-[var(--text-muted)] px-3 py-2 bg-[var(--bg-elevated)] border-r border-[var(--border)] shrink-0 whitespace-nowrap">
-                codinganthem.com/r/
-              </span>
-              <input
-                type="text"
-                value={customSlug}
-                onChange={(e) => { setCustomSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "")); setAliasError(""); }}
-                onBlur={handleAliasBlur}
-                placeholder="my-alias"
-                spellCheck={false}
-                className="mono flex-1 h-9 px-3 bg-transparent text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none"
-              />
-            </div>
-            {aliasError ? (
-              <p className="text-xs text-[#ef4444] leading-relaxed">{aliasError}</p>
-            ) : (
-              <p className="text-[11px] text-[var(--text-muted)]">
-                3–20 chars, lowercase letters, numbers, and hyphens only. Leave blank to auto-generate.
-              </p>
             )}
           </div>
 
