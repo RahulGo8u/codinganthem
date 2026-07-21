@@ -8,9 +8,13 @@ if (!GEMINI_API_KEY) {
 }
 
 // "-latest" alias: Google keeps this pointed at their current recommended
-// flash model, so we don't have to manually chase model deprecations
+// flash-lite model, so we don't have to manually chase model deprecations
 // (gemini-2.5-flash itself was cut off from new API keys as of this writing).
-const MODEL = "gemini-flash-latest";
+// flash-lite over regular flash: ~40-50% faster in direct testing for these
+// simple, well-defined structured tasks (explain/generate/diagnose — none
+// need deep multi-step reasoning), with comparable output quality, and a
+// higher free-tier daily request quota.
+const MODEL = "gemini-flash-lite-latest";
 const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`;
 const TIMEOUT_MS = 18_000;
 const MAX_OUTPUT_TOKENS = 1024;
