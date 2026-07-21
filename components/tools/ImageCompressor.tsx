@@ -15,43 +15,111 @@ import {
 
 const tool = getToolBySlug("image-compressor")!;
 
-type OutFormat = "image/jpeg" | "image/webp" | "image/png";
+type OutFormat = "image/jpeg" | "image/webp";
+
+async function encodeImage(
+  img: HTMLImageElement,
+  fmt: OutFormat,
+  quality: number
+): Promise<Blob> {
+  const canvas = document.createElement("canvas");
+  canvas.width = img.naturalWidth;
+  canvas.height = img.naturalHeight;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) throw new Error("Canvas not supported.");
+  if (fmt === "image/jpeg") {
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  }
+  ctx.drawImage(img, 0, 0);
+  return canvasToBlob(canvas, fmt, quality);
+}
+
+/**
+ * Encode at the requested quality; if the result is still larger than the
+ * source, step quality down until it shrinks (or we hit a floor). Canvas
+ * re-encoding of already-optimized JPEGs often grows the file at high quality.
+ */
+async function compressToSmaller(
+  img: HTMLImageElement,
+  sourceSize: number,
+  fmt: OutFormat,
+  startQuality: number
+): Promise<{ blob: Blob; quality: number; usedOriginal: boolean }> {
+  let q = startQuality;
+  let blob = await encodeImage(img, fmt, q);
+
+  // Prefer a smaller file; walk quality down in steps.
+  while (blob.size >= sourceSize && q > 0.35) {
+    q = Math.max(0.35, Math.round((q - 0.1) * 100) / 100);
+    blob = await encodeImage(img, fmt, q);
+  }
+
+  // Still larger (common for tiny already-optimized assets) — keep original.
+  if (blob.size >= sourceSize) {
+    return { blob, quality: q, usedOriginal: true };
+  }
+
+  return { blob, quality: q, usedOriginal: false };
+}
 
 export function ImageCompressor() {
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [resultUrl, setResultUrl] = useState<string | null>(null);
   const [resultSize, setResultSize] = useState(0);
-  const [quality, setQuality] = useState(0.8);
-  const [format, setFormat] = useState<OutFormat>("image/jpeg");
+  const [quality, setQuality] = useState(0.75);
+  const [appliedQuality, setAppliedQuality] = useState<number | null>(null);
+  const [format, setFormat] = useState<OutFormat>("image/webp");
   const [error, setError] = useState<string | null>(null);
+  const [note, setNote] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [dragging, setDragging] = useState(false);
+  const [keptOriginal, setKeptOriginal] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const resultBlob = useRef<Blob | null>(null);
 
   const compress = useCallback(async (source: File, q: number, fmt: OutFormat) => {
     setBusy(true);
     setError(null);
+    setNote(null);
+    setKeptOriginal(false);
     try {
       const img = await loadImageFromFile(source);
-      const canvas = document.createElement("canvas");
-      canvas.width = img.naturalWidth;
-      canvas.height = img.naturalHeight;
-      const ctx = canvas.getContext("2d");
-      if (!ctx) throw new Error("Canvas not supported.");
-      if (fmt === "image/jpeg") {
-        ctx.fillStyle = "#ffffff";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      const { blob, quality: usedQ, usedOriginal } = await compressToSmaller(
+        img,
+        source.size,
+        fmt,
+        q
+      );
+
+      if (usedOriginal) {
+        // Serve the original bytes so download never ships a larger file.
+        resultBlob.current = source;
+        setResultSize(source.size);
+        setAppliedQuality(null);
+        setKeptOriginal(true);
+        setNote(
+          "This image is already well optimized — re-encoding made it larger, so the original is kept. Try a lower quality or a different format."
+        );
+        setResultUrl((prev) => {
+          if (prev) URL.revokeObjectURL(prev);
+          return URL.createObjectURL(source);
+        });
+      } else {
+        resultBlob.current = blob;
+        setResultSize(blob.size);
+        setAppliedQuality(usedQ);
+        if (usedQ < q - 0.01) {
+          setNote(
+            `Quality was lowered from ${Math.round(q * 100)} to ${Math.round(usedQ * 100)} so the file actually got smaller.`
+          );
+        }
+        setResultUrl((prev) => {
+          if (prev) URL.revokeObjectURL(prev);
+          return URL.createObjectURL(blob);
+        });
       }
-      ctx.drawImage(img, 0, 0);
-      const blob = await canvasToBlob(canvas, fmt, fmt === "image/png" ? undefined : q);
-      resultBlob.current = blob;
-      setResultSize(blob.size);
-      setResultUrl((prev) => {
-        if (prev) URL.revokeObjectURL(prev);
-        return URL.createObjectURL(blob);
-      });
     } catch (e) {
       setError(e instanceof Error ? e.message : "Compression failed.");
     } finally {
@@ -74,16 +142,17 @@ export function ImageCompressor() {
         if (prev) URL.revokeObjectURL(prev);
         return URL.createObjectURL(f);
       });
-      const defaultFmt: OutFormat =
-        f.type === "image/png" ? "image/png" : f.type === "image/webp" ? "image/webp" : "image/jpeg";
+      // Always prefer a lossy format for compression. Keeping PNG as PNG often
+      // *increases* size because PNG is lossless and canvas re-encodes poorly.
+      const defaultFmt: OutFormat = "image/webp";
       setFormat(defaultFmt);
       await compress(f, quality, defaultFmt);
     },
     [compress, quality]
   );
 
-  const savings =
-    file && resultSize > 0 ? Math.max(0, Math.round((1 - resultSize / file.size) * 100)) : 0;
+  const deltaPct =
+    file && resultSize > 0 ? Math.round((1 - resultSize / file.size) * 100) : 0;
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-8 flex flex-col gap-6 pb-24">
@@ -120,7 +189,7 @@ export function ImageCompressor() {
         }`}
       >
         <p className="text-sm text-[var(--text-primary)] font-medium">Drop an image here or click to upload</p>
-        <p className="text-xs text-[var(--text-muted)] mt-1">PNG, JPG, WebP, GIF · max 10 MB</p>
+        <p className="text-xs text-[var(--text-muted)] mt-1">PNG, JPG, WebP, GIF · max 10 MB · outputs WebP or JPEG</p>
         <input ref={inputRef} type="file" accept={IMAGE_ACCEPT} className="hidden" onChange={(e) => {
           const f = e.target.files?.[0];
           if (f) void processFile(f);
@@ -128,6 +197,7 @@ export function ImageCompressor() {
       </div>
 
       {error && <p className="text-sm text-[#ef4444]">{error}</p>}
+      {note && <p className="text-sm text-[var(--text-muted)] leading-relaxed">{note}</p>}
 
       {file && (
         <>
@@ -136,11 +206,10 @@ export function ImageCompressor() {
               Quality
               <input
                 type="range"
-                min={0.1}
-                max={1}
+                min={0.35}
+                max={0.95}
                 step={0.05}
                 value={quality}
-                disabled={format === "image/png"}
                 onChange={(e) => {
                   const q = Number(e.target.value);
                   setQuality(q);
@@ -161,11 +230,15 @@ export function ImageCompressor() {
                 }}
                 className="rounded border border-[var(--border)] bg-[var(--bg-elevated)] px-2 py-1 text-[var(--text-primary)]"
               >
+                <option value="image/webp">WebP (best compression)</option>
                 <option value="image/jpeg">JPEG</option>
-                <option value="image/webp">WebP</option>
-                <option value="image/png">PNG</option>
               </select>
             </label>
+            {appliedQuality !== null && appliedQuality < quality - 0.01 && (
+              <span className="text-xs text-[var(--text-muted)]">
+                Applied quality: {Math.round(appliedQuality * 100)}
+              </span>
+            )}
             {busy && <span className="text-xs text-[var(--text-muted)]">Compressing…</span>}
           </div>
 
@@ -176,23 +249,27 @@ export function ImageCompressor() {
             </div>
             <div className="rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] p-4 flex flex-col gap-2">
               <span className="text-xs uppercase tracking-wider text-[var(--text-muted)]">
-                Compressed · {formatBytes(resultSize)}{savings > 0 ? ` · −${savings}%` : ""}
+                {keptOriginal
+                  ? `Kept original · ${formatBytes(resultSize)}`
+                  : `Compressed · ${formatBytes(resultSize)}${
+                      deltaPct > 0 ? ` · −${deltaPct}%` : deltaPct < 0 ? ` · +${Math.abs(deltaPct)}%` : ""
+                    }`}
               </span>
               {resultUrl && <img src={resultUrl} alt="Compressed" className="max-h-64 object-contain mx-auto" />}
             </div>
           </div>
 
           <button
-            disabled={!resultBlob.current}
+            disabled={!resultBlob.current || keptOriginal}
             onClick={() => {
-              if (!resultBlob.current || !file) return;
-              const ext = format === "image/png" ? "png" : format === "image/webp" ? "webp" : "jpg";
+              if (!resultBlob.current || !file || keptOriginal) return;
+              const ext = format === "image/webp" ? "webp" : "jpg";
               const base = file.name.replace(/\.[^.]+$/, "");
               downloadBlob(resultBlob.current, `${base}-compressed.${ext}`);
             }}
             className="self-start px-4 py-2 rounded-lg text-sm font-medium border border-[#6366f1]/40 bg-[#6366f1]/10 text-[#6366f1] hover:bg-[#6366f1]/20 disabled:opacity-40"
           >
-            Download compressed image
+            {keptOriginal ? "Nothing to download — original kept" : "Download compressed image"}
           </button>
         </>
       )}
