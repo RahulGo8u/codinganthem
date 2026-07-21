@@ -118,7 +118,7 @@ export function UrlShortener() {
         </h1>
       </div>
 
-      <div className="max-w-xl flex flex-col gap-6">
+      <div className="w-full max-w-2xl mx-auto flex flex-col gap-6">
         {/* Input form — hidden once a result exists */}
         {!result && (
           <div className="flex flex-col gap-4">
