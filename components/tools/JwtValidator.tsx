@@ -110,15 +110,32 @@ export function JwtValidator() {
       outputLabel="Validation Result"
       inputPlaceholder="Paste your JWT here (eyJ...)"
       outputPlaceholder="Validation result will appear here..."
+      badges={<span className="badge badge-neutral">Client-side</span>}
       outputContent={
         header && payload ? (
           <div className="flex flex-col">
-            <div className="px-4 py-2 border-b border-[var(--border)] flex flex-col gap-0.5">
-              {statusLines.map((line) => (
-                <p key={line} className={`text-xs mono ${line.includes("INVALID") || line.includes("EXPIRED") ? "text-[#ef4444]" : "text-[#22c55e]"}`}>
-                  {line}
-                </p>
-              ))}
+            <div className="px-4 py-3 border-b border-[var(--border)] flex flex-wrap gap-2">
+              {statusLines.map((line) => {
+                const isBad = line.includes("INVALID") || line.includes("EXPIRED");
+                const [label, ...rest] = line.split(":");
+                return (
+                  <span
+                    key={line}
+                    className={`badge mono ${isBad ? "" : "badge-success"}`}
+                    style={
+                      isBad
+                        ? {
+                            color: "var(--error)",
+                            background: "color-mix(in srgb, var(--error) 12%, transparent)",
+                            borderColor: "color-mix(in srgb, var(--error) 35%, transparent)",
+                          }
+                        : undefined
+                    }
+                  >
+                    {label.trim()}: {rest.join(":").trim()}
+                  </span>
+                );
+              })}
             </div>
             <div className="px-4 pt-3">
               <p className="text-[10px] font-medium uppercase tracking-wider text-[var(--text-muted)]">Header</p>

@@ -138,6 +138,7 @@ export function UserAgentParser() {
       inputLabel="User-Agent String"
       outputLabel="Parsed Details"
       inputPlaceholder="Paste a User-Agent string, or your browser's is loaded by default..."
+      badges={<span className="badge badge-neutral">Client-side</span>}
       extraActions={
         <button
           onClick={() => setInput(SAMPLE)}
@@ -148,11 +149,13 @@ export function UserAgentParser() {
       }
       outputContent={
         parsed ? (
-          <div className="w-full min-h-[320px] flex flex-col rounded-lg overflow-hidden">
-            <InfoRow label="Browser" value={`${parsed.browser} ${parsed.browserVersion}`.trim()} />
-            <InfoRow label="Rendering Engine" value={parsed.engine} />
-            <InfoRow label="Operating System" value={`${parsed.os} ${parsed.osVersion}`.trim()} />
-            <InfoRow label="Device Type" value={parsed.device} />
+          <div className="p-4">
+            <div className="result-card !p-0 flex flex-col overflow-hidden">
+              <InfoRow label="Browser" value={`${parsed.browser} ${parsed.browserVersion}`.trim()} />
+              <InfoRow label="Rendering Engine" value={parsed.engine} />
+              <InfoRow label="Operating System" value={`${parsed.os} ${parsed.osVersion}`.trim()} />
+              <InfoRow label="Device Type" value={parsed.device} />
+            </div>
           </div>
         ) : (
           <p className="p-4 text-[var(--text-muted)] text-sm">Parsed details will appear here...</p>

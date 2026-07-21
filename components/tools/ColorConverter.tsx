@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { ToolShell } from "@/components/ToolShell";
+import { CopyChip } from "@/components/CopyChip";
 import { getToolBySlug } from "@/lib/tools";
 
 const tool = getToolBySlug("color-converter")!;
@@ -121,6 +122,7 @@ export function ColorConverter() {
       outputLabel="Conversions"
       inputPlaceholder="Enter a color: #6366f1, rgb(99,102,241), or hsl(239,84%,67%)"
       outputPlaceholder="Converted values will appear here..."
+      badges={<span className="badge badge-neutral">Client-side</span>}
       extraActions={
         <button
           onClick={() => setInput(SAMPLE)}
@@ -138,21 +140,16 @@ export function ColorConverter() {
               style={{ backgroundColor: result.hex }}
             />
             {/* Values */}
-            <div className="flex flex-col gap-2">
+            <div className="result-card flex flex-col divide-y divide-[var(--border)]">
               {[
                 { label: "HEX", value: result.hex },
                 { label: "RGB", value: `rgb(${result.rgb.r}, ${result.rgb.g}, ${result.rgb.b})` },
                 { label: "HSL", value: `hsl(${result.hsl.h}, ${result.hsl.s}%, ${result.hsl.l}%)` },
               ].map(({ label, value }) => (
-                <div key={label} className="flex items-center justify-between gap-3">
+                <div key={label} className="flex items-center justify-between gap-3 py-2.5 first:pt-0 last:pb-0">
                   <span className="text-xs text-[var(--text-muted)] w-10">{label}</span>
                   <code className="mono text-sm text-[var(--text-primary)] flex-1">{value}</code>
-                  <button
-                    onClick={() => navigator.clipboard.writeText(value)}
-                    className="text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
-                  >
-                    Copy
-                  </button>
+                  <CopyChip value={value} label={label} />
                 </div>
               ))}
             </div>

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { ToolShell } from "@/components/ToolShell";
+import { CopyChip } from "@/components/CopyChip";
 import { getToolBySlug } from "@/lib/tools";
 
 const tool = getToolBySlug("hash-generator")!;
@@ -135,6 +136,24 @@ export function HashGenerator() {
       outputLabel={`${algo} Hash`}
       inputPlaceholder="Enter text to hash..."
       outputPlaceholder="Hash will appear here..."
+      badges={<span className="badge badge-neutral">Client-side</span>}
+      outputContent={
+        output ? (
+          <div className="p-4">
+            <div className="result-card flex items-center justify-between gap-3">
+              <div className="flex flex-col gap-1 min-w-0">
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--text-muted)]">
+                  {algo} Hash
+                </span>
+                <span className="mono text-sm text-[var(--text-primary)] break-all">{output}</span>
+              </div>
+              <CopyChip value={output} label={`${algo} hash`} />
+            </div>
+          </div>
+        ) : (
+          <p className="p-4 text-[var(--text-muted)] text-sm">Hash will appear here...</p>
+        )
+      }
       extraActions={
         <button
           onClick={() => setInput(SAMPLE)}

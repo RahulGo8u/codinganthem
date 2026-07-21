@@ -81,6 +81,7 @@ export function PasswordGenerator() {
       hideInputPane
       outputLabel="Generated Passwords"
       outputPlaceholder="Click Generate to create passwords..."
+      badges={<span className="badge badge-neutral">Client-side</span>}
       options={
         <div className="flex flex-wrap items-center gap-4">
           <label className="flex items-center gap-2 text-[var(--text-muted)] text-xs">
@@ -159,14 +160,23 @@ export function PasswordGenerator() {
                     style={{ width: strength.width, backgroundColor: strength.color }}
                   />
                 </div>
-                <span className="text-xs font-medium" style={{ color: strength.color }}>
+                <span
+                  className="badge"
+                  style={{
+                    color: strength.color,
+                    background: `color-mix(in srgb, ${strength.color} 12%, transparent)`,
+                    borderColor: `color-mix(in srgb, ${strength.color} 35%, transparent)`,
+                  }}
+                >
                   {strength.label}
                 </span>
               </div>
             )}
-            <pre className="mono text-sm text-[var(--text-primary)] whitespace-pre-wrap break-all leading-relaxed">
-              {output}
-            </pre>
+            <div className="result-card">
+              <pre className="mono text-sm text-[var(--text-primary)] whitespace-pre-wrap break-all leading-relaxed">
+                {output}
+              </pre>
+            </div>
           </div>
         ) : (
           <p className="text-[var(--text-muted)] text-sm">Click Generate to create passwords...</p>

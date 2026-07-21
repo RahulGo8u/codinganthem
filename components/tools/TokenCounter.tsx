@@ -139,6 +139,7 @@ export function TokenCounter() {
       outputLabel="Result"
       inputPlaceholder="Paste your prompt or text here..."
       outputPlaceholder="Paste text above to see the token count and cost estimate..."
+      badges={<span className="badge badge-neutral">Client-side</span>}
       extraActions={
         <button
           onClick={() => setInput(SAMPLE)}
@@ -180,19 +181,13 @@ export function TokenCounter() {
                 {loading ? "…" : tokenCount.toLocaleString()}
               </span>
               <span className="text-sm text-[var(--text-muted)]">tokens</span>
-              <span
-                className={`text-[10px] font-medium uppercase tracking-wider px-2 py-0.5 rounded-full border ${
-                  model.tokenizer === "estimate"
-                    ? "border-[#f59e0b]/40 text-[#f59e0b] bg-[#f59e0b]/10"
-                    : "border-[#22c55e]/40 text-[#22c55e] bg-[#22c55e]/10"
-                }`}
-              >
+              <span className={`badge ${model.tokenizer === "estimate" ? "" : "badge-success"}`} style={model.tokenizer === "estimate" ? { color: "#f59e0b", background: "rgba(245,158,11,0.1)", borderColor: "rgba(245,158,11,0.4)" } : undefined}>
                 {model.tokenizer === "estimate" ? "Estimate" : "Exact"}
               </span>
             </div>
 
             {/* Context window bar */}
-            <div className="flex flex-col gap-1.5">
+            <div className="result-card flex flex-col gap-1.5">
               <div className="flex items-center justify-between text-xs text-[var(--text-muted)]">
                 <span>Context window used</span>
                 <span className="mono">
@@ -201,20 +196,20 @@ export function TokenCounter() {
               </div>
               <div className="w-full h-1.5 rounded-full bg-[var(--bg-elevated)] overflow-hidden">
                 <div
-                  className="h-full rounded-full bg-[#6366f1] transition-all duration-300"
+                  className="h-full rounded-full bg-[var(--accent)] transition-all duration-300"
                   style={{ width: `${contextPct}%` }}
                 />
               </div>
             </div>
 
             {/* Cost for this prompt */}
-            <div className="flex flex-col gap-1 pt-1 border-t border-[var(--border)]">
+            <div className="result-card flex flex-col gap-1">
               <span className="text-xs text-[var(--text-muted)]">Cost for this prompt (input only)</span>
               <span className="text-lg font-semibold text-[var(--text-primary)] mono">{formatCost(promptCost)}</span>
             </div>
 
             {/* Cost at volume */}
-            <div className="flex flex-col gap-2">
+            <div className="result-card flex flex-col gap-3">
               <span className="text-[10px] font-medium uppercase tracking-wider text-[var(--text-muted)]">
                 At volume (input cost only)
               </span>

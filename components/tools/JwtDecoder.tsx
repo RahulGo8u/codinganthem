@@ -73,6 +73,7 @@ export function JwtDecoder() {
       outputLabel="Decoded"
       inputPlaceholder="Paste your JWT here (eyJ...)"
       outputPlaceholder="Decoded header and payload will appear here..."
+      badges={<span className="badge badge-neutral">Client-side</span>}
       extraActions={
         <button
           onClick={() => setInput(SAMPLE)}
@@ -85,12 +86,27 @@ export function JwtDecoder() {
         output ? (
           <div className="flex flex-col">
             {meta.length > 0 && (
-              <div className="px-4 py-2 border-b border-[var(--border)] flex flex-col gap-0.5">
-                {meta.map((m) => (
-                  <p key={m} className={`text-xs mono ${m.includes("EXPIRED") ? "text-[#ef4444]" : "text-[#22c55e]"}`}>
-                    {m}
-                  </p>
-                ))}
+              <div className="px-4 py-3 border-b border-[var(--border)] flex flex-wrap gap-2">
+                {meta.map((m) => {
+                  const isBad = m.includes("EXPIRED");
+                  return (
+                    <span
+                      key={m}
+                      className={`badge mono ${isBad ? "" : "badge-success"}`}
+                      style={
+                        isBad
+                          ? {
+                              color: "var(--error)",
+                              background: "color-mix(in srgb, var(--error) 12%, transparent)",
+                              borderColor: "color-mix(in srgb, var(--error) 35%, transparent)",
+                            }
+                          : undefined
+                      }
+                    >
+                      {m}
+                    </span>
+                  );
+                })}
               </div>
             )}
             <HighlightedOutput code={output} />

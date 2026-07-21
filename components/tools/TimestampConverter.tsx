@@ -71,20 +71,23 @@ export function TimestampConverter() {
           : "Enter date string (e.g. 2026-06-19T00:00:00Z)"
       }
       outputPlaceholder="Conversion result will appear here..."
+      badges={<span className="badge badge-neutral">Client-side</span>}
       outputContent={
         rows ? (
-          <div className="p-4 flex flex-col">
-            {rows.map(({ label, value }) => (
-              <div
-                key={label}
-                className="flex items-start gap-3 py-2.5 border-b border-[var(--border)] last:border-0"
-              >
-                <span className="text-xs text-[var(--text-muted)] w-24 shrink-0 pt-0.5 uppercase tracking-wider">
-                  {label}
-                </span>
-                <span className="text-sm text-[var(--text-primary)] mono break-all">{value}</span>
-              </div>
-            ))}
+          <div className="p-4">
+            <div className="result-card flex flex-col divide-y divide-[var(--border)]">
+              {rows.map(({ label, value }) => (
+                <div
+                  key={label}
+                  className="flex items-start gap-3 py-2.5 first:pt-0 last:pb-0"
+                >
+                  <span className="text-xs text-[var(--text-muted)] w-24 shrink-0 pt-0.5 uppercase tracking-wider">
+                    {label}
+                  </span>
+                  <span className="text-sm text-[var(--text-primary)] mono break-all">{value}</span>
+                </div>
+              ))}
+            </div>
           </div>
         ) : undefined
       }

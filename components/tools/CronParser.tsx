@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import { ToolShell } from "@/components/ToolShell";
 import { getToolBySlug } from "@/lib/tools";
+import { CopyChip } from "@/components/CopyChip";
 
 const tool = getToolBySlug("cron-parser")!;
 
@@ -122,10 +123,11 @@ function parseCron(cron: string): { fields: FieldDef[]; parts: string[]; explana
 export function CronParser() {
   const [input, setInput] = useState("");
 
-  const { output, error } = useMemo(() => {
-    if (!input.trim()) return { output: "", error: undefined };
+  const { output, error, parsed } = useMemo(() => {
+    if (!input.trim()) return { output: "", error: undefined, parsed: null };
     try {
-      const { fields, parts, explanations, summary, runs } = parseCron(input);
+      const result = parseCron(input);
+      const { fields, parts, explanations, summary, runs } = result;
       const lines = [
         summary,
         "",
@@ -134,9 +136,9 @@ export function CronParser() {
         ...(runs.length > 0 ? ["", "Next 5 scheduled runs:"] : []),
         ...runs.map((r, i) => `  ${i + 1}. ${r}`),
       ];
-      return { output: lines.join("\n"), error: undefined };
+      return { output: lines.join("\n"), error: undefined, parsed: result };
     } catch (e) {
-      return { output: "", error: (e as Error).message };
+      return { output: "", error: (e as Error).message, parsed: null };
     }
   }, [input]);
 
@@ -153,6 +155,58 @@ export function CronParser() {
       outputLabel="Explanation"
       inputPlaceholder="*/5 * * * *"
       outputPlaceholder="Plain-English explanation will appear here..."
+      badges={<span className="badge badge-neutral">Client-side</span>}
+      outputContent={
+        parsed ? (
+          <div className="p-4 flex flex-col gap-4">
+            {/* Summary */}
+            <div className="result-card flex items-center justify-between gap-3">
+              <div className="flex flex-col gap-1 min-w-0">
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--text-muted)]">
+                  Summary
+                </span>
+                <p className="text-base text-[var(--text-primary)] capitalize">{parsed.summary}</p>
+              </div>
+              <CopyChip value={parsed.summary} label="summary" />
+            </div>
+
+            {/* Field breakdown */}
+            <div className="result-card flex flex-col gap-1">
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--text-muted)] mb-2">
+                Field Breakdown
+              </span>
+              <div className="flex flex-col divide-y divide-[var(--border)]">
+                {parsed.fields.map((f, i) => (
+                  <div key={f.name} className="flex items-center gap-3 py-2 first:pt-0 last:pb-0">
+                    <span className="text-sm text-[var(--text-primary)] w-28 shrink-0">{f.name}</span>
+                    <span className="mono text-xs text-[var(--accent)] w-16 shrink-0">{parsed.parts[i]}</span>
+                    <span className="text-xs text-[var(--text-muted)]">{parsed.explanations[i]}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Next runs */}
+            {parsed.runs.length > 0 && (
+              <div className="result-card flex flex-col gap-2">
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--text-muted)]">
+                  Next 5 Scheduled Runs
+                </span>
+                <ol className="flex flex-col gap-2">
+                  {parsed.runs.map((r, i) => (
+                    <li key={i} className="flex items-center gap-2.5">
+                      <span className="badge badge-accent">{i + 1}</span>
+                      <span className="mono text-sm text-[var(--text-primary)]">{r}</span>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            )}
+          </div>
+        ) : (
+          <p className="p-4 text-[var(--text-muted)] text-sm">Plain-English explanation will appear here...</p>
+        )
+      }
       extraActions={
         <button
           onClick={() => setInput(SAMPLE)}

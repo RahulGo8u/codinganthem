@@ -51,6 +51,7 @@ export function WordCounter() {
       inputLabel="Text"
       outputLabel="Stats"
       inputPlaceholder="Paste or type your text here..."
+      badges={<span className="badge badge-neutral">Client-side</span>}
       extraActions={
         <button
           onClick={() => setInput(SAMPLE)}
@@ -60,18 +61,20 @@ export function WordCounter() {
         </button>
       }
       outputContent={
-        <div className="p-4 flex flex-col gap-2">
-          {STATS.map(({ label, key }) => (
-            <div
-              key={key}
-              className="flex items-center justify-between py-2 border-b border-[var(--border)] last:border-0"
-            >
-              <span className="text-xs text-[var(--text-muted)]">{label}</span>
-              <span className="text-sm font-semibold text-[var(--text-primary)] mono">
-                {stats[key].toLocaleString()}
-              </span>
-            </div>
-          ))}
+        <div className="p-4">
+          <div className="result-card flex flex-col divide-y divide-[var(--border)]">
+            {STATS.map(({ label, key }) => (
+              <div
+                key={key}
+                className="flex items-center justify-between py-2.5 first:pt-0 last:pb-0"
+              >
+                <span className="text-xs text-[var(--text-muted)]">{label}</span>
+                <span className="text-sm font-semibold text-[var(--text-primary)] mono">
+                  {stats[key].toLocaleString()}
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
       }
     />

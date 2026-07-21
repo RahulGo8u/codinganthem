@@ -69,23 +69,28 @@ export function UrlParser() {
         </button>
       }
       inputPlaceholder="https://www.example.com/path?q=hello&page=2#section"
+      badges={<span className="badge badge-neutral">Client-side</span>}
       outputContent={
         parsed ? (
-          <div className="p-4 flex flex-col gap-1">
-            {FIELD_LABELS.map(({ key, label }) =>
-              parsed[key] ? (
-                <div key={key} className="flex items-start gap-3 py-2 border-b border-[var(--border)] last:border-0">
-                  <span className="text-xs text-[var(--text-muted)] w-24 shrink-0 pt-0.5">{label}</span>
-                  <span className="text-xs text-[var(--text-primary)] mono break-all">{parsed[key]}</span>
-                </div>
-              ) : null
-            )}
+          <div className="p-4 flex flex-col gap-3">
+            <div className="result-card flex flex-col divide-y divide-[var(--border)]">
+              {FIELD_LABELS.map(({ key, label }) =>
+                parsed[key] ? (
+                  <div key={key} className="flex items-start gap-3 py-2.5 first:pt-0 last:pb-0">
+                    <span className="text-xs text-[var(--text-muted)] w-24 shrink-0 pt-0.5">{label}</span>
+                    <span className="text-xs text-[var(--text-primary)] mono break-all">{parsed[key]}</span>
+                  </div>
+                ) : null
+              )}
+            </div>
             {parsed.params.length > 0 && (
-              <div className="flex flex-col gap-1 py-2">
-                <span className="text-xs text-[var(--text-muted)] mb-1">Query params</span>
+              <div className="result-card flex flex-col gap-1.5">
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--text-muted)] mb-1">
+                  Query Params
+                </span>
                 {parsed.params.map(([k, v]) => (
-                  <div key={k} className="flex items-start gap-3 pl-2">
-                    <span className="text-xs text-[#6366f1] mono w-32 shrink-0 truncate">{k}</span>
+                  <div key={k} className="flex items-start gap-3">
+                    <span className="text-xs text-[var(--accent)] mono w-32 shrink-0 truncate">{k}</span>
                     <span className="text-xs text-[var(--text-primary)] mono break-all">{v}</span>
                   </div>
                 ))}

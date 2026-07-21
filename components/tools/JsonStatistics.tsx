@@ -106,6 +106,7 @@ export function JsonStatistics() {
       inputLabel="JSON"
       outputLabel="Statistics"
       inputPlaceholder="Paste your JSON here..."
+      badges={<span className="badge badge-neutral">Client-side</span>}
       extraActions={
         <button
           onClick={() => setInput('{"id":1,"name":"CodingAnthem","tags":["fast","free","private"],"active":true,"meta":{"stars":2400,"forks":680,"license":"MIT","contributors":[{"name":"Alice"},{"name":"Bob"}]},"score":null}')}
@@ -118,9 +119,9 @@ export function JsonStatistics() {
         stats ? (
           <div className="p-4 flex flex-col gap-5">
             {/* Summary grid */}
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-2 gap-3">
               {summaryRows.map(({ label, value }) => (
-                <div key={label} className="flex flex-col gap-0.5 p-3 rounded-lg bg-[var(--bg-elevated)]">
+                <div key={label} className="result-card flex flex-col gap-1">
                   <span className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider">{label}</span>
                   <span className="text-lg font-semibold text-[var(--text-primary)] mono">{value}</span>
                 </div>
@@ -128,7 +129,7 @@ export function JsonStatistics() {
             </div>
 
             {/* Type distribution */}
-            <div className="flex flex-col gap-2">
+            <div className="result-card flex flex-col gap-2">
               <p className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">Type distribution</p>
               {Object.entries(stats.types)
                 .sort(([, a], [, b]) => b - a)
