@@ -9,6 +9,10 @@ import {
   RESERVED_SLUGS,
 } from "@/lib/urlValidation";
 
+// Colocate with the MongoDB Atlas cluster (AWS Mumbai / ap-south-1) to avoid
+// cross-region round trips on every connection + query.
+export const preferredRegion = "bom1";
+
 const RATE_LIMIT = 10;        // requests
 const RATE_WINDOW = 60_000;   // 1 minute
 
@@ -86,66 +90,66 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // Resolve final slug
-  let finalSlug = rawSlug?.toLowerCase().trim() || "";
+  const customSlug = rawSlug?.toLowerCase().trim() || "";
 
-  if (finalSlug) {
-    // Check custom slug is not taken
-    const existing = await ShortUrl.findOne({ slug: finalSlug }).lean();
-    if (existing) {
-      return NextResponse.json(
-        { error: `The slug "${finalSlug}" is already taken. Try a different one.` },
-        { status: 409 }
-      );
-    }
-    if (RESERVED_SLUGS.has(finalSlug)) {
-      return NextResponse.json(
-        { error: `"${finalSlug}" is reserved and cannot be used.` },
-        { status: 422 }
-      );
-    }
-  } else {
-    // Auto-generate unique slug
-    let attempts = 0;
-    while (attempts < 5) {
-      const candidate = generateSlug(8);
-      const taken = await ShortUrl.exists({ slug: candidate });
-      if (!taken) { finalSlug = candidate; break; }
-      attempts++;
-    }
-    if (!finalSlug) {
-      return NextResponse.json(
-        { error: "Could not generate a unique slug. Please try again." },
-        { status: 500 }
-      );
-    }
+  // Reserved-word check is a cheap in-memory lookup — do it before touching the DB
+  if (customSlug && RESERVED_SLUGS.has(customSlug)) {
+    return NextResponse.json(
+      { error: `"${customSlug}" is reserved and cannot be used.` },
+      { status: 422 }
+    );
   }
 
   // Calculate expiry date
   const expiryMs = EXPIRY_MAP[expiry];
   const expiresAt = expiryMs ? new Date(Date.now() + expiryMs) : null;
 
-  // Save to DB
-  try {
-    await ShortUrl.create({
-      slug: finalSlug,
-      originalUrl: url,
-      clicks: 0,
-      expiresAt,
-    });
-  } catch (err: unknown) {
-    // Handle duplicate key race condition
-    if ((err as { code?: number }).code === 11000) {
-      return NextResponse.json(
-        { error: "That slug was just taken. Please try again." },
-        { status: 409 }
-      );
+  // Rely on the unique index on `slug` instead of a separate existence check
+  // beforehand — this cuts the request down to a single DB round trip in the
+  // common (non-collision) case, which matters a lot on a cross-region
+  // connection. Duplicate-key errors (code 11000) tell us the slug was taken.
+  let finalSlug = customSlug;
+  const MAX_AUTO_ATTEMPTS = 5;
+
+  for (let attempt = 0; ; attempt++) {
+    if (!finalSlug) finalSlug = generateSlug(8);
+
+    try {
+      await ShortUrl.create({
+        slug: finalSlug,
+        originalUrl: url,
+        clicks: 0,
+        expiresAt,
+      });
+      break; // success
+    } catch (err: unknown) {
+      const isDuplicateKey = (err as { code?: number }).code === 11000;
+
+      if (!isDuplicateKey) {
+        console.error("[shorten] DB error:", err);
+        return NextResponse.json(
+          { error: "Failed to save. Please try again." },
+          { status: 500 }
+        );
+      }
+
+      if (customSlug) {
+        // User-chosen slug is taken — nothing to retry, surface it directly
+        return NextResponse.json(
+          { error: `The slug "${customSlug}" is already taken. Try a different one.` },
+          { status: 409 }
+        );
+      }
+
+      // Auto-generated slug collided (astronomically rare) — retry with a new one
+      finalSlug = "";
+      if (attempt >= MAX_AUTO_ATTEMPTS - 1) {
+        return NextResponse.json(
+          { error: "Could not generate a unique slug. Please try again." },
+          { status: 500 }
+        );
+      }
     }
-    console.error("[shorten] DB error:", err);
-    return NextResponse.json(
-      { error: "Failed to save. Please try again." },
-      { status: 500 }
-    );
   }
 
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "https://codinganthem.com";

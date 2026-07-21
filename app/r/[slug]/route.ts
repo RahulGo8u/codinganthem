@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import ShortUrl from "@/lib/models/ShortUrl";
 
+// Colocate with the MongoDB Atlas cluster (AWS Mumbai / ap-south-1) to avoid
+// cross-region round trips on every connection + query.
+export const preferredRegion = "bom1";
+
 export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ slug: string }> }
