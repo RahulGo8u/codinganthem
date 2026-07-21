@@ -8,7 +8,9 @@ export type ToolCategory =
   | "web"
   | "visualizers"
   | "ai"
-  | "web3";
+  | "web3"
+  | "images"
+  | "css";
 
 /**
  * Where a tool's data is processed.
@@ -54,6 +56,8 @@ export const CATEGORY_LABELS: Record<ToolCategory, string> = {
   visualizers: "Visualizers",
   ai: "AI",
   web3: "Web3",
+  images: "Images",
+  css: "CSS",
 };
 
 /**
@@ -82,7 +86,7 @@ export const CATEGORY_META: Record<
     title: "Generators",
     tagline: "Generate UUIDs, passwords, QR codes, and mock data",
     intro:
-      "Free online generators for UUIDs, placeholder text, QR codes, and realistic mock data. Create test fixtures, seed data, and unique identifiers on demand — no sign-up, and everything runs locally in your browser.",
+      "Free online generators for UUIDs, placeholder text, QR codes, chmod permissions, and realistic mock data. Create test fixtures, seed data, and unique identifiers on demand — no sign-up, and everything runs locally in your browser.",
   },
   converters: {
     title: "Data Converters",
@@ -100,13 +104,13 @@ export const CATEGORY_META: Record<
     title: "Security & Crypto Tools",
     tagline: "Hashes, passwords, JWTs, and one-time passwords",
     intro:
-      "Free online security tools to generate hashes (MD5, SHA-256, and more), create strong passwords, work with JWTs, and generate TOTP codes. All cryptography runs in your browser via the Web Crypto API — no secrets ever leave your machine.",
+      "Free online security tools to generate hashes (MD5, SHA-256, bcrypt, and more), create strong passwords, work with JWTs, and generate TOTP codes. All cryptography runs in your browser — no secrets ever leave your machine.",
   },
   web: {
     title: "Web Developer Tools",
-    tagline: "URLs, HTML entities, slugs, and cURL",
+    tagline: "URLs, HTML entities, slugs, meta tags, and cURL",
     intro:
-      "Free online web development tools to encode and parse URLs, escape HTML entities, generate slugs, convert cURL commands to fetch(), parse User-Agent strings, and shorten links. Everyday utilities for frontend and backend work.",
+      "Free online web development tools to encode and parse URLs, escape HTML entities, generate SEO meta/Open Graph tags, create slugs, convert cURL commands to fetch(), parse User-Agent strings, and shorten links. Everyday utilities for frontend and backend work.",
   },
   visualizers: {
     title: "Visualizers & Previewers",
@@ -125,6 +129,18 @@ export const CATEGORY_META: Record<
     tagline: "Unit conversions and utilities for Ethereum development",
     intro:
       "Free online Web3 tools for Ethereum development — convert between Wei, Gwei, and Ether with exact precision, and more utilities on the way. Everything runs in your browser; only paste public data like addresses, never a private key or seed phrase.",
+  },
+  images: {
+    title: "Image Tools",
+    tagline: "Compress, resize, and generate favicons in your browser",
+    intro:
+      "Free online image tools to compress JPG/PNG/WebP, resize images to exact dimensions, and generate favicon packs — all processed locally in your browser. No uploads, no watermarks, no sign-up.",
+  },
+  css: {
+    title: "CSS Generators",
+    tagline: "Visual CSS tools with copy-ready code",
+    intro:
+      "Free online CSS generators for gradients and more. Build production-ready CSS visually, preview live, and copy the code — everything runs in your browser.",
   },
 };
 
@@ -704,6 +720,83 @@ export const tools: Tool[] = [
     keywords: ["eth", "wei", "gwei", "ether", "ethereum", "unit converter", "gas price", "web3"],
     explainer:
       "Convert between Wei, Kwei, Mwei, Gwei, Szabo, Finney, and Ether instantly — all seven fields stay in sync as you type.\n\n• Uses BigInt arithmetic, not floating-point, so large values (like 1 ETH = 1,000,000,000,000,000,000 Wei) are always exact\n• Quick-fill chips for common values: 1 ETH, a typical 20 Gwei gas price, and the 21000 Wei base gas cost of a simple transfer\n• Useful for reading gas estimates, RPC logs, and contract values that come back in raw Wei\n• Runs entirely in your browser — never paste a private key or seed phrase into this or any online tool",
+  },
+  {
+    slug: "image-compressor",
+    name: "Image Compressor",
+    seoTitle: "Free Image Compressor Online — Compress JPG, PNG & WebP",
+    description: "Compress JPG, PNG, and WebP images online with a quality slider and before/after size comparison. Free, private, and 100% browser-based — no upload to a server.",
+    category: "images",
+    icon: "Minimize2",
+    keywords: ["image compressor", "compress jpg", "compress png", "webp compressor", "reduce image size", "optimize image"],
+    explainer:
+      "Shrink image file size without leaving your browser. Upload a JPG, PNG, WebP, or GIF, tune quality, pick an output format, and download the result.\n\n• Before/after preview with exact byte savings\n• JPEG, WebP, and PNG output\n• Everything runs locally via the Canvas API — your images are never uploaded",
+  },
+  {
+    slug: "image-resizer",
+    name: "Image Resizer",
+    seoTitle: "Free Image Resizer Online — Resize Photos by Exact Pixels",
+    description: "Resize images to exact pixel dimensions online with optional aspect-ratio lock. Free image resizer for JPG, PNG, and WebP — runs entirely in your browser.",
+    category: "images",
+    icon: "Scaling",
+    keywords: ["image resizer", "resize image", "resize photo", "change image size", "scale image online"],
+    explainer:
+      "Set exact width and height, lock aspect ratio if you want, and download a resized copy instantly.\n\n• Works with PNG, JPG, WebP, and GIF\n• Live preview of original vs resized\n• No uploads — resizing happens on your device",
+  },
+  {
+    slug: "favicon-generator",
+    name: "Favicon Generator",
+    seoTitle: "Free Favicon Generator Online — From Text or Image",
+    description: "Generate favicon PNGs (16, 32, 48) and an Apple Touch icon from text or an uploaded image. Free favicon maker — no sign-up, runs in your browser.",
+    category: "images",
+    icon: "AppWindow",
+    keywords: ["favicon generator", "favicon maker", "apple touch icon", "create favicon", "favicon from text"],
+    explainer:
+      "Create a favicon pack from initials/text or a source image. Download 16×16, 32×32, 48×48, and 180×180 (Apple Touch) PNGs ready for your site.\n\n• Text mode with background and foreground colors\n• Image mode with cover-crop to square\n• Fully client-side — nothing is uploaded",
+  },
+  {
+    slug: "css-gradient-generator",
+    name: "CSS Gradient Generator",
+    seoTitle: "CSS Gradient Generator — Free Linear, Radial & Conic Builder",
+    description: "Create beautiful CSS gradients visually — linear, radial, and conic — with live preview and copy-ready CSS. Free online CSS gradient generator.",
+    category: "css",
+    icon: "Blend",
+    keywords: ["css gradient generator", "linear gradient", "radial gradient", "conic gradient", "css background gradient"],
+    explainer:
+      "Build linear, radial, or conic gradients with up to six color stops, live preview, and one-click copy of the CSS background rule.\n\n• Angle control for linear and conic gradients\n• Editable hex colors and stop positions\n• Perfect for hero backgrounds, buttons, and UI accents",
+  },
+  {
+    slug: "meta-tag-generator",
+    name: "Meta Tag Generator",
+    seoTitle: "Free Meta Tag & Open Graph Generator Online",
+    description: "Generate SEO meta tags, Open Graph, and Twitter Card tags with live Google and social previews. Free meta tag generator — copy-ready HTML.",
+    category: "web",
+    icon: "Tags",
+    keywords: ["meta tag generator", "open graph generator", "og tags", "twitter card generator", "seo meta tags"],
+    explainer:
+      "Fill in title, description, URL, and image — get complete <title>, description, canonical, Open Graph, and Twitter Card tags.\n\n• Live Google SERP preview and social card preview\n• Character-length hints for title and description\n• Copy the full HTML snippet in one click",
+  },
+  {
+    slug: "bcrypt-generator",
+    name: "Bcrypt Generator",
+    seoTitle: "Bcrypt Hash Generator & Verifier — Free Online Tool",
+    description: "Generate and verify bcrypt password hashes online with a configurable cost factor. Free bcrypt tool — runs entirely in your browser with bcryptjs.",
+    category: "security",
+    icon: "LockKeyhole",
+    keywords: ["bcrypt generator", "bcrypt hash", "bcrypt verifier", "password hash", "bcrypt online"],
+    explainer:
+      "Hash passwords with bcrypt and verify existing hashes. Choose cost rounds (4–14); 10–12 is typical for production.\n\n• Generate and verify in one page\n• Uses bcryptjs — your password never leaves the browser\n• Useful for testing fixtures and checking hashes from logs (never paste production secrets into any online tool if you can avoid it)",
+  },
+  {
+    slug: "chmod-calculator",
+    name: "chmod Calculator",
+    seoTitle: "chmod Calculator Online — Unix File Permissions Generator",
+    description: "Calculate Unix file permissions visually and get octal, symbolic, and chmod command output. Free chmod calculator with common presets (644, 755, and more).",
+    category: "generators",
+    icon: "FileCog",
+    keywords: ["chmod calculator", "unix permissions", "file permissions", "chmod 755", "chmod generator"],
+    explainer:
+      "Toggle read/write/execute for owner, group, and public — instantly see octal (e.g. 755), symbolic (rwxr-xr-x), and a ready-to-paste chmod command.\n\n• Presets for 644, 755, 600, 700, and 777\n• Optional setuid, setgid, and sticky bit\n• Edit octal directly to update the checkboxes",
   },
 ];
 

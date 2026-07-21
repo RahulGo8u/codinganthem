@@ -29,6 +29,9 @@ Most tools run **100% client-side** in your browser. A few (like URL Shortener) 
 - XML to JSON
 - YAML to JSON
 
+### CSS
+- CSS Gradient Generator — visual linear, radial, and conic gradients with copy-ready CSS
+
 ### Encoders
 - Base64 Encoder / Decoder
 - Image to Base64 — convert any image to a Base64 data URL
@@ -45,12 +48,19 @@ Most tools run **100% client-side** in your browser. A few (like URL Shortener) 
 - XML Formatter — format and validate XML with syntax highlighting
 
 ### Generators
+- chmod Calculator — Unix file permissions to octal, symbolic, and chmod command
 - Lorem Ipsum Generator
 - Mock Data Generator — generate realistic fake data (names, emails, addresses, and more)
 - QR Code Generator — generate QR codes from any text or URL
 - UUID Generator (v4)
 
+### Images
+- Favicon Generator — create favicon PNGs from text or an image
+- Image Compressor — compress JPG, PNG, and WebP with quality control
+- Image Resizer — resize images to exact pixel dimensions
+
 ### Security
+- Bcrypt Generator — generate and verify bcrypt password hashes
 - Hash Generator (MD5, SHA-1, SHA-256, SHA-512)
 - JWT Decoder — inspect header, payload, signature
 - JWT Generator — sign tokens with HS256/384/512
@@ -71,6 +81,7 @@ Most tools run **100% client-side** in your browser. A few (like URL Shortener) 
 ### Web
 - cURL to Fetch — convert a curl command to a JavaScript fetch() call
 - HTML Entities Encoder / Decoder
+- Meta Tag Generator — SEO, Open Graph, and Twitter Card tags with live preview
 - Slug Generator
 - URL Encoder / Decoder
 - URL Parser — protocol, host, path, query params, hash
@@ -91,6 +102,7 @@ Most tools run **100% client-side** in your browser. A few (like URL Shortener) 
 - [sql-formatter](https://sql-formatter-org.github.io/sql-formatter/) for SQL formatting
 - [js-beautify](https://github.com/beautifier/js-beautify) for JS / HTML / CSS formatting
 - [qrcode](https://www.npmjs.com/package/qrcode) for QR code generation
+- [bcryptjs](https://www.npmjs.com/package/bcryptjs) for client-side bcrypt hashing
 - [Mongoose](https://mongoosejs.com) + MongoDB Atlas for the URL Shortener backend and AI usage tracking
 - [Google Gemini API](https://ai.google.dev) for the AI-powered tools
 - [@vercel/analytics](https://vercel.com/docs/analytics) and [Plausible](https://plausible.io) for privacy-respecting usage analytics

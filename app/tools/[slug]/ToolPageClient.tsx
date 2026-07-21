@@ -164,6 +164,27 @@ const TOOL_MAP: Record<string, React.ComponentType> = {
   "eth-unit-converter": dynamic(() =>
     import("@/components/tools/EthUnitConverter").then((m) => ({ default: m.EthUnitConverter }))
   ),
+  "image-compressor": dynamic(() =>
+    import("@/components/tools/ImageCompressor").then((m) => ({ default: m.ImageCompressor }))
+  ),
+  "image-resizer": dynamic(() =>
+    import("@/components/tools/ImageResizer").then((m) => ({ default: m.ImageResizer }))
+  ),
+  "favicon-generator": dynamic(() =>
+    import("@/components/tools/FaviconGenerator").then((m) => ({ default: m.FaviconGenerator }))
+  ),
+  "css-gradient-generator": dynamic(() =>
+    import("@/components/tools/CssGradientGenerator").then((m) => ({ default: m.CssGradientGenerator }))
+  ),
+  "meta-tag-generator": dynamic(() =>
+    import("@/components/tools/MetaTagGenerator").then((m) => ({ default: m.MetaTagGenerator }))
+  ),
+  "bcrypt-generator": dynamic(() =>
+    import("@/components/tools/BcryptGenerator").then((m) => ({ default: m.BcryptGenerator }))
+  ),
+  "chmod-calculator": dynamic(() =>
+    import("@/components/tools/ChmodCalculator").then((m) => ({ default: m.ChmodCalculator }))
+  ),
 };
 
 export function ToolPageClient({ slug }: { slug: string }) {
