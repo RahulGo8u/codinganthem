@@ -42,15 +42,6 @@ export function HomepageClient({ faqs = [] }: { faqs?: Faq[] }) {
       <div className="hero-glow relative border-b border-[var(--border)]">
         <div className="max-w-7xl mx-auto px-6 py-20 flex flex-col items-center text-center gap-6">
 
-          {/* Client-side pill */}
-          <span className="badge badge-accent">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-              <path d="m9 12 2 2 4-4" />
-            </svg>
-            100% Client-Side Processing
-          </span>
-
           {/* Heading */}
           <div className="flex flex-col gap-3 max-w-2xl">
             <h1 className="text-4xl sm:text-5xl font-semibold tracking-tight" style={{ color: "var(--text-primary)" }}>
@@ -99,7 +90,7 @@ export function HomepageClient({ faqs = [] }: { faqs?: Faq[] }) {
             {[
               { value: `${tools.length}`, label: "Tools" },
               { value: "0", label: "Accounts needed" },
-              { value: "100%", label: "Client-side" },
+              { value: "Free", label: "Forever" },
               { value: `${CATEGORY_ORDER.length}`, label: "Categories" },
             ].map((s) => (
               <div key={s.label} className="flex flex-col gap-1">
