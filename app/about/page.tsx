@@ -2,11 +2,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { tools } from "@/lib/tools";
 
-const ogDescription = `${tools.length} free browser-based developer tools. No sign-up, no backend — your data never leaves your machine.`;
+const ogDescription = `${tools.length} free developer tools. No sign-up required — fast, clean, and built for everyday developer use.`;
 
 export const metadata: Metadata = {
   title: "About",
-  description: "CodingAnthem is a collection of fast, free developer tools that run entirely in your browser.",
+  description: "CodingAnthem is a collection of fast, free developer tools. No sign-up required.",
   alternates: {
     canonical: "https://www.codinganthem.com/about",
   },
@@ -36,7 +36,7 @@ export default function AboutPage() {
           </h1>
           <p className="text-[var(--text-muted)] leading-relaxed">
             CodingAnthem is a collection of developer tools built to be fast, free, and zero-friction.
-            Every tool runs entirely in your browser — your data never leaves your machine.
+            CodingAnthem is a growing collection of fast, free developer tools. No sign-up required.
           </p>
         </div>
 
@@ -53,7 +53,7 @@ export default function AboutPage() {
               },
               {
                 title: "Privacy by default",
-                desc: "All processing happens in your browser. Nothing is sent to a server.",
+                desc: "Client-side tools process everything in your browser. Server-side tools (like URL Shortener) use a secure backend — no data is stored beyond what's needed to run the tool.",
               },
               {
                 title: "Fast",

@@ -9,7 +9,7 @@ Before running `git commit` or `git push`, verify the following files are in syn
 
 ## When a new tool is added to `lib/tools.ts`
 
-1. **`README.md`** — bump the tool count ("All N tools run 100% client-side") and add the new tool under the correct category section.
+1. **`README.md`** — add the new tool under the correct category section. Do not claim all tools are client-side/backend-free — some tools (e.g. URL Shortener) use a backend; keep the intro wording accurate ("Most tools run 100% client-side... A few use a lightweight backend").
 
 2. **`public/llms.txt`** — add the new tool under the correct category section with its slug path. This file is manually maintained and does NOT auto-sync.
 

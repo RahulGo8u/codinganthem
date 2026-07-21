@@ -13,7 +13,7 @@ export function Footer() {
               <span style={{ color: "#6366f1" }}>coding</span>anthem
             </span>
             <p className="text-xs text-[var(--text-muted)]">
-              All tools run in your browser. No data is sent to a server.
+              Fast, free developer tools for everyday use.
             </p>
           </div>
 

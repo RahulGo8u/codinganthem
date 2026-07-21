@@ -2,7 +2,7 @@
 
 > Fast, free developer tools for your browser and AI workflows.
 
-CodingAnthem is a collection of free, browser-based developer utilities built for developers and AI-assisted workflows. All tools run entirely client-side — no data is sent to a server. No sign-up required.
+CodingAnthem is a collection of free developer utilities built for developers and AI-assisted workflows. Most tools run entirely client-side; a few (like URL Shortener) use a lightweight backend for storage. No sign-up required.
 
 ## Formatters
 

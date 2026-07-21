@@ -4,7 +4,7 @@ The developer toolbox you always wanted — fast, free, and private. Growing col
 
 🔗 [www.codinganthem.com](https://www.codinganthem.com) &nbsp;·&nbsp; [![Buy Me a Coffee](https://img.shields.io/badge/Support-Buy%20Me%20a%20Coffee-6366f1?style=flat&logo=buy-me-a-coffee&logoColor=white)](https://buymeacoffee.com/codinganthem)
 
-All 47 tools run **100% client-side**. No backend, no database, no sign-up — your data never leaves your machine.
+Most tools run **100% client-side** in your browser. A few (like URL Shortener) use a lightweight backend to store data — always noted on the tool page. No sign-up required for any tool.
 
 ## Tools
 
@@ -104,7 +104,7 @@ npm run lint    # lint
 
 ## Privacy
 
-Every tool runs client-side in your browser using JavaScript and Web APIs. No data is transmitted to any server, there are no accounts, and no tracking beyond privacy-respecting analytics.
+Most tools run client-side in your browser using JavaScript and Web APIs — nothing is transmitted anywhere. A small number of tools (like URL Shortener) require server-side storage to work; those tools only send the minimum data needed to function, and this is always disclosed on the tool page. There are no accounts, and no tracking beyond privacy-respecting analytics.
 
 ## Support
 

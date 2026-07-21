@@ -149,6 +149,9 @@ const TOOL_MAP: Record<string, React.ComponentType> = {
   "color-contrast-checker": dynamic(() =>
     import("@/components/tools/ColorContrastChecker").then((m) => ({ default: m.ColorContrastChecker }))
   ),
+  "url-shortener": dynamic(() =>
+    import("@/components/tools/UrlShortener").then((m) => ({ default: m.UrlShortener }))
+  ),
 };
 
 export function ToolPageClient({ slug }: { slug: string }) {

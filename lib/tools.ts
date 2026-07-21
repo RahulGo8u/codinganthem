@@ -502,6 +502,16 @@ export const tools: Tool[] = [
     explainer:
       "Check WCAG contrast ratio between any two colors — entirely in your browser.\n\n• Enter a text color and background color to see the exact contrast ratio\n• Instantly see Pass/Fail for WCAG AA and AAA at normal and large text sizes\n• Live preview shows how real text looks at that contrast\n• Useful for accessible web design, design systems, and color palette audits",
   },
+  {
+    slug: "url-shortener",
+    name: "URL Shortener",
+    description: "Shorten any URL and get a shareable codinganthem.com/r/... link",
+    category: "web",
+    icon: "Link",
+    keywords: ["url", "shorten", "short link", "link", "redirect", "tiny url"],
+    explainer:
+      "Paste any long URL to generate a short, shareable link at codinganthem.com/r/[alias]. You can set a custom alias or let one be auto-generated. Links can have an optional expiry (1 hour, 24 hours, 7 days, or 30 days). Click counts are tracked so you can see how many times your link was visited.",
+  },
 ];
 
 export function getToolBySlug(slug: string): Tool | undefined {

@@ -7,7 +7,7 @@ import { getToolBySlug } from "@/lib/tools";
 const tool = getToolBySlug("word-counter")!;
 
 const SAMPLE =
-  "CodingAnthem offers 43 free developer tools that run entirely in your browser. Nothing you type is ever sent to a server.";
+  "CodingAnthem offers dozens of free developer tools built for everyday use. Paste any text here to see live word and character counts.";
 
 interface Stats {
   words: number;

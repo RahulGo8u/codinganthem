@@ -1,0 +1,248 @@
+"use client";
+
+import { useState } from "react";
+import { Link, Loader2, CheckCircle, Copy, ExternalLink } from "lucide-react";
+
+const EXPIRY_OPTIONS = [
+  { value: "never", label: "Never expires" },
+  { value: "1h", label: "1 hour" },
+  { value: "24h", label: "24 hours" },
+  { value: "7d", label: "7 days" },
+  { value: "30d", label: "30 days" },
+];
+
+interface ShortenResult {
+  shortUrl: string;
+  slug: string;
+  expiresAt: string | null;
+}
+
+export function UrlShortener() {
+  const [url, setUrl] = useState("");
+  const [customSlug, setCustomSlug] = useState("");
+  const [expiry, setExpiry] = useState("never");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [result, setResult] = useState<ShortenResult | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  async function handleShorten() {
+    setError("");
+    setResult(null);
+
+    if (!url.trim()) {
+      setError("Please enter a URL.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const res = await fetch("/api/shorten", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          url: url.trim(),
+          slug: customSlug.trim() || undefined,
+          expiry,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error ?? "Something went wrong. Please try again.");
+        return;
+      }
+
+      setResult(data);
+    } catch {
+      setError("Network error. Please check your connection and try again.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function handleCopy() {
+    if (!result) return;
+    navigator.clipboard.writeText(result.shortUrl);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  }
+
+  function handleReset() {
+    setUrl("");
+    setCustomSlug("");
+    setExpiry("never");
+    setError("");
+    setResult(null);
+    setCopied(false);
+  }
+
+  return (
+    <div className="max-w-7xl mx-auto px-6 py-8 flex flex-col gap-6">
+      {/* Header */}
+      <div className="flex items-center gap-3">
+        <a
+          href="/"
+          className="flex items-center gap-1.5 text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
+          All tools
+        </a>
+        <span className="text-[var(--border)]">/</span>
+        <h1 className="text-sm font-medium" style={{ color: "var(--text-primary)" }}>
+          URL Shortener
+        </h1>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Input panel */}
+        <div className="flex flex-col gap-4">
+          {/* Long URL */}
+          <div className="flex flex-col gap-2">
+            <label className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">
+              Long URL
+            </label>
+            <div className={`flex items-center gap-2 rounded-lg border ${error && !result ? "border-[#ef4444]" : "border-[var(--border)]"} bg-[var(--bg-surface)] px-3`}>
+              <Link size={14} className="text-[var(--text-muted)] shrink-0" />
+              <input
+                type="url"
+                value={url}
+                onChange={(e) => { setUrl(e.target.value); setError(""); }}
+                onKeyDown={(e) => e.key === "Enter" && handleShorten()}
+                placeholder="https://example.com/very/long/url"
+                spellCheck={false}
+                className="flex-1 h-11 bg-transparent text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none"
+              />
+            </div>
+            {error && (
+              <p className="text-xs text-[#ef4444] leading-relaxed">{error}</p>
+            )}
+          </div>
+
+          {/* Custom alias */}
+          <div className="flex flex-col gap-2">
+            <label className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">
+              Custom Alias <span className="normal-case font-normal">(optional)</span>
+            </label>
+            <div className="flex items-center gap-0 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] overflow-hidden">
+              <span className="mono text-xs text-[var(--text-muted)] px-3 py-2 bg-[var(--bg-elevated)] border-r border-[var(--border)] shrink-0 whitespace-nowrap">
+                codinganthem.com/r/
+              </span>
+              <input
+                type="text"
+                value={customSlug}
+                onChange={(e) => setCustomSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""))}
+                placeholder="my-alias"
+                spellCheck={false}
+                className="mono flex-1 h-9 px-3 bg-transparent text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none"
+              />
+            </div>
+            <p className="text-[11px] text-[var(--text-muted)]">
+              3–20 chars, lowercase letters, numbers, and hyphens only. Leave blank to auto-generate.
+            </p>
+          </div>
+
+          {/* Expiry */}
+          <div className="flex flex-col gap-2">
+            <label className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">
+              Expires
+            </label>
+            <div className="flex flex-wrap gap-1.5">
+              {EXPIRY_OPTIONS.map((opt) => (
+                <button
+                  key={opt.value}
+                  onClick={() => setExpiry(opt.value)}
+                  className={`px-3 py-1.5 rounded-full text-xs border transition-colors ${
+                    expiry === opt.value
+                      ? "bg-[#6366f1]/15 text-[#6366f1] border-[#6366f1]/40"
+                      : "bg-[var(--bg-surface)] text-[var(--text-muted)] border-[var(--border)] hover:text-[var(--text-primary)]"
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Shorten button */}
+          <button
+            onClick={handleShorten}
+            disabled={loading || !url.trim()}
+            className="flex items-center justify-center gap-2 h-10 rounded-lg bg-[#6366f1] text-white text-sm font-medium hover:bg-[#4f46e5] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            {loading ? (
+              <>
+                <Loader2 size={14} className="animate-spin" />
+                Shortening...
+              </>
+            ) : (
+              <>
+                <Link size={14} />
+                Shorten URL
+              </>
+            )}
+          </button>
+        </div>
+
+        {/* Result panel */}
+        <div className="flex flex-col gap-2">
+          <label className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">
+            Short URL
+          </label>
+          <div className="flex-1 min-h-[280px] rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] flex flex-col items-center justify-center gap-4 p-6">
+            {result ? (
+              <>
+                <CheckCircle size={32} className="text-[#22c55e]" />
+                <div className="text-center flex flex-col gap-1">
+                  <p className="mono text-sm font-medium" style={{ color: "var(--text-primary)" }}>
+                    {result.shortUrl}
+                  </p>
+                  {result.expiresAt && (
+                    <p className="text-xs text-[var(--text-muted)]">
+                      Expires {new Date(result.expiresAt).toLocaleString()}
+                    </p>
+                  )}
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={handleCopy}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-medium border transition-all ${
+                      copied
+                        ? "bg-[#22c55e]/10 border-[#22c55e]/40 text-[#22c55e]"
+                        : "border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)]"
+                    }`}
+                  >
+                    <Copy size={13} />
+                    {copied ? "Copied!" : "Copy"}
+                  </button>
+                  <a
+                    href={result.shortUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
+                  >
+                    <ExternalLink size={13} />
+                    Open
+                  </a>
+                  <button
+                    onClick={handleReset}
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
+                  >
+                    New
+                  </button>
+                </div>
+              </>
+            ) : (
+              <p className="text-sm text-[var(--text-muted)] text-center">
+                Your shortened URL will appear here.
+              </p>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

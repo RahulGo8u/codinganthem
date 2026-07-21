@@ -15,7 +15,7 @@ const HOMEPAGE_FAQS = [
   {
     question: "Is my data safe when I use these tools?",
     answer:
-      "Yes. Every tool runs entirely in your browser using JavaScript and the Web Crypto API. Nothing you paste, type, or upload is ever sent to a server.",
+      "Yes. Most tools run entirely in your browser using JavaScript and the Web Crypto API, so nothing you paste is sent anywhere. A few tools (like URL Shortener) need a backend to work — those are clearly noted on the tool page and only store the minimum data required.",
   },
   {
     question: "Do I need to create an account or sign up?",
@@ -32,7 +32,7 @@ const HOMEPAGE_FAQS = [
   {
     question: "Can I use CodingAnthem alongside AI tools like ChatGPT or GitHub Copilot?",
     answer:
-      "Yes. Paste JSON, JWTs, SQL, or any AI-generated output directly into a tool to validate, format, or convert it — nothing leaves your browser in the process.",
+      "Yes. Paste JSON, JWTs, SQL, or any AI-generated output directly into a tool to validate, format, or convert it — most tools process everything locally in your browser.",
   },
 ];
 

@@ -51,9 +51,9 @@ export function HomepageClient({ faqs = [] }: { faqs?: Faq[] }) {
               </span>
             </h1>
             <p className="text-[var(--text-muted)] text-base sm:text-lg leading-relaxed">
-              {tools.length} developer tools that never phone home. Paste JSON from ChatGPT,
-              decode a JWT from a bug report, or format SQL from Copilot — instantly, with
-              nothing ever leaving this tab.
+              {tools.length} developer tools, most running entirely in your browser. Paste JSON
+              from ChatGPT, decode a JWT from a bug report, or format SQL from Copilot —
+              instantly, no sign-up required.
             </p>
           </div>
 
@@ -159,8 +159,8 @@ export function HomepageClient({ faqs = [] }: { faqs?: Faq[] }) {
             {[
               {
                 icon: "🔒",
-                title: "Your data stays local",
-                body: "No backend. No uploads. Everything runs in your browser — your JSON, passwords, and hashes never touch a server.",
+                title: "Privacy-first by default",
+                body: "Most tools run entirely in your browser — your JSON, passwords, and hashes never touch a server. The few that need storage (like URL Shortener) say so upfront.",
               },
               {
                 icon: "⚡",
