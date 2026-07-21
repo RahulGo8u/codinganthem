@@ -12,7 +12,7 @@ marked.setOptions({ async: false });
 const SAMPLE = `# Hello\n\nThis is **bold**, this is *italic*, and here's a [link](https://codinganthem.com).\n\n- Item one\n- Item two\n\n\`\`\`js\nconst x = 42;\n\`\`\``;
 
 export function MarkdownPreviewer() {
-  const [input, setInput] = useState("");
+  const [input, setInput] = useState(SAMPLE);
 
   const rendered = useMemo(() => {
     if (!input.trim()) return "";

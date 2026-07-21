@@ -10,7 +10,7 @@ const tool = getToolBySlug("json-formatter")!;
 const SAMPLE = `{"id":1,"name":"CodingAnthem","tags":["fast","free"],"active":true,"meta":{"stars":2400,"license":"MIT"}}`;
 
 export function JsonFormatter() {
-  const [input, setInput] = useState("");
+  const [input, setInput] = useState(SAMPLE);
   const [minify, setMinify] = useState(false);
 
   const { output, error } = useMemo(() => {

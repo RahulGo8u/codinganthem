@@ -106,7 +106,7 @@ async function sha(input: string, algo: string): Promise<string> {
 }
 
 export function HashGenerator() {
-  const [input, setInput] = useState("");
+  const [input, setInput] = useState(SAMPLE);
   const [algo, setAlgo] = useState<HashAlgo>("SHA-256");
   const [output, setOutput] = useState("");
   const reqRef = useRef(0);

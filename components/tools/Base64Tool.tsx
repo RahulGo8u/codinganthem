@@ -12,7 +12,7 @@ const SAMPLES = {
 };
 
 export function Base64Tool() {
-  const [input, setInput] = useState("");
+  const [input, setInput] = useState(SAMPLES.encode);
   const [mode, setMode] = useState<"encode" | "decode">("encode");
 
   const { output, error } = useMemo(() => {

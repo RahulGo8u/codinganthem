@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { diffLines, type Change } from "diff";
 import { getToolBySlug } from "@/lib/tools";
 import { Breadcrumb } from "@/components/Breadcrumb";
@@ -66,9 +66,24 @@ function buildRows(diff: Change[]): Row[] {
   return rows;
 }
 
+/** Renders rows as a plain-text unified diff (git-style +/- prefixes) for copying. */
+function rowsToUnifiedText(rows: Row[]): string {
+  const lines: string[] = [];
+  for (const row of rows) {
+    if (row.kind === "same") {
+      lines.push(`  ${row.left ?? ""}`);
+      continue;
+    }
+    if (row.left !== null) lines.push(`- ${row.left}`);
+    if (row.right !== null) lines.push(`+ ${row.right}`);
+  }
+  return lines.join("\n");
+}
+
 export function TextDiff() {
-  const [left, setLeft] = useState("");
-  const [right, setRight] = useState("");
+  const [left, setLeft] = useState(SAMPLE_LEFT);
+  const [right, setRight] = useState(SAMPLE_RIGHT);
+  const [copied, setCopied] = useState(false);
 
   const rows = useMemo(() => {
     if (!left && !right) return null;
@@ -80,6 +95,17 @@ export function TextDiff() {
     const added = rows.filter((r) => r.kind === "change" && r.right !== null).length;
     const removed = rows.filter((r) => r.kind === "change" && r.left !== null).length;
     return { added, removed };
+  }, [rows]);
+
+  const handleCopyDiff = useCallback(async () => {
+    if (!rows) return;
+    try {
+      await navigator.clipboard.writeText(rowsToUnifiedText(rows));
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      setCopied(false);
+    }
   }, [rows]);
 
   return (
@@ -119,7 +145,19 @@ export function TextDiff() {
       {/* Side-by-side diff */}
       {rows && (
         <div className="flex flex-col gap-2">
-          <label className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">Diff</label>
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">Diff</label>
+            <button
+              onClick={handleCopyDiff}
+              className={`text-xs px-2.5 py-1 rounded border transition-colors ${
+                copied
+                  ? "text-[#22c55e] border-[#22c55e]/40"
+                  : "text-[var(--text-muted)] border-[var(--border)] hover:text-[var(--text-primary)]"
+              }`}
+            >
+              {copied ? "Copied ✓" : "Copy diff"}
+            </button>
+          </div>
           <div className="rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] overflow-auto">
             {/* Column headers */}
             <div className="grid grid-cols-2 text-[10px] uppercase tracking-wider text-[var(--text-muted)] border-b border-[var(--border)] sticky top-0 bg-[var(--bg-surface)]">

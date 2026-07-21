@@ -43,7 +43,7 @@ function decodeJwt(token: string): { header: unknown; payload: unknown; signatur
 }
 
 export function JwtDecoder() {
-  const [input, setInput] = useState("");
+  const [input, setInput] = useState(SAMPLE);
 
   const { output, meta, error } = useMemo(() => {
     if (!input.trim()) return { output: "", meta: [], error: undefined };

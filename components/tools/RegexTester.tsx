@@ -30,9 +30,9 @@ function renderHighlighted(text: string, matches: RegExpExecArray[]): React.Reac
 }
 
 export function RegexTester() {
-  const [pattern, setPattern] = useState("");
+  const [pattern, setPattern] = useState(SAMPLE_PATTERN);
   const [flags, setFlags] = useState("g");
-  const [testString, setTestString] = useState("");
+  const [testString, setTestString] = useState(SAMPLE_TEXT);
 
   const result = useMemo(() => {
     if (!pattern || !testString) return null;

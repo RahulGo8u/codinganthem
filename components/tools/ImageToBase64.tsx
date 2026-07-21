@@ -69,6 +69,18 @@ export function ImageToBase64() {
     if (inputRef.current) inputRef.current.value = "";
   }, []);
 
+  const downloadBase64 = useCallback(() => {
+    if (!base64Only) return;
+    const blob = new Blob([base64Only], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    const baseName = fileName ? fileName.replace(/\.[^.]+$/, "") : "image";
+    a.href = url;
+    a.download = `${baseName}-base64.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }, [base64Only, fileName]);
+
   return (
     <div className="max-w-7xl mx-auto px-6 py-8 flex flex-col gap-6">
       {/* Header */}
@@ -143,13 +155,22 @@ export function ImageToBase64() {
           <div className="flex flex-col gap-2">
             <div className="flex items-center justify-between">
               <label className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">Base64 only</label>
-              <button
-                onClick={() => copy(base64Only, setCopiedBase64)}
-                disabled={!base64Only}
-                className={`text-xs px-2.5 py-1 rounded border transition-colors ${copiedBase64 ? "text-[#22c55e] border-[#22c55e]/40" : "text-[var(--text-muted)] border-[var(--border)] hover:text-[var(--text-primary)] disabled:opacity-40 disabled:cursor-not-allowed"}`}
-              >
-                {copiedBase64 ? "Copied ✓" : "Copy"}
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={downloadBase64}
+                  disabled={!base64Only}
+                  className="text-xs px-2.5 py-1 rounded border transition-colors text-[var(--text-muted)] border-[var(--border)] hover:text-[var(--text-primary)] disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  Download
+                </button>
+                <button
+                  onClick={() => copy(base64Only, setCopiedBase64)}
+                  disabled={!base64Only}
+                  className={`text-xs px-2.5 py-1 rounded border transition-colors ${copiedBase64 ? "text-[#22c55e] border-[#22c55e]/40" : "text-[var(--text-muted)] border-[var(--border)] hover:text-[var(--text-primary)] disabled:opacity-40 disabled:cursor-not-allowed"}`}
+                >
+                  {copiedBase64 ? "Copied ✓" : "Copy"}
+                </button>
+              </div>
             </div>
             <textarea
               readOnly
