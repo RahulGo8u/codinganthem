@@ -138,7 +138,6 @@ export function UserAgentParser() {
       inputLabel="User-Agent String"
       outputLabel="Parsed Details"
       inputPlaceholder="Paste a User-Agent string, or your browser's is loaded by default..."
-      badges={<span className="badge badge-neutral">Client-side</span>}
       extraActions={
         <button
           onClick={() => setInput(SAMPLE)}

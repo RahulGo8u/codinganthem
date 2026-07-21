@@ -155,7 +155,6 @@ export function CronParser() {
       outputLabel="Explanation"
       inputPlaceholder="*/5 * * * *"
       outputPlaceholder="Plain-English explanation will appear here..."
-      badges={<span className="badge badge-neutral">Client-side</span>}
       outputContent={
         parsed ? (
           <div className="p-4 flex flex-col gap-4">

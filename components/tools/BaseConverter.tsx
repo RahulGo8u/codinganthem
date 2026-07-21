@@ -66,7 +66,6 @@ export function BaseConverter() {
       outputLabel="All bases"
       inputPlaceholder="Enter a number..."
       outputPlaceholder="Conversions will appear here..."
-      badges={<span className="badge badge-neutral">Client-side</span>}
       outputContent={
         conversions.length > 0 ? (
           <div className="p-4 grid grid-cols-1 sm:grid-cols-2 gap-3">

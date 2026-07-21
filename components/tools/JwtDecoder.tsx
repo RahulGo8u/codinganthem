@@ -73,7 +73,6 @@ export function JwtDecoder() {
       outputLabel="Decoded"
       inputPlaceholder="Paste your JWT here (eyJ...)"
       outputPlaceholder="Decoded header and payload will appear here..."
-      badges={<span className="badge badge-neutral">Client-side</span>}
       extraActions={
         <button
           onClick={() => setInput(SAMPLE)}

@@ -51,7 +51,6 @@ export function WordCounter() {
       inputLabel="Text"
       outputLabel="Stats"
       inputPlaceholder="Paste or type your text here..."
-      badges={<span className="badge badge-neutral">Client-side</span>}
       extraActions={
         <button
           onClick={() => setInput(SAMPLE)}

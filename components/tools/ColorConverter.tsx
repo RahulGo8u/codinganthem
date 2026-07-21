@@ -122,7 +122,6 @@ export function ColorConverter() {
       outputLabel="Conversions"
       inputPlaceholder="Enter a color: #6366f1, rgb(99,102,241), or hsl(239,84%,67%)"
       outputPlaceholder="Converted values will appear here..."
-      badges={<span className="badge badge-neutral">Client-side</span>}
       extraActions={
         <button
           onClick={() => setInput(SAMPLE)}

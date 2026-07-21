@@ -110,7 +110,6 @@ export function JwtValidator() {
       outputLabel="Validation Result"
       inputPlaceholder="Paste your JWT here (eyJ...)"
       outputPlaceholder="Validation result will appear here..."
-      badges={<span className="badge badge-neutral">Client-side</span>}
       outputContent={
         header && payload ? (
           <div className="flex flex-col">

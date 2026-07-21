@@ -65,7 +65,6 @@ export function EthUnitConverter() {
       hideFileActions
       showClear
       outputLabel="Convert between Ethereum units"
-      badges={<span className="badge badge-neutral">Client-side</span>}
       extraActions={
         <div className="flex flex-wrap items-center gap-1.5">
           {QUICK_FILL_OPTIONS.map((opt) => (

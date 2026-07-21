@@ -69,7 +69,6 @@ export function UrlParser() {
         </button>
       }
       inputPlaceholder="https://www.example.com/path?q=hello&page=2#section"
-      badges={<span className="badge badge-neutral">Client-side</span>}
       outputContent={
         parsed ? (
           <div className="p-4 flex flex-col gap-3">

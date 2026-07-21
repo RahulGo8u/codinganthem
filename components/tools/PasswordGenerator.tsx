@@ -81,7 +81,6 @@ export function PasswordGenerator() {
       hideInputPane
       outputLabel="Generated Passwords"
       outputPlaceholder="Click Generate to create passwords..."
-      badges={<span className="badge badge-neutral">Client-side</span>}
       options={
         <div className="flex flex-wrap items-center gap-4">
           <label className="flex items-center gap-2 text-[var(--text-muted)] text-xs">

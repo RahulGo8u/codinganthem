@@ -98,12 +98,9 @@ export function FaviconGenerator() {
     <div className="max-w-7xl mx-auto px-6 py-8 flex flex-col gap-6 pb-24">
       <div className="flex flex-col gap-3">
         <Breadcrumb current={tool.name} asHeading={false} />
-        <div className="flex items-start justify-between gap-4 flex-wrap">
-          <div className="flex flex-col gap-1.5 min-w-0">
-            <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-[var(--text-primary)]">{tool.name}</h1>
-            <p className="text-sm text-[var(--text-muted)] leading-relaxed max-w-2xl">{tool.description}</p>
-          </div>
-          <span className="badge badge-neutral">Client-side</span>
+        <div className="flex flex-col gap-1.5 min-w-0">
+          <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-[var(--text-primary)]">{tool.name}</h1>
+          <p className="text-sm text-[var(--text-muted)] leading-relaxed max-w-2xl">{tool.description}</p>
         </div>
       </div>
 

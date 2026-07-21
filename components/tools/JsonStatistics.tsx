@@ -106,7 +106,6 @@ export function JsonStatistics() {
       inputLabel="JSON"
       outputLabel="Statistics"
       inputPlaceholder="Paste your JSON here..."
-      badges={<span className="badge badge-neutral">Client-side</span>}
       extraActions={
         <button
           onClick={() => setInput('{"id":1,"name":"CodingAnthem","tags":["fast","free","private"],"active":true,"meta":{"stars":2400,"forks":680,"license":"MIT","contributors":[{"name":"Alice"},{"name":"Bob"}]},"score":null}')}

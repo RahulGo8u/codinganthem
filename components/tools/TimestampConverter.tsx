@@ -71,7 +71,6 @@ export function TimestampConverter() {
           : "Enter date string (e.g. 2026-06-19T00:00:00Z)"
       }
       outputPlaceholder="Conversion result will appear here..."
-      badges={<span className="badge badge-neutral">Client-side</span>}
       outputContent={
         rows ? (
           <div className="p-4">

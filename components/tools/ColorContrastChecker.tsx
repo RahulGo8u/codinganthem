@@ -102,12 +102,7 @@ export function ColorContrastChecker() {
       hideInputPane
       outputLabel="Contrast Result"
       outputPlaceholder="Enter two colors above to check contrast..."
-      badges={
-        <>
-          <span className="badge badge-success">WCAG 2.1 Ready</span>
-          <span className="badge badge-neutral">Client-side</span>
-        </>
-      }
+      badges={<span className="badge badge-success">WCAG 2.1 Ready</span>}
       options={
         <div className="flex flex-wrap items-center gap-6 w-full">
           <label className="flex items-center gap-2 text-xs text-[var(--text-muted)]">

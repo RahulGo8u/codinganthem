@@ -136,7 +136,6 @@ export function HashGenerator() {
       outputLabel={`${algo} Hash`}
       inputPlaceholder="Enter text to hash..."
       outputPlaceholder="Hash will appear here..."
-      badges={<span className="badge badge-neutral">Client-side</span>}
       outputContent={
         output ? (
           <div className="p-4">

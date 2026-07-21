@@ -139,7 +139,6 @@ export function TokenCounter() {
       outputLabel="Result"
       inputPlaceholder="Paste your prompt or text here..."
       outputPlaceholder="Paste text above to see the token count and cost estimate..."
-      badges={<span className="badge badge-neutral">Client-side</span>}
       extraActions={
         <button
           onClick={() => setInput(SAMPLE)}

@@ -83,7 +83,6 @@ export function BcryptGenerator() {
       hideFileActions
       showClear
       outputLabel="Bcrypt hash & verify"
-      badges={<span className="badge badge-neutral">Client-side</span>}
       outputContent={
         <div className="flex flex-col gap-8">
           <section className="flex flex-col gap-3">
