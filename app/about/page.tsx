@@ -35,8 +35,8 @@ export default function AboutPage() {
             About <span className="text-[#6366f1]">CodingAnthem</span>
           </h1>
           <p className="text-[var(--text-muted)] leading-relaxed">
-            CodingAnthem is a collection of developer tools built to be fast, free, and zero-friction.
-            CodingAnthem is a growing collection of fast, free developer tools. No sign-up required.
+            CodingAnthem is a growing collection of developer tools built to be fast, free, and
+            zero-friction. No sign-up required.
           </p>
         </div>
 

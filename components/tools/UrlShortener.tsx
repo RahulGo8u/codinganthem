@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Link, Loader2, CheckCircle, Copy, ExternalLink, AlertCircle } from "lucide-react";
 import { validateUrl } from "@/lib/urlValidation";
+import { Breadcrumb } from "@/components/Breadcrumb";
 
 const EXPIRY_OPTIONS = [
   { value: "never", label: "Never expires" },
@@ -102,21 +103,7 @@ export function UrlShortener() {
   return (
     <div className="max-w-7xl mx-auto px-6 py-8 flex flex-col gap-6">
       {/* Header */}
-      <div className="flex items-center gap-3">
-        <a
-          href="/"
-          className="flex items-center gap-1.5 text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
-        >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="15 18 9 12 15 6" />
-          </svg>
-          All tools
-        </a>
-        <span className="text-[var(--border)]">/</span>
-        <h1 className="text-sm font-medium" style={{ color: "var(--text-primary)" }}>
-          URL Shortener
-        </h1>
-      </div>
+      <Breadcrumb current="URL Shortener" />
 
       <div className="w-full max-w-2xl mx-auto flex flex-col gap-6">
         {/* Input form — hidden once a result exists */}

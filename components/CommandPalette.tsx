@@ -13,7 +13,9 @@ function ToolIcon({ name }: { name: string }) {
 }
 
 const RECENT_KEY = "ca_recent_tools";
-const MAX_RECENT = 5;
+// Keep in sync with the homepage "Recently used" section (HomepageClient.tsx),
+// which displays up to 4 — both surfaces should show the same set.
+const MAX_RECENT = 4;
 
 function getRecent(): string[] {
   if (typeof window === "undefined") return [];

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { getToolBySlug } from "@/lib/tools";
-import Link from "next/link";
+import { Breadcrumb } from "@/components/Breadcrumb";
 
 const tool = getToolBySlug("jwt-generator")!;
 
@@ -84,16 +84,7 @@ export function JwtGenerator() {
     <div className="max-w-7xl mx-auto px-6 py-8 flex flex-col gap-6">
       {/* Header */}
       <div className="flex items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <Link href="/" className="flex items-center gap-1.5 text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="15 18 9 12 15 6" />
-            </svg>
-            All tools
-          </Link>
-          <span className="text-[var(--border)]">/</span>
-          <h1 className="text-sm font-medium text-[var(--text-primary)]">{tool.name}</h1>
-        </div>
+        <Breadcrumb current={tool.name} />
         <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#f59e0b]/10 border border-[#f59e0b]/30">
           <span className="text-xs text-[#f59e0b]">For testing only — do not use real secrets in this tool</span>
         </div>

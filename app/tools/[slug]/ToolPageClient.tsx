@@ -171,22 +171,9 @@ export function ToolPageClient({ slug }: { slug: string }) {
   return (
     <>
       <ToolComponent />
-      {tool.explainer && (
+      {related.length > 0 && (
         <div className="max-w-7xl mx-auto px-6 pb-12 mt-10">
           <div className="border-t border-[var(--border)] pt-10">
-            <h2 className="text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)] mb-3">
-              About {tool.name}
-            </h2>
-            <p className="text-sm text-[var(--text-muted)] leading-relaxed max-w-3xl whitespace-pre-line">
-              {tool.explainer}
-            </p>
-          </div>
-        </div>
-      )}
-
-      {related.length > 0 && (
-        <div className="max-w-7xl mx-auto px-6 pb-16">
-          <div className="border-t border-[var(--border)] pt-8">
             <h2 className="text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)] mb-4">
               Related tools
             </h2>
@@ -195,6 +182,19 @@ export function ToolPageClient({ slug }: { slug: string }) {
                 <ToolCard key={t.slug} tool={t} />
               ))}
             </div>
+          </div>
+        </div>
+      )}
+
+      {tool.explainer && (
+        <div className="max-w-7xl mx-auto px-6 pb-16">
+          <div className="border-t border-[var(--border)] pt-8">
+            <h2 className="text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)] mb-3">
+              About {tool.name}
+            </h2>
+            <p className="text-sm text-[var(--text-muted)] leading-relaxed max-w-3xl whitespace-pre-line">
+              {tool.explainer}
+            </p>
           </div>
         </div>
       )}

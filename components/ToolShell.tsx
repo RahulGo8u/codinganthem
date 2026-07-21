@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import Link from "next/link";
 import type { Tool } from "@/lib/tools";
+import { Breadcrumb } from "@/components/Breadcrumb";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 
@@ -166,17 +166,7 @@ export function ToolShell({
     <div className="max-w-7xl mx-auto px-6 py-8 flex flex-col gap-6 pb-24">
       {/* Header */}
       <div className="flex flex-col gap-3">
-        {/* Breadcrumb */}
-        <div className="flex items-center gap-2 text-xs text-[var(--text-muted)]">
-          <Link
-            href="/"
-            className="hover:text-[var(--text-primary)] transition-colors"
-          >
-            All tools
-          </Link>
-          <span className="text-[var(--border)]">/</span>
-          <span className="text-[var(--text-primary)]">{tool.name}</span>
-        </div>
+        <Breadcrumb current={tool.name} asHeading={false} />
 
         {/* Title row */}
         <div className="flex items-start justify-between gap-4 flex-wrap">
