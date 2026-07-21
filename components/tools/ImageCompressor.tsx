@@ -256,21 +256,20 @@ export function ImageCompressor() {
                     }`}
               </span>
               {resultUrl && <img src={resultUrl} alt="Compressed" className="max-h-64 object-contain mx-auto" />}
+              <button
+                disabled={!resultBlob.current || keptOriginal}
+                onClick={() => {
+                  if (!resultBlob.current || !file || keptOriginal) return;
+                  const ext = format === "image/webp" ? "webp" : "jpg";
+                  const base = file.name.replace(/\.[^.]+$/, "");
+                  downloadBlob(resultBlob.current, `${base}-compressed.${ext}`);
+                }}
+                className="self-end mt-1 px-4 py-2 rounded-lg text-sm font-medium border border-[#6366f1]/40 bg-[#6366f1]/10 text-[#6366f1] hover:bg-[#6366f1]/20 disabled:opacity-40"
+              >
+                {keptOriginal ? "Nothing to download — original kept" : "Download compressed image"}
+              </button>
             </div>
           </div>
-
-          <button
-            disabled={!resultBlob.current || keptOriginal}
-            onClick={() => {
-              if (!resultBlob.current || !file || keptOriginal) return;
-              const ext = format === "image/webp" ? "webp" : "jpg";
-              const base = file.name.replace(/\.[^.]+$/, "");
-              downloadBlob(resultBlob.current, `${base}-compressed.${ext}`);
-            }}
-            className="self-start px-4 py-2 rounded-lg text-sm font-medium border border-[#6366f1]/40 bg-[#6366f1]/10 text-[#6366f1] hover:bg-[#6366f1]/20 disabled:opacity-40"
-          >
-            {keptOriginal ? "Nothing to download — original kept" : "Download compressed image"}
-          </button>
         </>
       )}
     </div>
