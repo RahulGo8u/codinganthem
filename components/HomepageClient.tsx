@@ -42,11 +42,20 @@ export function HomepageClient({ faqs = [] }: { faqs?: Faq[] }) {
       <div className="hero-glow relative border-b border-[var(--border)]">
         <div className="max-w-7xl mx-auto px-6 py-20 flex flex-col items-center text-center gap-6">
 
+          {/* Client-side pill */}
+          <span className="badge badge-accent">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+              <path d="m9 12 2 2 4-4" />
+            </svg>
+            100% Client-Side Processing
+          </span>
+
           {/* Heading */}
-          <div className="flex flex-col gap-3 max-w-xl">
+          <div className="flex flex-col gap-3 max-w-2xl">
             <h1 className="text-4xl sm:text-5xl font-semibold tracking-tight" style={{ color: "var(--text-primary)" }}>
               <span style={{ color: "#6366f1" }}>coding</span>anthem{" "}
-              <span className="block text-xl sm:text-2xl font-normal mt-2" style={{ color: "var(--text-muted)" }}>
+              <span className="block text-xl sm:text-2xl font-normal mt-3" style={{ color: "var(--text-muted)" }}>
                 Free Online Developer Utilities &amp; Tools
               </span>
             </h1>
@@ -83,6 +92,23 @@ export function HomepageClient({ faqs = [] }: { faqs?: Faq[] }) {
           <HeroDemo />
 
         </div>
+
+        {/* Stats strip (truthful numbers) */}
+        <div className="border-t border-[var(--border)]">
+          <div className="max-w-7xl mx-auto px-6 py-6 grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
+            {[
+              { value: `${tools.length}`, label: "Tools" },
+              { value: "0", label: "Accounts needed" },
+              { value: "100%", label: "Client-side" },
+              { value: `${CATEGORY_ORDER.length}`, label: "Categories" },
+            ].map((s) => (
+              <div key={s.label} className="flex flex-col gap-1">
+                <span className="text-2xl font-semibold text-[var(--accent)]">{s.value}</span>
+                <span className="text-[11px] uppercase tracking-wider text-[var(--text-muted)]">{s.label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* Recently used */}
@@ -110,44 +136,82 @@ export function HomepageClient({ faqs = [] }: { faqs?: Faq[] }) {
 
       {/* Tools section */}
       <div className="max-w-7xl mx-auto px-6 py-12">
+        <div className="flex flex-col lg:flex-row gap-8">
 
-        {/* Section header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-          <div className="flex items-baseline gap-2">
-            <h2 className="text-sm font-semibold">Tools</h2>
-            <span className="text-xs text-[var(--text-muted)]">{filtered.length} of {tools.length}</span>
+          {/* Sidebar (lg+): categories + GitHub promo */}
+          <aside className="hidden lg:flex lg:flex-col gap-4 w-52 shrink-0">
+            <h2 className="text-sm font-semibold">Categories</h2>
+            <nav className="flex flex-col gap-0.5">
+              {CATEGORIES.map(({ id, label }) => (
+                <button
+                  key={id}
+                  onClick={() => startTransition(() => setFilter(id))}
+                  aria-pressed={filter === id}
+                  className={`text-left px-3 py-2 rounded-lg text-sm transition-colors ${
+                    filter === id
+                      ? "bg-[#6366f1]/15 text-[#6366f1] font-medium"
+                      : "text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)]"
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </nav>
+
+            <a
+              href="https://github.com/RahulGo8u/codinganthem"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-2 flex flex-col gap-1.5 p-4 rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] hover:border-[#6366f1]/40 transition-colors"
+            >
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--text-muted)]">
+                Open Source
+              </span>
+              <span className="text-xs text-[var(--text-muted)] leading-relaxed">
+                codinganthem is fully open source. Contribute your own tools.
+              </span>
+              <span className="text-xs font-medium text-[#6366f1] mt-1">View GitHub →</span>
+            </a>
+          </aside>
+
+          {/* Main column */}
+          <div className="flex-1 min-w-0">
+            {/* Section header */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+              <div className="flex items-baseline gap-2">
+                <h2 className="text-sm font-semibold lg:hidden">Tools</h2>
+                <span className="text-xs text-[var(--text-muted)]">{filtered.length} of {tools.length}</span>
+              </div>
+
+              {/* Category pills (mobile / tablet only) */}
+              <div className="flex flex-wrap gap-1.5 lg:hidden">
+                {CATEGORIES.map(({ id, label }) => (
+                  <button
+                    key={id}
+                    onClick={() => startTransition(() => setFilter(id))}
+                    aria-pressed={filter === id}
+                    className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
+                      filter === id
+                        ? "bg-[#6366f1]/15 text-[#6366f1] border-[#6366f1]/40"
+                        : "bg-[var(--bg-surface)] text-[var(--text-muted)] border-[var(--border)] hover:text-[var(--text-primary)] hover:border-[var(--text-muted)]/30"
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Tool grid */}
+            <div
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"
+              style={{ opacity: isPending ? 0.6 : 1, transition: "opacity 150ms" }}
+            >
+              {filtered.map((tool) => (
+                <MemoToolCard key={tool.slug} tool={tool} />
+              ))}
+            </div>
           </div>
-
-          {/* Category filters */}
-          <div className="flex flex-wrap gap-1.5">
-            {CATEGORIES.map(({ id, label }) => (
-              <button
-                key={id}
-                onClick={() => startTransition(() => setFilter(id))}
-                aria-pressed={filter === id}
-                className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
-                  filter === id
-                    ? "bg-[#6366f1]/15 text-[#6366f1] border-[#6366f1]/40"
-                    : "bg-[var(--bg-surface)] text-[var(--text-muted)] border-[var(--border)] hover:text-[var(--text-primary)] hover:border-[var(--text-muted)]/30"
-                }`}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Divider */}
-        <div className="border-t border-[var(--border)] mb-8" />
-
-        {/* Tool grid */}
-        <div
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"
-          style={{ opacity: isPending ? 0.6 : 1, transition: "opacity 150ms" }}
-        >
-          {filtered.map((tool) => (
-            <MemoToolCard key={tool.slug} tool={tool} />
-          ))}
         </div>
       </div>
 
@@ -160,26 +224,28 @@ export function HomepageClient({ faqs = [] }: { faqs?: Faq[] }) {
               {
                 icon: "🔒",
                 title: "Privacy-first by default",
-                body: "Most tools run entirely in your browser — your JSON, passwords, and hashes never touch a server. The few that need storage (like URL Shortener) say so upfront.",
+                body: "Your JSON, passwords, and hashes never touch a server.",
               },
               {
                 icon: "⚡",
                 title: "Results as you type",
-                body: "No submit buttons. No spinners. Tools respond on every keystroke — format JSON, match regex, compute hashes instantly.",
+                body: "No submit buttons, no spinners — instant on every keystroke.",
               },
               {
                 icon: "∅",
                 title: "No account. Ever.",
-                body: "Open the URL, use the tool, close the tab. Free forever. No sign-up, no paywalls, no tracking.",
+                body: "Open the URL, use the tool, close the tab. Free forever.",
               },
               {
                 icon: "🤖",
                 title: "Pairs well with AI",
-                body: "Paste ChatGPT or Copilot output straight into any tool. Validate JSON, encode Base64, or test regex without breaking your flow.",
+                body: "Paste ChatGPT or Copilot output straight into any tool.",
               },
             ].map(({ icon, title, body }) => (
               <div key={title} className="flex flex-col gap-3 p-6 bg-[var(--bg-surface)]">
-                <span className="text-2xl">{icon}</span>
+                <span className="w-10 h-10 flex items-center justify-center rounded-lg bg-[#6366f1]/10 text-xl">
+                  {icon}
+                </span>
                 <p className="text-sm font-semibold text-[var(--text-primary)] leading-snug">{title}</p>
                 <p className="text-xs text-[var(--text-muted)] leading-relaxed">{body}</p>
               </div>

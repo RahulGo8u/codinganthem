@@ -158,7 +158,7 @@ export function CommandPalette() {
                 {!search && recentTools.length > 0 && (
                   <Command.Group
                     heading="Recently used"
-                    className="[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:text-[var(--text-muted)] [&_[cmdk-group-heading]]:font-medium"
+                    className="[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-[10px] [&_[cmdk-group-heading]]:uppercase [&_[cmdk-group-heading]]:tracking-wider [&_[cmdk-group-heading]]:text-[var(--text-muted)] [&_[cmdk-group-heading]]:font-semibold"
                   >
                     {recentTools.map((tool) => (
                       <Command.Item
@@ -187,7 +187,7 @@ export function CommandPalette() {
                     <Command.Group
                       key={cat}
                       heading={search ? undefined : CATEGORY_LABELS[cat]}
-                      className="[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:text-[var(--text-muted)] [&_[cmdk-group-heading]]:font-medium mt-1"
+                      className="[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-[10px] [&_[cmdk-group-heading]]:uppercase [&_[cmdk-group-heading]]:tracking-wider [&_[cmdk-group-heading]]:text-[var(--text-muted)] [&_[cmdk-group-heading]]:font-semibold mt-1"
                     >
                       {catTools.map((tool) => (
                         <Command.Item
@@ -211,6 +211,24 @@ export function CommandPalette() {
                   );
                 })}
               </Command.List>
+
+              {/* Footer hint */}
+              <div className="flex items-center justify-between gap-3 px-4 py-2.5 border-t border-[var(--border)] text-[11px] text-[var(--text-muted)]">
+                <div className="flex items-center gap-3">
+                  <span className="flex items-center gap-1">
+                    <kbd className="px-1.5 py-0.5 rounded border border-[var(--border)] bg-[var(--bg-elevated)]">↑</kbd>
+                    <kbd className="px-1.5 py-0.5 rounded border border-[var(--border)] bg-[var(--bg-elevated)]">↓</kbd>
+                    to navigate
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <kbd className="px-1.5 py-0.5 rounded border border-[var(--border)] bg-[var(--bg-elevated)]">↵</kbd>
+                    to select
+                  </span>
+                </div>
+                <span className="text-[var(--text-muted)]">
+                  {tools.length} tools
+                </span>
+              </div>
             </Command>
           </div>
         </div>

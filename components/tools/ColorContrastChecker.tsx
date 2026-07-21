@@ -67,6 +67,21 @@ export function ColorContrastChecker() {
       ]
     : [];
 
+  const wcagLevels = ratio
+    ? [
+        {
+          level: "WCAG AA",
+          normal: ratio >= 4.5,
+          large: ratio >= 3,
+        },
+        {
+          level: "WCAG AAA",
+          normal: ratio >= 7,
+          large: ratio >= 4.5,
+        },
+      ]
+    : [];
+
   const output = ratio
     ? `Contrast ratio: ${ratio.toFixed(2)}:1\n${checks.map((c) => `${c.label}: ${c.pass ? "Pass" : "Fail"}`).join("\n")}`
     : "";
@@ -87,6 +102,12 @@ export function ColorContrastChecker() {
       hideInputPane
       outputLabel="Contrast Result"
       outputPlaceholder="Enter two colors above to check contrast..."
+      badges={
+        <>
+          <span className="badge badge-success">WCAG 2.1 Ready</span>
+          <span className="badge badge-neutral">Client-side</span>
+        </>
+      }
       options={
         <div className="flex flex-wrap items-center gap-6 w-full">
           <label className="flex items-center gap-2 text-xs text-[var(--text-muted)]">
@@ -124,36 +145,82 @@ export function ColorContrastChecker() {
       outputContent={
         ratio && fgRgb && bgRgb ? (
           <div className="p-4 flex flex-col gap-4">
-            {/* Live preview */}
-            <div
-              className="rounded-lg border border-[var(--border)] p-6 flex flex-col gap-1"
-              style={{ backgroundColor: toHex(bgRgb), color: toHex(fgRgb) }}
-            >
-              <p className="text-2xl font-semibold">Large text sample (24px+)</p>
-              <p className="text-sm">Normal text sample — the quick brown fox jumps over the lazy dog.</p>
-            </div>
+            {/* Result cards: ratio + WCAG AA/AAA */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              {/* Big ratio card */}
+              <div className="result-card flex flex-col gap-2">
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--text-muted)]">
+                  Contrast Ratio
+                </span>
+                <span className="text-4xl font-semibold text-[var(--accent)] mono leading-none">
+                  {ratio.toFixed(1)}:1
+                </span>
+                <div className="mt-1 h-1.5 rounded-full bg-[var(--bg-elevated)] overflow-hidden">
+                  <div
+                    className="h-full rounded-full bg-[var(--success)]"
+                    style={{ width: `${Math.min(100, (ratio / 21) * 100)}%` }}
+                  />
+                </div>
+              </div>
 
-            {/* Ratio */}
-            <div className="flex items-baseline gap-2">
-              <span className="text-3xl font-semibold text-[var(--text-primary)] mono">{ratio.toFixed(2)}:1</span>
-              <span className="text-sm text-[var(--text-muted)]">contrast ratio</span>
-            </div>
-
-            {/* Pass/fail grid */}
-            <div className="grid grid-cols-2 gap-3">
-              {checks.map((c) => (
-                <div
-                  key={c.label}
-                  className={`flex items-center justify-between px-3 py-2 rounded-lg border ${
-                    c.pass ? "border-[#22c55e]/40 bg-[#22c55e]/10" : "border-[#ef4444]/40 bg-[#ef4444]/10"
-                  }`}
-                >
-                  <span className="text-xs text-[var(--text-primary)]">{c.label}</span>
-                  <span className={`text-xs font-semibold ${c.pass ? "text-[#22c55e]" : "text-[#ef4444]"}`}>
-                    {c.pass ? "Pass" : "Fail"}
-                  </span>
+              {/* WCAG level cards */}
+              {wcagLevels.map((w) => (
+                <div key={w.level} className="result-card flex flex-col gap-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)]">
+                      {w.level}
+                    </span>
+                    <span className={w.normal && w.large ? "text-[var(--success)]" : "text-[var(--error)]"}>
+                      {w.normal && w.large ? (
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg>
+                      ) : (
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+                      )}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-[var(--text-primary)]">Normal Text</span>
+                    <span className={`badge ${w.normal ? "badge-success" : ""}`} style={w.normal ? undefined : { color: "var(--error)", background: "color-mix(in srgb, var(--error) 12%, transparent)", borderColor: "color-mix(in srgb, var(--error) 35%, transparent)" }}>
+                      {w.normal ? "PASS" : "FAIL"}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-semibold text-[var(--text-primary)]">Large Text</span>
+                    <span className={`badge ${w.large ? "badge-success" : ""}`} style={w.large ? undefined : { color: "var(--error)", background: "color-mix(in srgb, var(--error) 12%, transparent)", borderColor: "color-mix(in srgb, var(--error) 35%, transparent)" }}>
+                      {w.large ? "PASS" : "FAIL"}
+                    </span>
+                  </div>
                 </div>
               ))}
+            </div>
+
+            {/* Visual preview */}
+            <div className="flex flex-col gap-2">
+              <span className="text-xs font-semibold text-[var(--text-primary)]">Visual Preview</span>
+              <div
+                className="rounded-xl border border-[var(--border)] p-6 flex flex-col gap-3"
+                style={{ backgroundColor: toHex(bgRgb), color: toHex(fgRgb) }}
+              >
+                <p className="text-2xl font-semibold">Large Headline Preview</p>
+                <p className="text-sm leading-relaxed">
+                  The quick brown fox jumps over the lazy dog. Accessibility is not just a
+                  checklist, it&apos;s a way of designing for everyone, everywhere.
+                </p>
+                <div className="flex flex-wrap gap-3 mt-2">
+                  <span
+                    className="px-3 py-1.5 rounded-lg text-xs font-medium border"
+                    style={{ borderColor: toHex(fgRgb), color: toHex(fgRgb) }}
+                  >
+                    Action Primary
+                  </span>
+                  <span
+                    className="px-3 py-1.5 rounded-lg text-xs font-medium"
+                    style={{ color: toHex(fgRgb), opacity: 0.7 }}
+                  >
+                    Ghost Secondary
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
         ) : (

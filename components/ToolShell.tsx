@@ -50,6 +50,8 @@ interface ToolShellProps {
   extraActions?: React.ReactNode;
   /** Extra buttons for the action bar (right side, next to Download/Copy) */
   extraRightActions?: React.ReactNode;
+  /** Right-aligned badges shown in the header next to the title (e.g. "Client-side", "WCAG 2.1") */
+  badges?: React.ReactNode;
   /** Hide Upload file + Download buttons (e.g. generator tools) */
   hideFileActions?: boolean;
   /** Hide only the default (.txt) Download button while keeping Upload — use when a tool provides its own download action via extraActions */
@@ -76,6 +78,7 @@ export function ToolShell({
   outputContent,
   extraActions,
   extraRightActions,
+  badges,
   hideFileActions = false,
   hideDownload = false,
   showClear = false,
@@ -160,46 +163,35 @@ export function ToolShell({
   const charCount = input.length;
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-8 flex flex-col gap-6">
+    <div className="max-w-7xl mx-auto px-6 py-8 flex flex-col gap-6 pb-24">
       {/* Header */}
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
+      <div className="flex flex-col gap-3">
+        {/* Breadcrumb */}
+        <div className="flex items-center gap-2 text-xs text-[var(--text-muted)]">
           <Link
             href="/"
-            className="flex items-center gap-1.5 text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
+            className="hover:text-[var(--text-primary)] transition-colors"
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="15 18 9 12 15 6" />
-            </svg>
             All tools
           </Link>
           <span className="text-[var(--border)]">/</span>
-          <h1 className="text-sm font-medium text-[var(--text-primary)]">{tool.name}</h1>
+          <span className="text-[var(--text-primary)]">{tool.name}</span>
         </div>
 
-        <button
-          onClick={async () => {
-            try {
-              await navigator.clipboard.writeText(window.location.href);
-              setShared(true);
-              setTimeout(() => setShared(false), 1500);
-            } catch {
-              setShared(false);
-            }
-          }}
-          className={`flex items-center gap-1.5 text-xs transition-colors ${
-            shared
-              ? "text-[#22c55e]"
-              : "text-[var(--text-muted)] hover:text-[var(--text-primary)]"
-          }`}
-          title="Copy link to this tool"
-        >
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
-            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
-          </svg>
-          {shared ? "Copied!" : "Share"}
-        </button>
+        {/* Title row */}
+        <div className="flex items-start justify-between gap-4 flex-wrap">
+          <div className="flex flex-col gap-1.5 min-w-0">
+            <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-[var(--text-primary)]">
+              {tool.name}
+            </h1>
+            {tool.description && (
+              <p className="text-sm text-[var(--text-muted)] leading-relaxed max-w-2xl">
+                {tool.description}
+              </p>
+            )}
+          </div>
+          {badges && <div className="flex items-center gap-2 flex-wrap shrink-0">{badges}</div>}
+        </div>
       </div>
 
       {/* Options bar */}
@@ -278,55 +270,80 @@ export function ToolShell({
         </div>
       </div>
 
-      {/* Action bar */}
-      <div className="flex flex-col gap-2">
-        {uploadError && (
-          <p className="text-xs text-[#ef4444] leading-relaxed">{uploadError}</p>
-        )}
-      <div className="flex items-center justify-between gap-3 flex-wrap">
-        <div className="flex items-center gap-2">
-          {(!hideFileActions || showClear) && (
-            <button
-              onClick={handleClear}
-              disabled={!input}
-              className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[#ef4444]/40 bg-[#ef4444]/10 text-[#ef4444] hover:bg-[#ef4444]/20 hover:border-[#ef4444]/60 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-            >
-              Clear
-            </button>
+      {/* Sticky action bar */}
+      <div className="sticky bottom-0 -mx-6 mt-2 border-t border-[var(--border)] bg-[var(--bg-base)]/90 backdrop-blur-md">
+        <div className="px-6 py-3 flex flex-col gap-2">
+          {uploadError && (
+            <p className="text-xs text-[#ef4444] leading-relaxed">{uploadError}</p>
           )}
-          {!hideFileActions && (
-            <button
-              onClick={handleUpload}
-              className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
-            >
-              Upload file
-            </button>
-          )}
-          {extraActions}
-        </div>
+          <div className="flex items-center justify-between gap-3 flex-wrap">
+            <div className="flex items-center gap-2">
+              {(!hideFileActions || showClear) && (
+                <button
+                  onClick={handleClear}
+                  disabled={!input}
+                  className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[#ef4444]/40 bg-[#ef4444]/10 text-[#ef4444] hover:bg-[#ef4444]/20 hover:border-[#ef4444]/60 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                >
+                  Clear
+                </button>
+              )}
+              {!hideFileActions && (
+                <button
+                  onClick={handleUpload}
+                  className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
+                >
+                  Upload file
+                </button>
+              )}
+              {extraActions}
+            </div>
 
-        <div className="flex items-center gap-2">
-          {extraRightActions}
-          {!hideFileActions && !hideDownload && (
-            <button
-              onClick={handleDownload}
-              disabled={!output}
-              className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-            >
-              Download
-            </button>
-          )}
-          {(!outputContent || output !== "") && (
-          <button
-            onClick={handleCopy}
-            disabled={!output}
-            className="px-4 py-1.5 rounded-lg text-xs font-medium border border-[#22c55e]/40 bg-[#22c55e]/10 text-[#22c55e] hover:bg-[#22c55e]/20 hover:border-[#22c55e]/60 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
-          >
-            {copied ? "Copied ✓" : "Copy"}
-          </button>
-          )}
+            <div className="flex items-center gap-2">
+              {extraRightActions}
+              <button
+                onClick={async () => {
+                  try {
+                    await navigator.clipboard.writeText(window.location.href);
+                    setShared(true);
+                    setTimeout(() => setShared(false), 1500);
+                  } catch {
+                    setShared(false);
+                  }
+                }}
+                title="Copy link to this tool"
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
+                  shared
+                    ? "border-[#22c55e]/40 text-[#22c55e]"
+                    : "border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)]"
+                }`}
+              >
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+                  <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+                </svg>
+                {shared ? "Copied!" : "Copy URL"}
+              </button>
+              {!hideFileActions && !hideDownload && (
+                <button
+                  onClick={handleDownload}
+                  disabled={!output}
+                  className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                >
+                  Download
+                </button>
+              )}
+              {(!outputContent || output !== "") && (
+                <button
+                  onClick={handleCopy}
+                  disabled={!output}
+                  className="px-4 py-1.5 rounded-lg text-xs font-medium border border-[#22c55e]/40 bg-[#22c55e]/10 text-[#22c55e] hover:bg-[#22c55e]/20 hover:border-[#22c55e]/60 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                >
+                  {copied ? "Copied ✓" : "Copy"}
+                </button>
+              )}
+            </div>
+          </div>
         </div>
-      </div>
       </div>
     </div>
   );
