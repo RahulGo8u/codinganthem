@@ -4,11 +4,14 @@ The developer toolbox you always wanted — fast, free, and private. Growing col
 
 🔗 [www.codinganthem.com](https://www.codinganthem.com) &nbsp;·&nbsp; [![Buy Me a Coffee](https://img.shields.io/badge/Support-Buy%20Me%20a%20Coffee-6366f1?style=flat&logo=buy-me-a-coffee&logoColor=white)](https://buymeacoffee.com/codinganthem)
 
-Most tools run **100% client-side** in your browser. A few (like URL Shortener) use a lightweight backend to store data — always noted on the tool page. No sign-up required for any tool.
+Most tools run **100% client-side** in your browser. A few (like URL Shortener) use a lightweight backend to store data, and the AI tools send input to Google's Gemini API to generate a response — always noted on the tool page. No sign-up required for any tool.
 
 ## Tools
 
 ### AI
+- AI Code Explainer — paste any code snippet and get a plain-English explanation, powered by Gemini
+- AI Error Message Explainer — paste an error or stack trace and get a diagnosis, likely cause, and fix, powered by Gemini
+- AI Text-to-SQL Generator — describe a query in plain English and get a ready-to-use SQL statement, powered by Gemini
 - Prompt Template Filler — fill in {{variables}} in a prompt template and open the result directly in ChatGPT
 - Token Counter & Estimator — count tokens and estimate API cost for GPT, Claude, and Gemini models
 
@@ -71,6 +74,7 @@ Most tools run **100% client-side** in your browser. A few (like URL Shortener) 
 - Slug Generator
 - URL Encoder / Decoder
 - URL Parser — protocol, host, path, query params, hash
+- URL Shortener — shorten any URL and get a shareable codinganthem.com/r/ link (uses a backend — see Privacy below)
 - User-Agent Parser — browser, engine, OS, and device detection
 
 ## Stack
@@ -84,7 +88,9 @@ Most tools run **100% client-side** in your browser. A few (like URL Shortener) 
 - [sql-formatter](https://sql-formatter-org.github.io/sql-formatter/) for SQL formatting
 - [js-beautify](https://github.com/beautifier/js-beautify) for JS / HTML / CSS formatting
 - [qrcode](https://www.npmjs.com/package/qrcode) for QR code generation
-- [@vercel/analytics](https://vercel.com/docs/analytics) for privacy-respecting usage analytics
+- [Mongoose](https://mongoosejs.com) + MongoDB Atlas for the URL Shortener backend and AI usage tracking
+- [Google Gemini API](https://ai.google.dev) for the AI-powered tools
+- [@vercel/analytics](https://vercel.com/docs/analytics) and [Plausible](https://plausible.io) for privacy-respecting usage analytics
 
 Tools are statically generated per route and code-split with `next/dynamic`, so each tool only loads its own bundle.
 
@@ -97,6 +103,8 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
+Requires a few environment variables to run the URL Shortener and AI tools locally — see [`ENVIRONMENT_VARIABLES.md`](ENVIRONMENT_VARIABLES.md) for the full list and setup steps. Tools that don't need a backend work without any setup.
+
 ```bash
 npm run build   # production build
 npm run lint    # lint
@@ -104,7 +112,7 @@ npm run lint    # lint
 
 ## Privacy
 
-Most tools run client-side in your browser using JavaScript and Web APIs — nothing is transmitted anywhere. A small number of tools (like URL Shortener) require server-side storage to work; those tools only send the minimum data needed to function, and this is always disclosed on the tool page. There are no accounts, and no tracking beyond privacy-respecting analytics.
+Most tools run client-side in your browser using JavaScript and Web APIs — nothing is transmitted anywhere. A small number of tools (like URL Shortener) require server-side storage to work; those tools only send the minimum data needed to function, and this is always disclosed on the tool page. The AI tools send your input to Google's Gemini API to generate a response — a distinct, third-party data flow, separate from the client-side and server-side categories above. There are no accounts, and no tracking beyond privacy-respecting analytics. Full details: [`/privacy`](https://www.codinganthem.com/privacy).
 
 ## Support
 

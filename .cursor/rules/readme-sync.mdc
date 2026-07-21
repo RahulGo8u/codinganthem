@@ -1,0 +1,51 @@
+---
+description: Keep README.md in sync with the codebase whenever a change affects what it documents
+alwaysApply: true
+---
+
+# Keep README.md in Sync
+
+Before finishing any task, check whether `README.md` needs updating. It is
+the first thing anyone (contributor, visitor, future you) reads — treat it
+as documentation debt if it drifts from what the code actually does.
+
+For new tools specifically, see the existing checklist in
+`.cursor/rules/pre-commit-checklist.mdc` — this rule covers everything else.
+
+## Triggers that almost always require a README update
+
+1. **New page or route added** (e.g. `/privacy`, a new tool category page) —
+   mention it if it's user-facing and not already implied by "Tools" list.
+2. **New major dependency or piece of infrastructure** — e.g. adding
+   `mongoose`/MongoDB, an AI provider SDK, a new analytics tool. Add it to
+   the **Stack** section with a one-line reason, same style as existing
+   entries.
+3. **A tool's data-flow model changes** — e.g. a tool moves from
+   client-side-only to using a backend, or starts calling a third-party API
+   (like Gemini). Update the intro paragraph and **Privacy** section
+   wording — don't let it silently become inaccurate (this project has
+   been burned by this before: an earlier version claimed "100%
+   client-side" for every tool after the URL Shortener already used a
+   backend).
+4. **New environment variable required to run the project** — mention it
+   in **Development** setup if a contributor would need it to run
+   `npm run dev` successfully, and always keep the full details in
+   `ENVIRONMENT_VARIABLES.md` (the two files serve different audiences:
+   README is a quick-start overview, `ENVIRONMENT_VARIABLES.md` is the
+   complete reference).
+5. **Tool count changes** — added or removed a tool. Update `lib/tools.ts`
+   entry count and the category list (see `pre-commit-checklist.mdc`).
+6. **License, support links, or ownership changes.**
+
+## What does NOT need a README update
+
+- Internal refactors with no user-facing or contributor-facing change
+  (e.g. extracting a shared component, renaming an internal function).
+- Bug fixes that don't change documented behavior.
+- Style/UI-only changes that don't add a new page or capability.
+
+## Quick self-check before considering a task done
+
+Ask: *"If someone read only the README right now, would anything I just
+built surprise them, or would a claim in the README now be false?"* If
+yes to either, update it before finishing.

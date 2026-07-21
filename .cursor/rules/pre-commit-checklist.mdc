@@ -39,7 +39,10 @@ git add package.json package-lock.json pnpm-lock.yaml
 ## Quick sanity check before committing
 
 ```bash
-# Confirm README count matches actual tool count
-grep "All [0-9]* tools" README.md
-grep -c "  {$" lib/tools.ts   # should match the number above
+# Count tool bullets within the "## Tools" section of README.md only
+# (scoped between "## Tools" and "## Stack" — a bare grep over the whole
+# file also matches unrelated bullets, e.g. in the Stack section)
+sed -n '/^## Tools/,/^## Stack/p' README.md | grep -c "^- "
+# Count tool entries in lib/tools.ts — should match the number above
+grep -c "    slug:" lib/tools.ts
 ```
