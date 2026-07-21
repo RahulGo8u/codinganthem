@@ -78,7 +78,8 @@ export async function POST(req: NextRequest) {
   // Connect to DB
   try {
     await connectDB();
-  } catch {
+  } catch (err) {
+    console.error("[shorten] DB connection error:", err);
     return NextResponse.json(
       { error: "Service temporarily unavailable. Please try again." },
       { status: 503 }

@@ -15,7 +15,8 @@ export async function GET(
 
   try {
     await connectDB();
-  } catch {
+  } catch (err) {
+    console.error("[redirect] DB connection error:", err);
     return NextResponse.json(
       { error: "Service temporarily unavailable." },
       { status: 503 }
