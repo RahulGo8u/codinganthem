@@ -21,6 +21,7 @@ Locally, these live in `.env.local` (gitignored, never committed).
 |---|---|---|
 | `NEXT_PUBLIC_BASE_URL` | Base URL used to build short links returned by `/api/shorten`. | `https://codinganthem.com` |
 | `AI_TOOLS_ENABLED` | Kill switch for all AI tools. Set to `false` in the Vercel dashboard to instantly disable every AI route (no deploy needed) if costs spike or abuse is detected. | `true` (enabled) |
+| `GOOGLE_SITE_VERIFICATION` | Google Search Console verification code (from the "HTML tag" verification method — just the `content` value, not the full tag). Wired into `app/layout.tsx`'s `verification.google` field. Unset by default, so nothing renders until you connect Search Console. | `abc123...` |
 
 ---
 

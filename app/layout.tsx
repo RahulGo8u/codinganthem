@@ -75,6 +75,11 @@ export const metadata: Metadata = {
       follow: true,
     },
   },
+  // Optional: set GOOGLE_SITE_VERIFICATION once you have a verification code
+  // from Google Search Console. Undefined until then, so this is a no-op.
+  verification: {
+    google: process.env.GOOGLE_SITE_VERIFICATION,
+  },
 };
 
 const jsonLd = {

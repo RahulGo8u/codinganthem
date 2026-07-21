@@ -32,6 +32,15 @@ export type Tool = {
   explainer: string; // short SEO paragraph shown below the tool
   /** Data-processing model. Omit for client-only tools (the default). */
   dataFlow?: ToolDataFlow;
+  /**
+   * Keyword-targeted <title>/OG/Twitter title, distinct from the on-page `name`.
+   * `name` stays a clean, generic label used in the UI (H1, cards, breadcrumbs);
+   * `seoTitle` is written to target the actual search phrase a user would type,
+   * so every tool page has a unique, differentiated title tag instead of the
+   * same "{name} — Free Online Tool" boilerplate. Falls back to that boilerplate
+   * when omitted.
+   */
+  seoTitle?: string;
 };
 
 export const CATEGORY_LABELS: Record<ToolCategory, string> = {
@@ -123,6 +132,7 @@ export const tools: Tool[] = [
   {
     slug: "json-formatter",
     name: "JSON Formatter",
+    seoTitle: "Free JSON Formatter & Validator Online",
     description: "Format, validate, and minify JSON online for free. Instantly catch syntax errors, apply clean indentation, and minify with one click — no sign-up needed.",
     category: "formatters",
     icon: "Braces",
@@ -133,6 +143,7 @@ export const tools: Tool[] = [
   {
     slug: "base64",
     name: "Base64 Encoder / Decoder",
+    seoTitle: "Base64 Encode & Decode Online — Free Converter",
     description: "Encode or decode Base64 text and files instantly online. Free Base64 converter for JWTs, data URLs, and auth headers — everything runs in your browser.",
     category: "encoders",
     icon: "ArrowLeftRight",
@@ -143,6 +154,7 @@ export const tools: Tool[] = [
   {
     slug: "uuid-generator",
     name: "UUID Generator",
+    seoTitle: "Free UUID v4 Generator Online — Bulk & Instant",
     description: "Generate one or hundreds of random v4 UUIDs instantly online, for free. Perfect for database primary keys, session tokens, and API request IDs.",
     category: "generators",
     icon: "Fingerprint",
@@ -153,6 +165,7 @@ export const tools: Tool[] = [
   {
     slug: "password-generator",
     name: "Password Generator",
+    seoTitle: "Strong Random Password Generator — Free & Secure",
     description: "Generate strong, random passwords online using the Web Crypto API. Customize length and character sets, with a built-in strength indicator — free.",
     category: "security",
     icon: "KeyRound",
@@ -163,6 +176,7 @@ export const tools: Tool[] = [
   {
     slug: "hash-generator",
     name: "Hash Generator",
+    seoTitle: "MD5, SHA-256 & SHA-512 Hash Generator Online",
     description: "Generate MD5, SHA-1, SHA-256, and SHA-512 hashes instantly online, for free. Useful for checksums, file integrity checks, and password hashing.",
     category: "security",
     icon: "Hash",
@@ -173,6 +187,7 @@ export const tools: Tool[] = [
   {
     slug: "timestamp-converter",
     name: "Unix Timestamp Converter",
+    seoTitle: "Unix Timestamp to Date Converter — Free Online Tool",
     description: "Convert Unix timestamps to human-readable dates and back, instantly online. Supports local time, UTC, and ISO 8601 — free, no sign-up required.",
     category: "converters",
     icon: "Clock",
@@ -183,6 +198,7 @@ export const tools: Tool[] = [
   {
     slug: "color-converter",
     name: "Color Converter",
+    seoTitle: "HEX to RGB to HSL Color Converter — Free, Live Preview",
     description: "Convert colors between HEX, RGB, and HSL instantly online with a live preview. Free color converter for CSS, Figma, and Tailwind workflows.",
     category: "converters",
     icon: "Palette",
@@ -193,6 +209,7 @@ export const tools: Tool[] = [
   {
     slug: "regex-tester",
     name: "Regex Tester",
+    seoTitle: "Free Online Regex Tester with Live Match Highlighting",
     description: "Test and debug regular expressions online with live match highlighting. See match counts and positions instantly — free, no console needed.",
     category: "text",
     icon: "Regex",
@@ -203,6 +220,7 @@ export const tools: Tool[] = [
   {
     slug: "case-converter",
     name: "Case Converter",
+    seoTitle: "camelCase, snake_case & PascalCase Converter — Free",
     description: "Convert text between camelCase, snake_case, PascalCase, kebab-case, and more, instantly online. Free tool for renaming variables and API fields.",
     category: "text",
     icon: "CaseSensitive",
@@ -213,6 +231,7 @@ export const tools: Tool[] = [
   {
     slug: "text-diff",
     name: "Text Diff",
+    seoTitle: "Free Online Text Compare & Diff Checker Tool",
     description: "Compare two blocks of text and highlight every change, line by line, instantly online. Free diff checker for code, configs, and API responses.",
     category: "text",
     icon: "GitCompare",
@@ -223,6 +242,7 @@ export const tools: Tool[] = [
   {
     slug: "url-encoder",
     name: "URL Encoder / Decoder",
+    seoTitle: "URL Encoder & Decoder Online — Free Percent-Encoding Tool",
     description: "Encode and decode URLs and query string parameters online, instantly. Supports value encoding, full URL encoding, and decoding — free tool.",
     category: "web",
     icon: "Link",
@@ -233,6 +253,7 @@ export const tools: Tool[] = [
   {
     slug: "jwt-decoder",
     name: "JWT Decoder",
+    seoTitle: "Free JWT Decoder Online — Inspect Token Header & Payload",
     description: "Decode JWT tokens online and inspect the header, payload, and signature instantly. Free JWT decoder for debugging auth — no data ever sent anywhere.",
     category: "security",
     icon: "KeySquare",
@@ -243,6 +264,7 @@ export const tools: Tool[] = [
   {
     slug: "base-converter",
     name: "Number Base Converter",
+    seoTitle: "Binary, Octal, Decimal & Hex Converter — Free Online Tool",
     description: "Convert numbers between binary, octal, decimal, and hexadecimal instantly online. Free number base converter for bitwise ops and memory addresses.",
     category: "converters",
     icon: "Binary",
@@ -253,6 +275,7 @@ export const tools: Tool[] = [
   {
     slug: "lorem-ipsum",
     name: "Lorem Ipsum Generator",
+    seoTitle: "Lorem Ipsum Generator — Free Placeholder Text Online",
     description: "Generate classic lorem ipsum placeholder text online, instantly. Choose how many paragraphs you need for wireframes and mockups — free, no sign-up.",
     category: "generators",
     icon: "AlignLeft",
@@ -263,6 +286,7 @@ export const tools: Tool[] = [
   {
     slug: "csv-to-json",
     name: "CSV to JSON",
+    seoTitle: "CSV to JSON Converter Online — Free & Instant",
     description: "Convert CSV data or spreadsheet files to a JSON array instantly online, for free. Perfect for importing data into APIs and databases — no sign-up.",
     category: "converters",
     icon: "Table",
@@ -273,6 +297,7 @@ export const tools: Tool[] = [
   {
     slug: "html-entities",
     name: "HTML Entities Encoder / Decoder",
+    seoTitle: "HTML Entity Encoder & Decoder — Free Online Tool",
     description: "Encode and decode HTML entities like &lt; and &gt; instantly online. Free tool for safely embedding user content in HTML, emails, and templates.",
     category: "web",
     icon: "Code",
@@ -283,6 +308,7 @@ export const tools: Tool[] = [
   {
     slug: "yaml-to-json",
     name: "YAML to JSON",
+    seoTitle: "YAML to JSON Converter Online — Free & Instant",
     description: "Convert YAML configuration files to JSON format instantly online, for free. Perfect for docker-compose, GitHub Actions, and Kubernetes configs.",
     category: "converters",
     icon: "FileJson",
@@ -293,6 +319,7 @@ export const tools: Tool[] = [
   {
     slug: "markdown-preview",
     name: "Markdown Previewer",
+    seoTitle: "Free Online Markdown Live Preview Editor",
     description: "Write Markdown online and see a live rendered HTML preview instantly. Free Markdown previewer for drafting READMEs, docs, and blog posts.",
     category: "visualizers",
     icon: "FileText",
@@ -303,6 +330,7 @@ export const tools: Tool[] = [
   {
     slug: "word-counter",
     name: "Word Counter",
+    seoTitle: "Free Word & Character Counter with Reading Time",
     description: "Count words, characters, sentences, and estimate reading time instantly online. Free word counter that updates live as you type or paste text.",
     category: "text",
     icon: "AlignLeft",
@@ -313,6 +341,7 @@ export const tools: Tool[] = [
   {
     slug: "json-to-yaml",
     name: "JSON to YAML",
+    seoTitle: "JSON to YAML Converter Online — Free & Instant",
     description: "Convert JSON to YAML format instantly online, for free. Paste any valid JSON and get clean, readable YAML output for config file conversions.",
     category: "converters",
     icon: "FileJson",
@@ -323,6 +352,7 @@ export const tools: Tool[] = [
   {
     slug: "json-to-csv",
     name: "JSON to CSV",
+    seoTitle: "JSON to CSV Converter Online — Free, Excel-Ready Output",
     description: "Convert a JSON array to CSV format instantly online, for free. Ready to open in Excel or Google Sheets — great for exporting API data.",
     category: "converters",
     icon: "Table",
@@ -333,6 +363,7 @@ export const tools: Tool[] = [
   {
     slug: "url-parser",
     name: "URL Parser",
+    seoTitle: "Free URL Parser Online — Break Down Any URL Instantly",
     description: "Parse any URL into its components online — protocol, host, path, query params, and hash. Free URL parser for debugging redirects and OAuth callbacks.",
     category: "web",
     icon: "Link",
@@ -343,6 +374,7 @@ export const tools: Tool[] = [
   {
     slug: "slug-generator",
     name: "Slug Generator",
+    seoTitle: "Free Slug Generator — Convert Text to URL-Friendly Slugs",
     description: "Convert any text into a clean, URL-friendly slug instantly online. Free slug generator for blog post URLs, API routes, and file names.",
     category: "web",
     icon: "Link2",
@@ -353,6 +385,7 @@ export const tools: Tool[] = [
   {
     slug: "cron-parser",
     name: "Cron Expression Parser",
+    seoTitle: "Cron Expression Parser — Free Online Cron Job Decoder",
     description: "Decode any cron expression into plain English online, instantly. Free cron parser that shows the next scheduled run times — no more guessing.",
     category: "converters",
     icon: "Timer",
@@ -363,6 +396,7 @@ export const tools: Tool[] = [
   {
     slug: "string-escape",
     name: "String Escape / Unescape",
+    seoTitle: "String Escape & Unescape Tool — Free Online",
     description: "Escape or unescape special characters in strings instantly online. Free tool for embedding strings in JSON, debugging APIs, and copying code.",
     category: "encoders",
     icon: "Braces",
@@ -373,6 +407,7 @@ export const tools: Tool[] = [
   {
     slug: "jwt-generator",
     name: "JWT Generator",
+    seoTitle: "Free JWT Generator Online — Sign Tokens with HS256/384/512",
     description: "Create signed JWT tokens online using HS256, HS384, or HS512 via the Web Crypto API. Free JWT generator for testing auth flows — no server calls.",
     category: "security",
     icon: "ShieldCheck",
@@ -383,6 +418,7 @@ export const tools: Tool[] = [
   {
     slug: "json-statistics",
     name: "JSON Statistics",
+    seoTitle: "JSON Structure Analyzer — Free Online JSON Stats Tool",
     description: "Analyze any JSON document's structure online — node count, depth, size, and type distribution. Free tool for understanding large API responses.",
     category: "formatters",
     icon: "BarChart2",
@@ -393,6 +429,7 @@ export const tools: Tool[] = [
   {
     slug: "json-diff",
     name: "JSON Diff",
+    seoTitle: "Free Online JSON Diff Tool — Compare Two JSON Files",
     description: "Compare two JSON documents online and highlight every addition, removal, and change. Free JSON diff tool with key-sorted, noise-free comparisons.",
     category: "formatters",
     icon: "GitCompare",
@@ -403,6 +440,7 @@ export const tools: Tool[] = [
   {
     slug: "qr-code-generator",
     name: "QR Code Generator",
+    seoTitle: "Free QR Code Generator Online — Instant & Downloadable",
     description: "Generate a QR code for any text, URL, or contact info instantly online. Free QR code generator with downloadable PNG output — no sign-up needed.",
     category: "generators",
     icon: "QrCode",
@@ -413,6 +451,7 @@ export const tools: Tool[] = [
   {
     slug: "sql-formatter",
     name: "SQL Formatter",
+    seoTitle: "Free SQL Formatter & Beautifier (MySQL, Postgres, SQLite)",
     description: "Format and beautify SQL queries online with dialect-aware indentation, for free. Supports MySQL, PostgreSQL, SQLite, and more — no sign-up.",
     category: "formatters",
     icon: "Database",
@@ -423,6 +462,7 @@ export const tools: Tool[] = [
   {
     slug: "image-to-base64",
     name: "Image to Base64",
+    seoTitle: "Image to Base64 Converter — Free Online Data URL Tool",
     description: "Convert any image to a Base64 data URL instantly online, for free. Supports PNG, JPG, GIF, WebP, and SVG — great for embedding images in CSS.",
     category: "encoders",
     icon: "Image",
@@ -433,6 +473,7 @@ export const tools: Tool[] = [
   {
     slug: "jwt-validator",
     name: "JWT Validator",
+    seoTitle: "Free JWT Validator Online — Verify Signature & Expiry",
     description: "Verify a JWT token's HMAC signature and check its expiry online, instantly. Free JWT validator for HS256, HS384, and HS512 signed tokens.",
     category: "security",
     icon: "ShieldCheck",
@@ -443,6 +484,7 @@ export const tools: Tool[] = [
   {
     slug: "js-formatter",
     name: "JavaScript Formatter",
+    seoTitle: "Free JavaScript Formatter & Beautifier Online",
     description: "Format and beautify messy or minified JavaScript code online, instantly. Free JS formatter for readable, properly indented output — no sign-up.",
     category: "formatters",
     icon: "FileCode",
@@ -453,6 +495,7 @@ export const tools: Tool[] = [
   {
     slug: "html-formatter",
     name: "HTML Formatter",
+    seoTitle: "Free HTML Formatter & Beautifier Online",
     description: "Format and beautify HTML markup online with proper indentation, instantly. Free HTML formatter for inspecting page source and email templates.",
     category: "formatters",
     icon: "FileCode",
@@ -463,6 +506,7 @@ export const tools: Tool[] = [
   {
     slug: "css-formatter",
     name: "CSS Formatter",
+    seoTitle: "Free CSS Formatter & Beautifier Online",
     description: "Format and beautify minified or messy CSS online, instantly. Free CSS formatter with clean, consistent indentation for every rule and property.",
     category: "formatters",
     icon: "FileCode",
@@ -473,6 +517,7 @@ export const tools: Tool[] = [
   {
     slug: "sql-in-generator",
     name: "SQL IN Generator",
+    seoTitle: "SQL IN Clause Generator — Free Online Tool",
     description: "Turn a list of values into a ready-to-use SQL IN clause instantly online. Free tool that adds commas and quotes automatically — no sign-up.",
     category: "converters",
     icon: "Database",
@@ -483,6 +528,7 @@ export const tools: Tool[] = [
   {
     slug: "json-to-typescript",
     name: "JSON to TypeScript",
+    seoTitle: "JSON to TypeScript Interface Generator — Free Online",
     description: "Generate TypeScript interfaces from any JSON object instantly online, for free. Great for typing API responses — nothing leaves your browser.",
     category: "converters",
     icon: "Braces",
@@ -493,6 +539,7 @@ export const tools: Tool[] = [
   {
     slug: "curl-to-fetch",
     name: "cURL to Fetch",
+    seoTitle: "cURL to Fetch() Converter — Free Online Tool",
     description: "Convert a cURL command into a JavaScript fetch() call instantly online, for free. Perfect for copying requests from DevTools or Postman.",
     category: "web",
     icon: "Terminal",
@@ -503,6 +550,7 @@ export const tools: Tool[] = [
   {
     slug: "mermaid-viewer",
     name: "Mermaid Diagram Viewer",
+    seoTitle: "Free Mermaid Diagram Renderer & Live Viewer Online",
     description: "Render Mermaid diagram code into live flowcharts, sequence, ER, and class diagrams online. Free Mermaid viewer with zoom, pan, and SVG export.",
     category: "visualizers",
     icon: "GitBranch",
@@ -513,6 +561,7 @@ export const tools: Tool[] = [
   {
     slug: "totp-generator",
     name: "TOTP / OTP Generator",
+    seoTitle: "Free TOTP Generator Online — Test 2FA Codes (RFC 6238)",
     description: "Generate RFC 6238 time-based one-time passwords (TOTP) online from a secret key. Free TOTP generator for testing 2FA flows — no sign-up needed.",
     category: "security",
     icon: "Smartphone",
@@ -523,6 +572,7 @@ export const tools: Tool[] = [
   {
     slug: "user-agent-parser",
     name: "User-Agent Parser",
+    seoTitle: "User-Agent String Parser — Free Online Tool",
     description: "Parse any User-Agent string into browser, engine, OS, and device details online. Free User-Agent parser for debugging logs and analytics data.",
     category: "web",
     icon: "Monitor",
@@ -533,6 +583,7 @@ export const tools: Tool[] = [
   {
     slug: "xml-formatter",
     name: "XML Formatter",
+    seoTitle: "Free XML Formatter & Validator Online",
     description: "Format, validate, and beautify XML markup online with proper indentation, for free. Great for SOAP payloads, RSS feeds, and config files.",
     category: "formatters",
     icon: "FileCode",
@@ -543,6 +594,7 @@ export const tools: Tool[] = [
   {
     slug: "prompt-template-filler",
     name: "Prompt Template Filler",
+    seoTitle: "AI Prompt Template Filler — Free Online Tool for ChatGPT",
     description: "Fill in {{variables}} in any AI prompt template instantly online, for free. Open the resolved prompt directly in ChatGPT with one click.",
     category: "ai",
     icon: "Sparkles",
@@ -553,6 +605,7 @@ export const tools: Tool[] = [
   {
     slug: "mock-data-generator",
     name: "Mock Data Generator",
+    seoTitle: "Free Mock Data Generator Online — Fake JSON & CSV Data",
     description: "Generate realistic mock data online for testing APIs, seeding databases, or prototypes. Free tool exporting to JSON or CSV — no sign-up needed.",
     category: "generators",
     icon: "Database",
@@ -563,6 +616,7 @@ export const tools: Tool[] = [
   {
     slug: "token-counter",
     name: "Token Counter & Estimator",
+    seoTitle: "AI Token Counter for GPT, Claude & Gemini — Free Online",
     description: "Count tokens and estimate API cost for GPT, Claude, and Gemini models online, instantly. Free token counter using OpenAI's real tiktoken tokenizer.",
     category: "ai",
     icon: "Calculator",
@@ -573,6 +627,7 @@ export const tools: Tool[] = [
   {
     slug: "xml-to-json",
     name: "XML to JSON",
+    seoTitle: "XML to JSON Converter Online — Free & Instant",
     description: "Convert XML markup to a clean JSON object instantly online, for free. Perfect for parsing SOAP responses, RSS feeds, and legacy XML APIs.",
     category: "converters",
     icon: "FileJson",
@@ -583,6 +638,7 @@ export const tools: Tool[] = [
   {
     slug: "color-contrast-checker",
     name: "Color Contrast Checker",
+    seoTitle: "WCAG Color Contrast Checker — Free Accessibility Tool",
     description: "Check WCAG contrast ratio between any two colors online, instantly. Free accessibility checker showing Pass/Fail for WCAG AA and AAA levels.",
     category: "converters",
     icon: "Eye",
@@ -593,6 +649,7 @@ export const tools: Tool[] = [
   {
     slug: "url-shortener",
     name: "URL Shortener",
+    seoTitle: "Free URL Shortener Online — Short Links with Expiry",
     description: "Shorten any URL online and get a free, shareable codinganthem.com/r/ link instantly. Optional link expiry and click tracking — no sign-up needed.",
     category: "web",
     icon: "Link",
@@ -604,6 +661,7 @@ export const tools: Tool[] = [
   {
     slug: "ai-code-explainer",
     name: "AI Code Explainer",
+    seoTitle: "AI Code Explainer — Free Online Tool to Explain Any Code",
     description: "Paste any code snippet and get a plain-English explanation instantly, powered by AI. Free tool for understanding unfamiliar code in any language.",
     category: "ai",
     icon: "Sparkles",
@@ -615,6 +673,7 @@ export const tools: Tool[] = [
   {
     slug: "ai-sql-generator",
     name: "AI Text-to-SQL Generator",
+    seoTitle: "AI Text-to-SQL Generator — Free Online Query Builder",
     description: "Describe the query you need in plain English and get a ready-to-use SQL statement, powered by AI. Free tool with dialect support.",
     category: "ai",
     icon: "Database",
@@ -626,6 +685,7 @@ export const tools: Tool[] = [
   {
     slug: "ai-error-explainer",
     name: "AI Error Message Explainer",
+    seoTitle: "AI Error Message Explainer — Free Online Debug Helper",
     description: "Paste any error message or stack trace and get a plain-English diagnosis with a suggested fix, powered by AI. Free, no sign-up.",
     category: "ai",
     icon: "AlertTriangle",
@@ -637,6 +697,7 @@ export const tools: Tool[] = [
   {
     slug: "eth-unit-converter",
     name: "ETH Unit Converter",
+    seoTitle: "ETH Unit Converter — Free Wei, Gwei & Ether Calculator",
     description: "Convert between Wei, Gwei, and Ether with exact BigInt precision, instantly online. Free Ethereum unit converter — no rounding errors, no sign-up.",
     category: "web3",
     icon: "Coins",
@@ -697,4 +758,15 @@ export function getIsFreeFaqAnswer(tool: Tool): string {
     return `Yes, ${tool.name} is completely free. No account or sign-up required, and all processing happens in your browser — nothing is sent to a server.`;
   }
   return `Yes, ${tool.name} is completely free — no account or sign-up required. This tool sends your input to a backend service to work (see the tool description and our Privacy Policy for exactly what's sent and why).`;
+}
+
+/**
+ * Honest answer to "Is my data safe when I use {tool}?", generated from the
+ * same `dataFlow` field so it's systematic rather than hand-written per tool.
+ */
+export function getDataSafetyFaqAnswer(tool: Tool): string {
+  if (isClientSideOnly(tool)) {
+    return `Yes. ${tool.name} runs entirely in your browser using JavaScript and Web APIs — your input is never uploaded, transmitted, or stored on any server.`;
+  }
+  return `${tool.name} sends your input to a backend service (or third-party API) to work, so it isn't purely local like most CodingAnthem tools. We only send what's needed to produce the result, and don't use it for anything else — see the Privacy Policy for exactly what's sent and why.`;
 }

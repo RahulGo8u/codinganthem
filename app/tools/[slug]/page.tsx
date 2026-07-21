@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { getToolBySlug, getIsFreeFaqAnswer, tools } from "@/lib/tools";
+import { getToolBySlug, getIsFreeFaqAnswer, getDataSafetyFaqAnswer, tools } from "@/lib/tools";
 import { ToolPageClient } from "./ToolPageClient";
 
 interface Props {
@@ -17,7 +17,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!tool) return {};
 
   const url = `https://www.codinganthem.com/tools/${tool.slug}`;
-  const title = `${tool.name} — Free Online Tool`;
+  // seoTitle is a hand-written, keyword-targeted title distinct from the
+  // generic on-page `name` — falls back to the old boilerplate if unset.
+  const title = tool.seoTitle ?? `${tool.name} — Free Online Tool`;
 
   return {
     title,
@@ -32,13 +34,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       url,
       type: "website",
       siteName: "CodingAnthem",
-      images: [{ url: "/opengraph-image", width: 1200, height: 630 }],
+      // No explicit `images` here — the colocated opengraph-image.tsx in this
+      // route segment generates a per-tool image automatically.
     },
     twitter: {
       card: "summary_large_image",
       title,
       description: tool.description,
-      images: ["/opengraph-image"],
     },
   };
 }
@@ -124,6 +126,14 @@ export default async function ToolPage({ params }: Props) {
         acceptedAnswer: {
           "@type": "Answer",
           text: getIsFreeFaqAnswer(tool),
+        },
+      },
+      {
+        "@type": "Question",
+        name: `Is my data safe when I use ${tool.name}?`,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: getDataSafetyFaqAnswer(tool),
         },
       },
     ],
