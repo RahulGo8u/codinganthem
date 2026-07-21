@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import ShortUrl from "@/lib/models/ShortUrl";
 import { checkRateLimit } from "@/lib/rateLimit";
+import { isSameOriginRequest } from "@/lib/originGuard";
+import { isBodyTooLarge } from "@/lib/requestSizeLimit";
 import {
   validateUrl,
   validateSlug,
@@ -15,6 +17,7 @@ export const preferredRegion = "bom1";
 
 const RATE_LIMIT = 10;        // requests
 const RATE_WINDOW = 60_000;   // 1 minute
+const MAX_BODY_BYTES = 10_000; // generous for a URL + slug + expiry payload
 
 const EXPIRY_MAP: Record<string, number | null> = {
   "1h":   60 * 60 * 1000,
@@ -33,6 +36,16 @@ function getClientIp(req: NextRequest): string {
 }
 
 export async function POST(req: NextRequest) {
+  // Block direct API calls (Postman/curl/other sites) — see lib/originGuard.ts
+  // for what this does and does not protect against.
+  if (!isSameOriginRequest(req)) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  if (isBodyTooLarge(req, MAX_BODY_BYTES)) {
+    return NextResponse.json({ error: "Request body too large." }, { status: 413 });
+  }
+
   // Rate limit by IP
   const ip = getClientIp(req);
   const rl = checkRateLimit(`${ip}:shorten`, RATE_LIMIT, RATE_WINDOW);
@@ -57,7 +70,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid request body." }, { status: 400 });
   }
 
-  const { url, slug: rawSlug, expiry = "never" } = body;
+  // Explicitly coerce to string — req.json() returns `any` at runtime, so a
+  // malformed body could otherwise pass an object (e.g. a Mongo operator
+  // like { $ne: null }) where a string is expected. The TS annotation on
+  // `body` above is compile-time only and gives no runtime guarantee.
+  const url = typeof body.url === "string" ? body.url : "";
+  const rawSlug = typeof body.slug === "string" ? body.slug : "";
+  const expiry = typeof body.expiry === "string" ? body.expiry : "never";
 
   // Validate URL
   const urlResult = validateUrl(url ?? "");

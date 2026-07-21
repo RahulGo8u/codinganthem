@@ -25,6 +25,10 @@ export async function connectDB(): Promise<typeof mongoose> {
     cache.promise = mongoose.connect(MONGODB_URI, {
       dbName: "codinganthem",
       bufferCommands: false,
+      // Fail fast and predictably on an outage instead of hanging until
+      // Vercel's own function timeout kicks in.
+      serverSelectionTimeoutMS: 8_000,
+      socketTimeoutMS: 15_000,
     });
   }
 
