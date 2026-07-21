@@ -11,7 +11,7 @@ function formatCount(n: number): string {
   return String(n);
 }
 
-export function GitHubStars() {
+export function GitHubStars({ className = "" }: { className?: string }) {
   const [stars, setStars] = useState<number | null>(null);
 
   useEffect(() => {
@@ -58,7 +58,7 @@ export function GitHubStars() {
   // footer links around (avoids layout shift / CLS).
   return (
     <span
-      className="inline-flex items-center justify-start gap-1 text-[var(--text-muted)] w-[3.75rem] tabular-nums"
+      className={`inline-flex items-center justify-start gap-1 text-[var(--text-muted)] tabular-nums ${className || "w-[3.75rem]"}`}
       aria-hidden={stars === null}
     >
       {stars !== null && (
