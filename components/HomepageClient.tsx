@@ -50,7 +50,7 @@ export function HomepageClient({ faqs = [] }: { faqs?: Faq[] }) {
                 Free Online Developer Utilities &amp; Tools
               </span>
             </h1>
-            <p className="text-[var(--text-muted)] text-base sm:text-lg leading-relaxed">
+            <p className="text-base sm:text-lg leading-relaxed" style={{ color: "var(--text-muted)" }}>
               {tools.length} developer tools, most running entirely in your browser. Paste JSON
               from ChatGPT, decode a JWT from a bug report, or format SQL from Copilot —
               instantly, no sign-up required.
