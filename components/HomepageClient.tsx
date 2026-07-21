@@ -46,7 +46,7 @@ export function HomepageClient({ faqs = [] }: { faqs?: Faq[] }) {
           {/* Heading */}
           <div className="flex flex-col gap-3 max-w-2xl">
             <span className="text-sm font-semibold tracking-tight" style={{ color: "var(--text-muted)" }}>
-              <span style={{ color: "#6366f1" }}>coding</span>anthem
+              <span style={{ color: "var(--accent-text)" }}>coding</span>anthem
             </span>
             <h1 className="text-4xl sm:text-5xl font-semibold tracking-tight" style={{ color: "var(--text-primary)" }}>
               {tools.length} Free Developer Tools
@@ -153,7 +153,7 @@ export function HomepageClient({ faqs = [] }: { faqs?: Faq[] }) {
                   aria-pressed={filter === id}
                   className={`text-left px-3 py-2 rounded-lg text-sm transition-colors ${
                     filter === id
-                      ? "bg-[#6366f1]/15 text-[#6366f1] font-medium"
+                      ? "bg-[#6366f1]/15 text-[var(--accent-text)] font-medium"
                       : "text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)]"
                   }`}
                 >
@@ -199,7 +199,7 @@ export function HomepageClient({ faqs = [] }: { faqs?: Faq[] }) {
                     aria-pressed={filter === id}
                     className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
                       filter === id
-                        ? "bg-[#6366f1]/15 text-[#6366f1] border-[#6366f1]/40"
+                        ? "bg-[#6366f1]/15 text-[var(--accent-text)] border-[#6366f1]/40"
                         : "bg-[var(--bg-surface)] text-[var(--text-muted)] border-[var(--border)] hover:text-[var(--text-primary)] hover:border-[var(--text-muted)]/30"
                     }`}
                   >

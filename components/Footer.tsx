@@ -36,7 +36,7 @@ export function Footer() {
           {/* Brand + tagline */}
           <div className="flex flex-col gap-1.5">
             <span className="font-semibold text-sm" style={{ color: "var(--text-primary)" }}>
-              <span style={{ color: "#6366f1" }}>coding</span>anthem
+              <span style={{ color: "var(--accent-text)" }}>coding</span>anthem
             </span>
             <p className="text-xs text-[var(--text-muted)]">
               Fast, free developer tools for everyday use.

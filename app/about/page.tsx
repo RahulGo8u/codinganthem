@@ -32,7 +32,7 @@ export default function AboutPage() {
         {/* Header */}
         <div className="flex flex-col gap-4">
           <h1 className="text-2xl font-semibold text-[var(--text-primary)] tracking-tight">
-            About <span className="text-[#6366f1]">CodingAnthem</span>
+            About <span className="text-[var(--accent-text)]">CodingAnthem</span>
           </h1>
           <p className="text-[var(--text-muted)] leading-relaxed">
             CodingAnthem is a growing collection of developer tools built to be fast, free, and

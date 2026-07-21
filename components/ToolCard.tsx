@@ -22,7 +22,7 @@ export function ToolCard({ tool }: { tool: Tool }) {
         </div>
         <div className="flex items-center gap-1.5">
           {tool.isNew && (
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-[#6366f1] bg-[#6366f1]/10 px-1.5 py-0.5 rounded">
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--accent-text)] bg-[#6366f1]/10 px-1.5 py-0.5 rounded">
               New
             </span>
           )}

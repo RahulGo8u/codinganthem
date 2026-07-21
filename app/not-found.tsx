@@ -21,7 +21,7 @@ export default function NotFound() {
     <div className="max-w-2xl mx-auto px-6 py-20 flex flex-col items-center text-center gap-8">
       {/* Logotype */}
       <div className="text-3xl font-semibold tracking-tight">
-        <span style={{ color: "#6366f1" }}>coding</span>
+        <span style={{ color: "var(--accent-text)" }}>coding</span>
         <span className="text-[var(--text-primary)]">anthem</span>
       </div>
 

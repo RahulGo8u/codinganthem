@@ -17,7 +17,7 @@ const nextConfig: NextConfig = {
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: blob:",
       "font-src 'self' data:",
-      "connect-src 'self' https://plausible.io https://va.vercel-scripts.com https://vitals.vercel-insights.com https://generativelanguage.googleapis.com",
+      "connect-src 'self' https://plausible.io https://va.vercel-scripts.com https://vitals.vercel-insights.com https://generativelanguage.googleapis.com https://api.github.com",
       "frame-ancestors 'none'",
       "base-uri 'self'",
       "form-action 'self'",

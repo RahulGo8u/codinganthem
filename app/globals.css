@@ -30,6 +30,8 @@
 :root {
   --accent: #6366f1;
   --accent-hover: #4f46e5;
+  /* Text-on-surface accent — darker in light mode for WCAG AA contrast */
+  --accent-text: #6366f1;
   --accent-soft: rgba(99, 102, 241, 0.12);
   --success: #22c55e;
   --error: #ef4444;
@@ -44,6 +46,7 @@
   --border: #1f1f1f;
   --text-primary: #ededed;
   --text-muted: #888888;
+  --accent-text: #6366f1;
 
   /* Syntax highlighting (code output panes) — light pastels for dark backgrounds */
   --syntax-key: #a5b4fc;
@@ -61,6 +64,8 @@
   --border: #e5e7eb;
   --text-primary: #111111;
   --text-muted: #6b7280;
+  /* #4338ca on white ≈ 7:1 — passes AA for small text (logo, NEW badges, pills) */
+  --accent-text: #4338ca;
 
   /* Syntax highlighting (code output panes) — darker/saturated for readability on light backgrounds */
   --syntax-key: #4338ca;

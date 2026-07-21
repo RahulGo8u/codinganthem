@@ -18,7 +18,7 @@ export function Nav() {
           className="font-semibold tracking-tight hover:opacity-80 transition-opacity text-base"
           style={{ color: "var(--text-primary)" }}
         >
-          <span style={{ color: "#6366f1" }}>coding</span>anthem
+          <span style={{ color: "var(--accent-text)" }}>coding</span>anthem
         </Link>
 
         {/* Right side */}

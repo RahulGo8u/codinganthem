@@ -56,7 +56,7 @@ export default function PrivacyPage() {
         {/* Header */}
         <div className="flex flex-col gap-4">
           <h1 className="text-2xl font-semibold text-[var(--text-primary)] tracking-tight">
-            Privacy <span className="text-[#6366f1]">Policy</span>
+            Privacy <span className="text-[var(--accent-text)]">Policy</span>
           </h1>
           <p className="text-[var(--text-muted)] leading-relaxed">
             This page explains what data CodingAnthem collects, how it&apos;s used, and what stays
