@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Link, Loader2, CheckCircle, Copy, ExternalLink } from "lucide-react";
+import { Link, Loader2, CheckCircle, Copy, ExternalLink, AlertCircle } from "lucide-react";
+import { validateUrl, validateSlug } from "@/lib/urlValidation";
 
 const EXPIRY_OPTIONS = [
   { value: "never", label: "Never expires" },
@@ -22,27 +23,68 @@ export function UrlShortener() {
   const [customSlug, setCustomSlug] = useState("");
   const [expiry, setExpiry] = useState("never");
   const [loading, setLoading] = useState(false);
+  const [urlError, setUrlError] = useState("");
+  const [aliasError, setAliasError] = useState("");
   const [error, setError] = useState("");
   const [result, setResult] = useState<ShortenResult | null>(null);
   const [copied, setCopied] = useState(false);
+
+  function handleUrlBlur() {
+    const trimmed = url.trim();
+    if (!trimmed) {
+      setUrlError("");
+      return;
+    }
+    const res = validateUrl(trimmed);
+    setUrlError(res.valid ? "" : (res.error ?? ""));
+  }
+
+  function handleAliasBlur() {
+    const trimmed = customSlug.trim();
+    if (!trimmed) {
+      setAliasError("");
+      return;
+    }
+    const res = validateSlug(trimmed);
+    setAliasError(res.valid ? "" : (res.error ?? ""));
+  }
 
   async function handleShorten() {
     setError("");
     setResult(null);
 
-    if (!url.trim()) {
-      setError("Please enter a URL.");
+    const trimmedUrl = url.trim();
+    const trimmedSlug = customSlug.trim();
+
+    if (!trimmedUrl) {
+      setUrlError("Please enter a URL.");
       return;
     }
 
+    // Run the same validation the server will run, up front — avoids a
+    // wasted network round-trip for input that's already known to be invalid.
+    const urlCheck = validateUrl(trimmedUrl);
+    if (!urlCheck.valid) {
+      setUrlError(urlCheck.error ?? "Invalid URL.");
+      return;
+    }
+
+    const slugCheck = validateSlug(trimmedSlug);
+    if (!slugCheck.valid) {
+      setAliasError(slugCheck.error ?? "Invalid alias.");
+      return;
+    }
+
+    setUrlError("");
+    setAliasError("");
     setLoading(true);
     try {
       const res = await fetch("/api/shorten", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          url: url.trim(),
-          slug: customSlug.trim() || undefined,
+          url: trimmedUrl,
+          slug: trimmedSlug || undefined,
           expiry,
         }),
       });
@@ -73,6 +115,8 @@ export function UrlShortener() {
     setUrl("");
     setCustomSlug("");
     setExpiry("never");
+    setUrlError("");
+    setAliasError("");
     setError("");
     setResult(null);
     setCopied(false);
@@ -105,20 +149,21 @@ export function UrlShortener() {
             <label className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">
               Long URL
             </label>
-            <div className={`flex items-center gap-2 rounded-lg border ${error && !result ? "border-[#ef4444]" : "border-[var(--border)]"} bg-[var(--bg-surface)] px-3`}>
+            <div className={`flex items-center gap-2 rounded-lg border ${urlError ? "border-[#ef4444]" : "border-[var(--border)]"} bg-[var(--bg-surface)] px-3`}>
               <Link size={14} className="text-[var(--text-muted)] shrink-0" />
               <input
                 type="url"
                 value={url}
-                onChange={(e) => { setUrl(e.target.value); setError(""); }}
+                onChange={(e) => { setUrl(e.target.value); setUrlError(""); }}
+                onBlur={handleUrlBlur}
                 onKeyDown={(e) => e.key === "Enter" && handleShorten()}
                 placeholder="https://example.com/very/long/url"
                 spellCheck={false}
                 className="flex-1 h-11 bg-transparent text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none"
               />
             </div>
-            {error && (
-              <p className="text-xs text-[#ef4444] leading-relaxed">{error}</p>
+            {urlError && (
+              <p className="text-xs text-[#ef4444] leading-relaxed">{urlError}</p>
             )}
           </div>
 
@@ -127,22 +172,27 @@ export function UrlShortener() {
             <label className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">
               Custom Alias <span className="normal-case font-normal">(optional)</span>
             </label>
-            <div className="flex items-center gap-0 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] overflow-hidden">
+            <div className={`flex items-center gap-0 rounded-lg border ${aliasError ? "border-[#ef4444]" : "border-[var(--border)]"} bg-[var(--bg-surface)] overflow-hidden`}>
               <span className="mono text-xs text-[var(--text-muted)] px-3 py-2 bg-[var(--bg-elevated)] border-r border-[var(--border)] shrink-0 whitespace-nowrap">
                 codinganthem.com/r/
               </span>
               <input
                 type="text"
                 value={customSlug}
-                onChange={(e) => setCustomSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""))}
+                onChange={(e) => { setCustomSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "")); setAliasError(""); }}
+                onBlur={handleAliasBlur}
                 placeholder="my-alias"
                 spellCheck={false}
                 className="mono flex-1 h-9 px-3 bg-transparent text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none"
               />
             </div>
-            <p className="text-[11px] text-[var(--text-muted)]">
-              3–20 chars, lowercase letters, numbers, and hyphens only. Leave blank to auto-generate.
-            </p>
+            {aliasError ? (
+              <p className="text-xs text-[#ef4444] leading-relaxed">{aliasError}</p>
+            ) : (
+              <p className="text-[11px] text-[var(--text-muted)]">
+                3–20 chars, lowercase letters, numbers, and hyphens only. Leave blank to auto-generate.
+              </p>
+            )}
           </div>
 
           {/* Expiry */}
@@ -166,6 +216,14 @@ export function UrlShortener() {
               ))}
             </div>
           </div>
+
+          {/* Submission error banner */}
+          {error && (
+            <div className="flex items-start gap-2 px-3 py-2.5 rounded-lg border border-[#ef4444]/40 bg-[#ef4444]/10 text-xs text-[#ef4444] leading-relaxed">
+              <AlertCircle size={14} className="shrink-0 mt-0.5" />
+              <span>{error}</span>
+            </div>
+          )}
 
           {/* Shorten button */}
           <button
