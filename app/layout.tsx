@@ -112,21 +112,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
 
-        {/* Google Analytics */}
-        <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-HZ86NBTX6L"
-          strategy="afterInteractive"
-        />
-        <Script id="google-analytics" strategy="afterInteractive">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'G-HZ86NBTX6L');
-          `}
-        </Script>
-
-        {/* Plausible Analytics */}
+        {/* Plausible Analytics — cookie-free, privacy-respecting */}
         <Script
           defer
           data-domain="codinganthem.com"

@@ -25,6 +25,9 @@ export function Footer() {
             <Link href="/about" className="hover:text-[var(--text-primary)] transition-colors">
               About
             </Link>
+            <Link href="/privacy" className="hover:text-[var(--text-primary)] transition-colors">
+              Privacy
+            </Link>
             <a
               href="https://github.com/RahulGo8u/codinganthem"
               target="_blank"
