@@ -161,6 +161,9 @@ const TOOL_MAP: Record<string, React.ComponentType> = {
   "ai-error-explainer": dynamic(() =>
     import("@/components/tools/AiErrorExplainer").then((m) => ({ default: m.AiErrorExplainer }))
   ),
+  "eth-unit-converter": dynamic(() =>
+    import("@/components/tools/EthUnitConverter").then((m) => ({ default: m.EthUnitConverter }))
+  ),
 };
 
 export function ToolPageClient({ slug }: { slug: string }) {

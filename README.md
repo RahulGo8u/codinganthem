@@ -77,6 +77,9 @@ Most tools run **100% client-side** in your browser. A few (like URL Shortener) 
 - URL Shortener — shorten any URL and get a shareable codinganthem.com/r/ link (uses a backend — see Privacy below)
 - User-Agent Parser — browser, engine, OS, and device detection
 
+### Web3
+- ETH Unit Converter — convert between Wei, Kwei, Mwei, Gwei, Szabo, Finney, and Ether with exact BigInt precision
+
 ## Stack
 
 - [Next.js 16](https://nextjs.org) (App Router, TypeScript)

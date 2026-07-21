@@ -7,7 +7,8 @@ export type ToolCategory =
   | "security"
   | "web"
   | "visualizers"
-  | "ai";
+  | "ai"
+  | "web3";
 
 /**
  * Where a tool's data is processed.
@@ -43,6 +44,7 @@ export const CATEGORY_LABELS: Record<ToolCategory, string> = {
   web: "Web",
   visualizers: "Visualizers",
   ai: "AI",
+  web3: "Web3",
 };
 
 /**
@@ -108,6 +110,12 @@ export const CATEGORY_META: Record<
     tagline: "Prompt tooling, token counting, and AI code help",
     intro:
       "Free AI-powered developer tools: fill in prompt templates, count tokens and estimate API cost for GPT, Claude, and Gemini, and get AI explanations for code, SQL, and error messages. Some tools send your input to an AI API to work — see each tool's description and our Privacy Policy for details.",
+  },
+  web3: {
+    title: "Web3 & Ethereum Tools",
+    tagline: "Unit conversions and utilities for Ethereum development",
+    intro:
+      "Free online Web3 tools for Ethereum development — convert between Wei, Gwei, and Ether with exact precision, and more utilities on the way. Everything runs in your browser; only paste public data like addresses, never a private key or seed phrase.",
   },
 };
 
@@ -625,6 +633,16 @@ export const tools: Tool[] = [
     keywords: ["ai", "error explainer", "stack trace", "debug", "gemini", "fix error"],
     explainer:
       "Paste any cryptic error message or stack trace and get a plain-English diagnosis of what went wrong, its likely cause, and a suggested fix, powered by Google's Gemini AI. Works across languages and environments — just select the closest match if you know it. Your error message is sent to Google's Gemini API to generate the explanation — see the Privacy Policy for details.",
+  },
+  {
+    slug: "eth-unit-converter",
+    name: "ETH Unit Converter",
+    description: "Convert between Wei, Gwei, and Ether with exact BigInt precision, instantly online. Free Ethereum unit converter — no rounding errors, no sign-up.",
+    category: "web3",
+    icon: "Coins",
+    keywords: ["eth", "wei", "gwei", "ether", "ethereum", "unit converter", "gas price", "web3"],
+    explainer:
+      "Convert between Wei, Kwei, Mwei, Gwei, Szabo, Finney, and Ether instantly — all seven fields stay in sync as you type.\n\n• Uses BigInt arithmetic, not floating-point, so large values (like 1 ETH = 1,000,000,000,000,000,000 Wei) are always exact\n• Quick-fill chips for common values: 1 ETH, a typical 20 Gwei gas price, and the 21000 Wei base gas cost of a simple transfer\n• Useful for reading gas estimates, RPC logs, and contract values that come back in raw Wei\n• Runs entirely in your browser — never paste a private key or seed phrase into this or any online tool",
   },
 ];
 
