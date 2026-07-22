@@ -20,6 +20,14 @@ import {
 
 const tool = getToolBySlug("pdf-compare")!;
 
+/** Display-only: strip control/bidi overrides and cap length (React still text-escapes). */
+function safeFileName(name: string | undefined): string {
+  if (!name) return "";
+  return name
+    .replace(/[\u0000-\u001f\u007f\u202a-\u202e\u2066-\u2069]/g, "")
+    .slice(0, 180);
+}
+
 type Slot = {
   file: File | null;
   loaded: LoadedPdf | null;
@@ -154,14 +162,14 @@ function PdfDropzone({
         {slot.loading ? (
           <>
             <p className="text-sm font-medium text-[var(--text-primary)] truncate max-w-full px-2">
-              {slot.file?.name ?? "Opening PDF…"}
+              {safeFileName(slot.file?.name) || "Opening PDF…"}
             </p>
             <p className="text-xs text-[var(--text-muted)]">Opening PDF…</p>
           </>
         ) : slot.file && slot.loaded ? (
           <>
             <p className="text-sm font-medium text-[var(--text-primary)] truncate max-w-full px-2">
-              {slot.file.name}
+              {safeFileName(slot.file.name)}
             </p>
             <p className="text-xs text-[var(--text-muted)]">
               {slot.loaded.pageCount} page{slot.loaded.pageCount === 1 ? "" : "s"} ·{" "}
@@ -211,7 +219,7 @@ export function PdfCompare() {
   const [textRows, setTextRows] = useState<TextRow[] | null>(null);
   const [textStats, setTextStats] = useState<{ added: number; removed: number } | null>(null);
   const [hasTextLayer, setHasTextLayer] = useState(false);
-  const [view, setView] = useState<"overlay" | "side">("overlay");
+  const [view, setView] = useState<"overlay" | "side">("side");
   const runId = useRef(0);
   const loadGen = useRef({ 1: 0, 2: 0 });
   const pdf1Ref = useRef(pdf1);

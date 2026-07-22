@@ -6,10 +6,20 @@ export const PDF_ACCEPT = "application/pdf,.pdf";
 
 /** Max render width in CSS pixels — keeps memory predictable on phones. */
 const RENDER_MAX_WIDTH = 720;
+/** Cap page height after scale so a tiny-width / huge-height MediaBox cannot OOM. */
+const RENDER_MAX_HEIGHT = 1400;
+/** Hard ceiling on canvas pixel count (width * height). */
+const RENDER_MAX_PIXELS = RENDER_MAX_WIDTH * RENDER_MAX_HEIGHT;
+/** Cap extracted text so a text bomb cannot freeze the tab. */
+const MAX_TEXT_CHARS = 500_000;
+/** Cap how many text items we walk per page. */
+const MAX_TEXT_ITEMS_PER_PAGE = 20_000;
 /** Pixel channel delta below this counts as identical (anti-alias noise). */
 const PIXEL_THRESHOLD = 28;
 /** Fraction of differing pixels below this → page treated as identical. */
 const PAGE_IDENTICAL_RATIO = 0.002;
+/** pdf.js maxImageSize — skip decoding absurd embedded bitmaps. */
+const MAX_IMAGE_PIXELS = 4096 * 4096;
 
 type PdfJs = typeof import("pdfjs-dist");
 type PDFDocumentProxy = import("pdfjs-dist").PDFDocumentProxy;
@@ -22,6 +32,7 @@ async function getPdfjs(): Promise<PdfJs> {
   }
   if (!pdfjsPromise) {
     pdfjsPromise = import("pdfjs-dist").then((pdfjs) => {
+      // Always pin to our same-origin worker — never let document content choose a worker URL.
       pdfjs.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
       return pdfjs;
     });
@@ -48,7 +59,25 @@ export function looksLikePdf(data: Uint8Array): boolean {
 }
 
 function isPdfFileName(name: string): boolean {
-  return name.toLowerCase().endsWith(".pdf");
+  // Reject path-like / null-byte names; require a real .pdf suffix (not .pdf.exe).
+  if (!name || name.includes("\0") || name.includes("/") || name.includes("\\")) {
+    return false;
+  }
+  const base = name.split(/[/\\]/).pop() ?? name;
+  return /\.pdf$/i.test(base);
+}
+
+function assertAllowedUploadMeta(file: File): void {
+  // Require .pdf name AND MIME application/pdf or empty (browsers often omit type on drop).
+  // Content is still verified via %PDF- magic bytes before parsing.
+  const mimeOk = file.type === "application/pdf" || file.type === "";
+  const nameOk = isPdfFileName(file.name);
+  if (!nameOk) {
+    throw new Error("Only files with a .pdf extension are supported.");
+  }
+  if (!mimeOk) {
+    throw new Error("Only PDF files are supported.");
+  }
 }
 
 export type LoadedPdf = {
@@ -67,22 +96,34 @@ export async function loadPdf(file: File): Promise<LoadedPdf> {
     );
   }
 
-  const typeOk = !file.type || file.type === "application/pdf";
-  const nameOk = isPdfFileName(file.name);
-  if (!typeOk && !nameOk) {
-    throw new Error("Only PDF files are supported.");
-  }
+  assertAllowedUploadMeta(file);
 
   const pdfjs = await getPdfjs();
   const data = new Uint8Array(await file.arrayBuffer());
 
+  // Content sniff — blocks .pdf-named images/binaries/HTML before pdf.js runs.
   if (!looksLikePdf(data)) {
     throw new Error("This does not look like a valid PDF file.");
   }
 
   let doc: PDFDocumentProxy;
   try {
-    doc = await pdfjs.getDocument({ data, useSystemFonts: true }).promise;
+    doc = await pdfjs.getDocument({
+      data,
+      // Harden parsing surface area
+      enableXfa: false,
+      stopAtErrors: true,
+      disableFontFace: true,
+      useSystemFonts: false,
+      verbosity: 0,
+      // We pass a full buffer — no network range/stream fetches of the PDF itself
+      disableRange: true,
+      disableStream: true,
+      disableAutoFetch: true,
+      // Avoid worker fetching remote CMap/font/wasm URLs
+      useWorkerFetch: false,
+      maxImageSize: MAX_IMAGE_PIXELS,
+    }).promise;
   } catch (e) {
     const msg = e instanceof Error ? e.message : "Failed to open PDF.";
     if (/password|encrypted/i.test(msg)) {
@@ -105,12 +146,18 @@ export async function loadPdf(file: File): Promise<LoadedPdf> {
 
 export async function extractPdfText(doc: PDFDocumentProxy): Promise<string> {
   const parts: string[] = [];
+  let totalChars = 0;
+
   for (let i = 1; i <= doc.numPages; i++) {
+    if (totalChars >= MAX_TEXT_CHARS) break;
     const page = await doc.getPage(i);
     const content = await page.getTextContent();
     const strings: string[] = [];
     let lastY: number | null = null;
+    let itemCount = 0;
+
     for (const item of content.items) {
+      if (itemCount++ >= MAX_TEXT_ITEMS_PER_PAGE) break;
       if (!("str" in item)) continue;
       const y = Array.isArray(item.transform) ? item.transform[5] : null;
       if (lastY !== null && y !== null && Math.abs(y - lastY) > 6) {
@@ -122,12 +169,17 @@ export async function extractPdfText(doc: PDFDocumentProxy): Promise<string> {
       ) {
         strings.push(" ");
       }
-      strings.push(item.str);
+      const str = typeof item.str === "string" ? item.str : "";
+      strings.push(str);
+      totalChars += str.length;
+      if (totalChars >= MAX_TEXT_CHARS) break;
       if (y !== null) lastY = y;
     }
     parts.push(strings.join("").trim());
   }
-  return parts.join("\n\n").trim();
+
+  const text = parts.join("\n\n").trim();
+  return text.length > MAX_TEXT_CHARS ? text.slice(0, MAX_TEXT_CHARS) : text;
 }
 
 export type RenderedPage = {
@@ -136,23 +188,46 @@ export type RenderedPage = {
   height: number;
 };
 
+function clampRenderScale(pageWidth: number, pageHeight: number): number {
+  const safeW = Math.max(pageWidth, 1);
+  const safeH = Math.max(pageHeight, 1);
+  let scale = Math.min(1.5, RENDER_MAX_WIDTH / safeW);
+  let w = safeW * scale;
+  let h = safeH * scale;
+  if (h > RENDER_MAX_HEIGHT) {
+    scale *= RENDER_MAX_HEIGHT / h;
+    w = safeW * scale;
+    h = safeH * scale;
+  }
+  const pixels = w * h;
+  if (pixels > RENDER_MAX_PIXELS) {
+    scale *= Math.sqrt(RENDER_MAX_PIXELS / pixels);
+  }
+  return Math.max(scale, 0.05);
+}
+
 export async function renderPdfPage(
   doc: PDFDocumentProxy,
   pageNumber: number
 ): Promise<RenderedPage> {
   const page = await doc.getPage(pageNumber);
   const unscaled = page.getViewport({ scale: 1 });
-  const scale = Math.min(1.5, RENDER_MAX_WIDTH / unscaled.width);
+  const scale = clampRenderScale(unscaled.width, unscaled.height);
   const viewport = page.getViewport({ scale });
+  const width = Math.max(1, Math.floor(viewport.width));
+  const height = Math.max(1, Math.floor(viewport.height));
+  if (width * height > RENDER_MAX_PIXELS * 1.05) {
+    throw new Error("PDF page dimensions are too large to render safely.");
+  }
   const canvas = document.createElement("canvas");
-  canvas.width = Math.max(1, Math.floor(viewport.width));
-  canvas.height = Math.max(1, Math.floor(viewport.height));
+  canvas.width = width;
+  canvas.height = height;
   const ctx = canvas.getContext("2d", { willReadFrequently: true });
   if (!ctx) throw new Error("Canvas not supported in this browser.");
   ctx.fillStyle = "#ffffff";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillRect(0, 0, width, height);
   await page.render({ canvasContext: ctx, viewport, canvas }).promise;
-  return { canvas, width: canvas.width, height: canvas.height };
+  return { canvas, width, height };
 }
 
 export type PageCompareResult = {
@@ -186,6 +261,9 @@ export function compareRenderedPages(
 ): PageCompareResult {
   const width = Math.max(left.width, right.width);
   const height = Math.max(left.height, right.height);
+  if (width * height > RENDER_MAX_PIXELS * 1.05) {
+    throw new Error("Combined page size is too large to compare safely.");
+  }
   const a = padToSize(left.canvas, width, height);
   const b = padToSize(right.canvas, width, height);
 
