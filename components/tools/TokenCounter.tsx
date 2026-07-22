@@ -39,8 +39,8 @@ const MODELS: ModelDef[] = [
 
 const PROVIDERS = ["OpenAI", "Anthropic", "Google"];
 
-// Cache loaded tokenizers at module scope so switching models back and forth
-// within a session never re-downloads the same rank data.
+// Cache loaded tokenizers at module scope so switching models never re-imports
+// the (large) rank tables. Ranks are bundled from js-tiktoken — no CDN/CSP.
 const encoderCache = new Map<string, Promise<Tiktoken>>();
 
 async function getEncoder(tokenizer: "o200k_base" | "cl100k_base"): Promise<Tiktoken> {
@@ -48,11 +48,15 @@ async function getEncoder(tokenizer: "o200k_base" | "cl100k_base"): Promise<Tikt
   if (!cached) {
     cached = (async () => {
       const { Tiktoken } = await import("js-tiktoken/lite");
-      const res = await fetch(`https://tiktoken.pages.dev/js/${tokenizer}.json`);
-      if (!res.ok) throw new Error("Failed to download tokenizer data.");
-      const ranks = await res.json();
+      const ranks =
+        tokenizer === "o200k_base"
+          ? (await import("js-tiktoken/ranks/o200k_base")).default
+          : (await import("js-tiktoken/ranks/cl100k_base")).default;
       return new Tiktoken(ranks);
-    })();
+    })().catch((err) => {
+      encoderCache.delete(tokenizer);
+      throw err;
+    });
     encoderCache.set(tokenizer, cached);
   }
   return cached;
@@ -79,15 +83,15 @@ export function TokenCounter() {
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
 
-    if (!input.trim()) {
-      setTokenCount(0);
-      setError(undefined);
-      setLoading(false);
-      return;
-    }
-
     debounceRef.current = setTimeout(() => {
       const id = ++reqRef.current;
+
+      if (!input.trim()) {
+        setTokenCount(0);
+        setError(undefined);
+        setLoading(false);
+        return;
+      }
 
       if (model.tokenizer === "estimate") {
         setTokenCount(Math.ceil(input.length / 4));
@@ -105,7 +109,8 @@ export function TokenCounter() {
         })
         .catch(() => {
           if (id !== reqRef.current) return;
-          setError("Failed to load the tokenizer — check your connection and try again.");
+          setTokenCount(0);
+          setError("Failed to load the tokenizer. Please try again.");
         })
         .finally(() => {
           if (id === reqRef.current) setLoading(false);
@@ -223,13 +228,16 @@ export function TokenCounter() {
                 </div>
               </div>
               <p className="text-[10px] text-[var(--text-muted)] leading-relaxed">
-                Prices as of {PRICE_DATE}, sourced from public provider pricing pages. Output-token cost isn't included since response length can't be known from a prompt alone. Verify against your provider's billing dashboard before budgeting.
+                Prices as of {PRICE_DATE}, sourced from public provider pricing pages. Output-token cost
+                is not included since response length cannot be known from a prompt alone. Verify
+                against your provider&apos;s billing dashboard before budgeting.
               </p>
             </div>
 
             {model.tokenizer === "estimate" && (
               <p className="text-[10px] text-[#f59e0b] leading-relaxed">
-                {model.provider} doesn't publish a public tokenizer, so this count is a character-based approximation (~4 characters per token) rather than an exact count.
+                {model.provider} does not publish a public tokenizer, so this count is a
+                character-based approximation (~4 characters per token) rather than an exact count.
               </p>
             )}
           </div>

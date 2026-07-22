@@ -660,7 +660,7 @@ export const tools: Tool[] = [
     icon: "Calculator",
     keywords: ["token counter", "gpt tokenizer", "tiktoken", "llm tokens", "context window", "ai cost calculator", "claude tokens", "gemini tokens"],
     explainer:
-      "Count tokens and estimate API cost before you send a single request — entirely in your browser.\n\n• Exact counts for GPT-4o, GPT-4.1, and GPT-3.5 via OpenAI's real tiktoken tokenizer\n• Character-based estimates for Claude and Gemini, since those providers don't publish a public tokenizer\n• Shows how much of the model's context window your text uses, plus estimated cost for this prompt\n• Tokenizer data loads on first use — nothing you paste is ever sent to a server",
+      "Count tokens and estimate API cost before you send a single request — entirely in your browser.\n\n• Exact counts for GPT-4o, GPT-4.1, and GPT-3.5 via OpenAI's real tiktoken tokenizer (bundled locally — no remote download)\n• Character-based estimates for Claude and Gemini, since those providers don't publish a public tokenizer\n• Shows how much of the model's context window your text uses, plus estimated cost for this prompt\n• Nothing you paste is ever sent to a server",
   },
   {
     slug: "xml-to-json",

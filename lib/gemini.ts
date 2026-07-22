@@ -94,13 +94,11 @@ export async function generateStructured<T>(options: GenerateOptions): Promise<T
           responseMimeType: "application/json",
           responseSchema,
           maxOutputTokens: MAX_OUTPUT_TOKENS,
-          temperature: 0.2,
-          // Newer Gemini models "think" by default, and thinking tokens count
-          // against maxOutputTokens — without disabling this, simple structured
-          // tasks like ours can get truncated (finishReason: MAX_TOKENS) before
-          // any actual output is produced. These tasks don't need multi-step
-          // reasoning, so disabling it is also faster and cheaper.
-          thinkingConfig: { thinkingBudget: 0 },
+          // Gemini 3.x flash-lite (what gemini-flash-lite-latest resolves to)
+          // uses thinkingLevel, not thinkingBudget. "minimal" keeps structured
+          // tasks fast and avoids burning output budget on internal reasoning.
+          // Do not send temperature — deprecated on Gemini 3 and can 400.
+          thinkingConfig: { thinkingLevel: "minimal" },
         },
       }),
     });
@@ -114,6 +112,15 @@ export async function generateStructured<T>(options: GenerateOptions): Promise<T
   }
 
   if (!response.ok) {
+    // Log a short, safe snippet of Gemini's error body for Vercel diagnosis —
+    // never log the request URL (contains the API key query param).
+    try {
+      const errBody = await response.text();
+      const snippet = errBody.replace(/\s+/g, " ").slice(0, 300);
+      console.error(`[gemini] HTTP ${response.status}: ${snippet}`);
+    } catch {
+      console.error(`[gemini] HTTP ${response.status} (body unreadable)`);
+    }
     if (response.status === 429) {
       throw new GeminiError("AI tool is temporarily at capacity. Please try again shortly.", 429);
     }
