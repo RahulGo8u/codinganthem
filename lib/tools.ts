@@ -100,7 +100,7 @@ export const CATEGORY_META: Record<
     title: "Text Utilities",
     tagline: "Compare, count, and transform text",
     intro:
-      "Free online text tools to test regular expressions, convert case, diff two texts, and count words and characters. Fast, browser-based utilities for everyday writing, coding, and content work.",
+      "Free online text tools to test regular expressions, convert case, diff two texts, compare PDFs, and count words and characters. Fast, browser-based utilities for everyday writing, coding, and content work.",
   },
   security: {
     title: "Security & Crypto Tools",
@@ -256,6 +256,26 @@ export const tools: Tool[] = [
     keywords: ["diff", "compare", "text", "difference", "changes"],
     explainer:
       "Spot exactly what changed between two texts — line by line, instantly.\n\n• Added lines highlighted in green, removed in red — same style as Git diffs\n• Paste config files, API responses, code snippets, or any two blocks of text\n• Useful for reviewing changes before committing or debugging response differences\n• No size limit — compares as much text as you paste",
+  },
+  {
+    slug: "pdf-compare",
+    name: "PDF Compare",
+    seoTitle: "Compare Two PDFs Online — Free PDF Diff Checker",
+    description:
+      "Compare two PDF files online and highlight visual and text differences. Free multi-page PDF compare — runs in your browser, no upload to a server.",
+    category: "text",
+    icon: "FileDiff",
+    keywords: [
+      "pdf compare",
+      "pdf diff",
+      "compare pdf",
+      "pdf difference",
+      "compare two pdfs",
+      "pdf checker",
+    ],
+    isNew: true,
+    explainer:
+      "Upload two PDFs, click Compare, and see highlighted differences — layout changes, images, and wording updates.\n\n• Side-by-side pages plus a difference highlight overlay\n• Page navigator shows which pages differ\n• Text-change list when the PDF has an extractable text layer\n• 100% client-side — your PDFs never leave this device\n• Limits: 10 MB and 50 pages per file; password-protected PDFs are not supported",
   },
   {
     slug: "url-encoder",

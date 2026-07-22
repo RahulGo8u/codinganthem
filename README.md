@@ -87,6 +87,7 @@ A few tools (like URL Shortener) use a lightweight backend, and AI tools send in
 
 ### Text Utils
 - Case Converter (camelCase, snake_case, PascalCase, kebab-case, …)
+- PDF Compare — compare two PDFs with visual highlights and text changes (client-side)
 - Regex Tester — live inline match highlighting
 - Text Diff — side-by-side comparison
 - Word Counter — words, characters, sentences, reading time
@@ -120,6 +121,7 @@ A few tools (like URL Shortener) use a lightweight backend, and AI tools send in
 - [js-beautify](https://www.npmjs.com/package/js-beautify) for JS / HTML / CSS formatting
 - [qrcode](https://www.npmjs.com/package/qrcode) for QR code generation
 - [bcryptjs](https://www.npmjs.com/package/bcryptjs) for client-side bcrypt hashing
+- [pdfjs-dist](https://www.npmjs.com/package/pdfjs-dist) for client-side PDF rendering and compare
 - [Mongoose](https://mongoosejs.com) + MongoDB Atlas for the URL Shortener backend and AI usage tracking
 - [Google Gemini API](https://ai.google.dev) for the AI-powered tools
 - [@vercel/analytics](https://vercel.com/docs/analytics) and [Plausible](https://plausible.io) for privacy-respecting usage analytics

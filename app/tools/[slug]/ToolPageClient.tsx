@@ -38,6 +38,11 @@ const TOOL_MAP: Record<string, React.ComponentType> = {
   "text-diff": dynamic(() =>
     import("@/components/tools/TextDiff").then((m) => ({ default: m.TextDiff }))
   ),
+  "pdf-compare": dynamic(
+    () =>
+      import("@/components/tools/PdfCompare").then((m) => ({ default: m.PdfCompare })),
+    { ssr: false }
+  ),
   "url-encoder": dynamic(() =>
     import("@/components/tools/UrlEncoderDecoder").then((m) => ({ default: m.UrlEncoderDecoder }))
   ),

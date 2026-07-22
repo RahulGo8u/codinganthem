@@ -18,6 +18,8 @@ const nextConfig: NextConfig = {
       "img-src 'self' data: blob:",
       "font-src 'self' data:",
       "connect-src 'self' https://plausible.io https://va.vercel-scripts.com https://vitals.vercel-insights.com https://generativelanguage.googleapis.com https://api.github.com",
+      // pdf.js loads its worker from /pdf.worker.min.mjs (same origin)
+      "worker-src 'self' blob:",
       "frame-ancestors 'none'",
       "base-uri 'self'",
       "form-action 'self'",
