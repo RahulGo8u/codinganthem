@@ -145,6 +145,10 @@ export function JwtValidator() {
             </div>
             <HighlightedOutput code={JSON.stringify(payload, null, 2)} />
           </div>
+        ) : token.trim() && !secret ? (
+          <p className="p-4 text-sm text-[var(--text-muted)] leading-relaxed">
+            Enter your secret key above to validate the signature.
+          </p>
         ) : undefined
       }
       extraActions={

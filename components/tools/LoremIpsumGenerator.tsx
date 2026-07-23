@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { ToolShell } from "@/components/ToolShell";
 import { getToolBySlug } from "@/lib/tools";
 
@@ -48,6 +48,12 @@ export function LoremIpsumGenerator() {
     setOutput(result.join("\n\n"));
   }, [paragraphs]);
 
+  useEffect(() => {
+    generate();
+    // Intentionally mount-only so changing paragraph count doesn't surprise-overwrite.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <ToolShell
       tool={tool}
@@ -69,8 +75,7 @@ export function LoremIpsumGenerator() {
           </button>
           <button
             onClick={generate}
-            disabled={!output}
-            className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
           >
             Regenerate
           </button>

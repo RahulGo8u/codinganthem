@@ -2,10 +2,15 @@
 
 import { useState } from "react";
 import { Sparkles, Loader2, AlertCircle, Copy } from "lucide-react";
-import { Breadcrumb } from "@/components/Breadcrumb";
+import { ToolPageHeader } from "@/components/ToolPageHeader";
 import { AiDisclaimer } from "@/components/AiDisclaimer";
+import { getToolBySlug } from "@/lib/tools";
 
+const tool = getToolBySlug("ai-sql-generator")!;
 const MAX_DESCRIPTION_CHARS = 500;
+
+const SAMPLE_DESCRIPTION =
+  "List the top 5 customers by total order value in the last 90 days, including email and order count.";
 
 const DIALECTS = [
   { value: "", label: "Standard SQL" },
@@ -73,9 +78,23 @@ export function AiSqlGenerator() {
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-8 flex flex-col gap-6">
-      <Breadcrumb current="AI Text-to-SQL Generator" />
+      <ToolPageHeader
+        tool={tool}
+        trailing={
+          <button
+            type="button"
+            onClick={() => {
+              setDescription(SAMPLE_DESCRIPTION);
+              setResult(null);
+              setError("");
+            }}
+            className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
+          >
+            Load sample
+          </button>
+        }
+      />
 
-      {/* Options bar */}
       <div className="flex flex-wrap items-center gap-1.5 px-4 py-2.5 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] text-sm">
         {DIALECTS.map((d) => (
           <button
@@ -111,15 +130,13 @@ export function AiSqlGenerator() {
         />
       </div>
 
-      {/* Error banner */}
       {error && (
-        <div className="flex items-start gap-2 px-3 py-2.5 rounded-lg border border-[#ef4444]/40 bg-[#ef4444]/10 text-xs text-[#ef4444] leading-relaxed">
+        <div role="alert" className="flex items-start gap-2 px-3 py-2.5 rounded-lg border border-[#ef4444]/40 bg-[#ef4444]/10 text-xs text-[#ef4444] leading-relaxed">
           <AlertCircle size={14} className="shrink-0 mt-0.5" />
           <span>{error}</span>
         </div>
       )}
 
-      {/* Generate button */}
       <button
         onClick={handleGenerate}
         disabled={loading || !description.trim()}
@@ -138,7 +155,6 @@ export function AiSqlGenerator() {
         )}
       </button>
 
-      {/* Result */}
       {result && (
         <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between">

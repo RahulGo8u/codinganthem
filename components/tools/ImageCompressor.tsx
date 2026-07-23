@@ -193,7 +193,7 @@ export function ImageCompressor() {
         }} />
       </div>
 
-      {error && <p className="text-sm text-[#ef4444]">{error}</p>}
+      {error && <p role="alert" className="text-sm text-[#ef4444]">{error}</p>}
       {note && <p className="text-sm text-[var(--text-muted)] leading-relaxed">{note}</p>}
 
       {file && (
@@ -254,16 +254,20 @@ export function ImageCompressor() {
               </span>
               {resultUrl && <img src={resultUrl} alt="Compressed" className="max-h-64 object-contain mx-auto" />}
               <button
-                disabled={!resultBlob.current || keptOriginal}
+                disabled={!resultBlob.current}
                 onClick={() => {
-                  if (!resultBlob.current || !file || keptOriginal) return;
+                  if (!resultBlob.current || !file) return;
+                  if (keptOriginal) {
+                    downloadBlob(resultBlob.current, file.name);
+                    return;
+                  }
                   const ext = format === "image/webp" ? "webp" : "jpg";
                   const base = file.name.replace(/\.[^.]+$/, "");
                   downloadBlob(resultBlob.current, `${base}-compressed.${ext}`);
                 }}
                 className="self-end mt-1 px-4 py-2 rounded-lg text-sm font-medium border border-[#6366f1]/40 bg-[#6366f1]/10 text-[#6366f1] hover:bg-[#6366f1]/20 disabled:opacity-40"
               >
-                {keptOriginal ? "Nothing to download — original kept" : "Download compressed image"}
+                {keptOriginal ? "Download original" : "Download compressed image"}
               </button>
             </div>
           </div>

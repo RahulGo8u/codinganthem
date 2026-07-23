@@ -3,7 +3,7 @@
 import { useState, useMemo, useCallback, useRef, useEffect } from "react";
 import { diffLines, type Change } from "diff";
 import { getToolBySlug } from "@/lib/tools";
-import { Breadcrumb } from "@/components/Breadcrumb";
+import { ToolPageHeader } from "@/components/ToolPageHeader";
 import {
   activeHunkRowClass,
   findHunkStarts,
@@ -165,15 +165,17 @@ export function TextDiff() {
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-8 flex flex-col gap-6">
-      <div className="flex items-center justify-between gap-4">
-        <Breadcrumb current={tool.name} />
-        {stats && (
-          <div className="flex items-center gap-3 text-xs">
-            <span className="text-[#22c55e]">+{stats.added} added</span>
-            <span className="text-[#ef4444]">−{stats.removed} removed</span>
-          </div>
-        )}
-      </div>
+      <ToolPageHeader
+        tool={tool}
+        trailing={
+          stats ? (
+            <div className="flex items-center gap-3 text-xs">
+              <span className="text-[#22c55e]">+{stats.added} added</span>
+              <span className="text-[#ef4444]">−{stats.removed} removed</span>
+            </div>
+          ) : undefined
+        }
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {[

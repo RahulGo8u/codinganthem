@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { getToolBySlug } from "@/lib/tools";
-import { Breadcrumb } from "@/components/Breadcrumb";
+import { ToolPageHeader } from "@/components/ToolPageHeader";
 
 const tool = getToolBySlug("totp-generator")!;
 
@@ -120,16 +120,18 @@ export function TotpGenerator() {
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-8 flex flex-col gap-6">
-      {/* Header */}
-      <div className="flex items-center justify-between gap-4">
-        <Breadcrumb current={tool.name} />
-        <button
-          onClick={() => setSecret(SAMPLE_SECRET)}
-          className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
-        >
-          Load sample
-        </button>
-      </div>
+      <ToolPageHeader
+        tool={tool}
+        trailing={
+          <button
+            type="button"
+            onClick={() => setSecret(SAMPLE_SECRET)}
+            className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
+          >
+            Load sample
+          </button>
+        }
+      />
 
       {/* Secret input */}
       <div className="flex flex-col gap-2 max-w-xl">
@@ -144,7 +146,7 @@ export function TotpGenerator() {
           placeholder="JBSWY3DPEHPK3PXP"
           className={`mono w-full px-4 py-3 rounded-lg border ${error ? "border-[#ef4444]" : "border-[var(--border)]"} bg-[var(--bg-surface)] text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none`}
         />
-        {error && <p className="text-xs text-[#ef4444] leading-relaxed">{error}</p>}
+        {error && <p role="alert" className="text-xs text-[#ef4444] leading-relaxed">{error}</p>}
       </div>
 
       {/* Code display */}

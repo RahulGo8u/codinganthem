@@ -71,6 +71,28 @@ export function BcryptGenerator() {
     setVerifyError(null);
   }, []);
 
+  const loadSample = useCallback(async () => {
+    const sample = "password";
+    setPlain(sample);
+    setRounds(10);
+    setHashBusy(true);
+    setHashError(null);
+    setVerifyResult(null);
+    setVerifyError(null);
+    try {
+      await new Promise((r) => setTimeout(r, 10));
+      const salt = await bcrypt.genSalt(10);
+      const result = await bcrypt.hash(sample, salt);
+      setHash(result);
+      setVerifyPlain(sample);
+      setVerifyHash(result);
+    } catch {
+      setHashError("Failed to generate sample hash.");
+    } finally {
+      setHashBusy(false);
+    }
+  }, []);
+
   return (
     <ToolShell
       tool={tool}
@@ -83,6 +105,16 @@ export function BcryptGenerator() {
       hideFileActions
       showClear
       outputLabel="Bcrypt hash & verify"
+      extraActions={
+        <button
+          type="button"
+          onClick={() => void loadSample()}
+          disabled={hashBusy}
+          className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] disabled:opacity-40 transition-colors"
+        >
+          Load sample
+        </button>
+      }
       outputContent={
         <div className="flex flex-col gap-8">
           <section className="flex flex-col gap-3">

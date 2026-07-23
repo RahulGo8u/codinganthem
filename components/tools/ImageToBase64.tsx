@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useRef } from "react";
 import { getToolBySlug } from "@/lib/tools";
-import { Breadcrumb } from "@/components/Breadcrumb";
+import { ToolPageHeader } from "@/components/ToolPageHeader";
 
 const tool = getToolBySlug("image-to-base64")!;
 
@@ -83,8 +83,7 @@ export function ImageToBase64() {
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-8 flex flex-col gap-6">
-      {/* Header */}
-      <Breadcrumb current={tool.name} />
+      <ToolPageHeader tool={tool} />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Upload area */}
@@ -119,7 +118,7 @@ export function ImageToBase64() {
             )}
           </div>
           <input ref={inputRef} type="file" accept="image/*" className="hidden" onChange={handleFileInput} />
-          {error && <p className="text-xs text-[#ef4444] leading-relaxed">{error}</p>}
+          {error && <p role="alert" className="text-xs text-[#ef4444] leading-relaxed">{error}</p>}
           {dataUrl && (
             <div className="flex items-center justify-between text-xs text-[var(--text-muted)]">
               <span className="truncate max-w-[200px]">{fileName}</span>

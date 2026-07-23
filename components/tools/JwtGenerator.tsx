@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { getToolBySlug } from "@/lib/tools";
-import { Breadcrumb } from "@/components/Breadcrumb";
+import { ToolPageHeader } from "@/components/ToolPageHeader";
 
 const tool = getToolBySlug("jwt-generator")!;
 
@@ -82,13 +82,14 @@ export function JwtGenerator() {
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-8 flex flex-col gap-6">
-      {/* Header */}
-      <div className="flex items-center justify-between gap-4">
-        <Breadcrumb current={tool.name} />
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#f59e0b]/10 border border-[#f59e0b]/30">
-          <span className="text-xs text-[#f59e0b]">For testing only — do not use real secrets in this tool</span>
-        </div>
-      </div>
+      <ToolPageHeader
+        tool={tool}
+        trailing={
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#f59e0b]/10 border border-[#f59e0b]/30">
+            <span className="text-xs text-[#f59e0b]">For testing only — do not use real secrets in this tool</span>
+          </div>
+        }
+      />
 
       {/* Options */}
       <div className="flex flex-wrap items-center gap-3 px-4 py-2.5 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] text-sm">

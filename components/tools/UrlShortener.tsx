@@ -3,7 +3,10 @@
 import { useState } from "react";
 import { Link, Loader2, CheckCircle, Copy, ExternalLink, AlertCircle } from "lucide-react";
 import { validateUrl } from "@/lib/urlValidation";
-import { Breadcrumb } from "@/components/Breadcrumb";
+import { ToolPageHeader } from "@/components/ToolPageHeader";
+import { getToolBySlug } from "@/lib/tools";
+
+const tool = getToolBySlug("url-shortener")!;
 
 const EXPIRY_OPTIONS = [
   { value: "never", label: "Never expires" },
@@ -102,8 +105,7 @@ export function UrlShortener() {
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-8 flex flex-col gap-6">
-      {/* Header */}
-      <Breadcrumb current="URL Shortener" />
+      <ToolPageHeader tool={tool} />
 
       <div className="w-full max-w-2xl mx-auto flex flex-col gap-6">
         {/* Input form — hidden once a result exists */}
@@ -129,7 +131,7 @@ export function UrlShortener() {
                 />
               </div>
               {urlError && (
-                <p className="text-xs text-[#ef4444] leading-relaxed">{urlError}</p>
+                <p role="alert" className="text-xs text-[#ef4444] leading-relaxed">{urlError}</p>
               )}
             </div>
 

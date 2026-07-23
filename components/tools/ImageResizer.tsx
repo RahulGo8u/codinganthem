@@ -137,7 +137,7 @@ export function ImageResizer() {
         }} />
       </div>
 
-      {error && <p className="text-sm text-[#ef4444]">{error}</p>}
+      {error && <p role="alert" className="text-sm text-[#ef4444]">{error}</p>}
 
       {file && imgEl && (
         <>

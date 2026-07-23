@@ -132,15 +132,7 @@ export function PasswordGenerator() {
       }
       extraActions={
         <button
-          onClick={() => {
-            setOutput("");
-            setCount(1);
-            setLength(16);
-            setUseUpper(true);
-            setUseLower(true);
-            setUseNumbers(true);
-            setUseSymbols(true);
-          }}
+          onClick={() => setOutput("")}
           disabled={!output}
           className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[#ef4444]/40 bg-[#ef4444]/10 text-[#ef4444] hover:bg-[#ef4444]/20 hover:border-[#ef4444]/60 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
         >

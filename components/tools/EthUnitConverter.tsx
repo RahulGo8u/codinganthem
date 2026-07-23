@@ -8,9 +8,27 @@ import { ETH_UNITS, QUICK_FILL_OPTIONS, parseUnitToWei, formatWeiToUnit, type Et
 
 const tool = getToolBySlug("eth-unit-converter")!;
 
+function buildFromUnit(unitKey: string, value: string): {
+  rawInputs: Record<string, string>;
+  weiValue: bigint;
+} | null {
+  const unit = ETH_UNITS.find((u) => u.key === unitKey);
+  if (!unit) return null;
+  const wei = parseUnitToWei(value, unit.decimals);
+  if (wei === null) return null;
+  const rawInputs: Record<string, string> = { [unit.key]: value };
+  for (const u of ETH_UNITS) {
+    if (u.key === unit.key) continue;
+    rawInputs[u.key] = formatWeiToUnit(wei, u.decimals);
+  }
+  return { rawInputs, weiValue: wei };
+}
+
+const INITIAL = buildFromUnit("ether", "1")!;
+
 export function EthUnitConverter() {
-  const [rawInputs, setRawInputs] = useState<Record<string, string>>({});
-  const [weiValue, setWeiValue] = useState<bigint | null>(null);
+  const [rawInputs, setRawInputs] = useState<Record<string, string>>(INITIAL.rawInputs);
+  const [weiValue, setWeiValue] = useState<bigint | null>(INITIAL.weiValue);
   const [invalidKey, setInvalidKey] = useState<string | null>(null);
 
   const applyValue = useCallback((unit: EthUnit, value: string) => {
@@ -105,7 +123,7 @@ export function EthUnitConverter() {
             );
           })}
           {invalidKey && (
-            <p className="text-xs text-[#ef4444] pt-2.5">
+            <p role="alert" className="text-xs text-[#ef4444] pt-2.5">
               Enter a valid non-negative or negative decimal number for {ETH_UNITS.find((u) => u.key === invalidKey)?.label}.
             </p>
           )}

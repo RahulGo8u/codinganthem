@@ -9,7 +9,7 @@ import {
   type ReactNode,
 } from "react";
 import { getToolBySlug } from "@/lib/tools";
-import { Breadcrumb } from "@/components/Breadcrumb";
+import { ToolPageHeader } from "@/components/ToolPageHeader";
 import { isTypingTarget, wrapIndex } from "@/lib/diffHunks";
 
 const tool = getToolBySlug("regex-tester")!;
@@ -146,16 +146,18 @@ export function RegexTester() {
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-8 flex flex-col gap-6">
-      <div className="flex items-center justify-between gap-4">
-        <Breadcrumb current={tool.name} />
-        <button
-          type="button"
-          onClick={loadSample}
-          className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
-        >
-          Load sample
-        </button>
-      </div>
+      <ToolPageHeader
+        tool={tool}
+        trailing={
+          <button
+            type="button"
+            onClick={loadSample}
+            className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
+          >
+            Load sample
+          </button>
+        }
+      />
 
       <div className="flex flex-col gap-2">
         <label className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">
