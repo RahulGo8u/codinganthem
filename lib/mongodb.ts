@@ -1,10 +1,9 @@
 import mongoose from "mongoose";
 
-const MONGODB_URI: string = process.env.MONGODB_URI ?? "";
-
-if (!MONGODB_URI) {
-  throw new Error("MONGODB_URI environment variable is not defined");
-}
+// Do not throw at import time — Next evaluates API route modules during
+// `next build` page-data collection, and Preview/Dependabot builds often
+// lack Production secrets. Fail at connectDB() instead.
+// Read process.env inside connectDB so we never capture an empty build-time value.
 
 // Cache connection across hot reloads in dev and across serverless invocations
 declare global {
@@ -19,10 +18,15 @@ const cache = global._mongooseCache ?? { conn: null, promise: null };
 global._mongooseCache = cache;
 
 export async function connectDB(): Promise<typeof mongoose> {
+  const uri = process.env.MONGODB_URI ?? "";
+  if (!uri) {
+    throw new Error("MONGODB_URI environment variable is not defined");
+  }
+
   if (cache.conn) return cache.conn;
 
   if (!cache.promise) {
-    cache.promise = mongoose.connect(MONGODB_URI, {
+    cache.promise = mongoose.connect(uri, {
       dbName: "codinganthem",
       bufferCommands: false,
       // Fail fast and predictably on an outage instead of hanging until

@@ -1,11 +1,10 @@
 // Server-only Gemini API client. Never import this from a client component —
 // GEMINI_API_KEY must never reach the browser.
-
-const GEMINI_API_KEY: string = process.env.GEMINI_API_KEY ?? "";
-
-if (!GEMINI_API_KEY) {
-  throw new Error("GEMINI_API_KEY environment variable is not defined");
-}
+//
+// Do not throw at import time — Next evaluates API route modules during
+// `next build` page-data collection, and Preview/Dependabot builds often
+// lack Production secrets. Fail inside generateStructured() instead.
+// Read the key at call time so we never capture an empty build-time value.
 
 // "-latest" alias: Google keeps this pointed at their current recommended
 // flash-lite model, so we don't have to manually chase model deprecations
@@ -77,12 +76,17 @@ interface GenerateOptions {
 export async function generateStructured<T>(options: GenerateOptions): Promise<T> {
   const { systemPrompt, userContent, responseSchema } = options;
 
+  const apiKey = process.env.GEMINI_API_KEY ?? "";
+  if (!apiKey) {
+    throw new GeminiError("GEMINI_API_KEY environment variable is not defined", 503);
+  }
+
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), TIMEOUT_MS);
 
   let response: Response;
   try {
-    response = await fetch(`${API_URL}?key=${GEMINI_API_KEY}`, {
+    response = await fetch(`${API_URL}?key=${apiKey}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       signal: controller.signal,

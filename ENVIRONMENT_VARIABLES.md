@@ -1,12 +1,14 @@
 # Environment Variables
 
-Environment variables required to run CodingAnthem. Set these in **Vercel → Project → Settings → Environment Variables** for Production, Preview, and Development.
+Environment variables required to **run** CodingAnthem’s backend-backed tools at request time. Set these in **Vercel → Project → Settings → Environment Variables** for Production, Preview, and Development.
 
 Locally, these live in `.env.local` (gitignored, never committed).
 
+`next build` must succeed without `MONGODB_URI` / `GEMINI_API_KEY` (Preview and Dependabot deploys often omit secrets). Those vars are checked when URL Shortener / AI API routes actually run, not at module import. Still enable them for Preview if you want those tools to work on preview URLs.
+
 ---
 
-## Required
+## Required at runtime
 
 | Variable | Description | Example |
 |---|---|---|
