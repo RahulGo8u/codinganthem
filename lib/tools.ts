@@ -466,14 +466,24 @@ export const tools: Tool[] = [
   },
   {
     slug: "json-diff",
-    name: "JSON Diff",
-    seoTitle: "Free Online JSON Diff Tool — Compare Two JSON Files",
-    description: "Compare two JSON documents online and highlight every addition, removal, and change. Free JSON diff tool with key-sorted, noise-free comparisons.",
+    name: "JSON Compare",
+    seoTitle: "Compare Two JSON Files Online — Free JSON Diff Tool",
+    description:
+      "Compare two JSON documents online and highlight every addition, removal, and change. Free JSON compare tool with key-sorted, noise-free side-by-side results.",
     category: "formatters",
     icon: "GitCompare",
-    keywords: ["json", "diff", "compare", "difference", "changes", "json diff", "compare json"],
+    keywords: [
+      "json compare",
+      "compare json",
+      "json diff",
+      "json difference",
+      "compare two json",
+      "json",
+      "diff",
+      "compare",
+    ],
     explainer:
-      "Compare two JSON documents side by side — keys are sorted so formatting differences don't create noise.\n\n• Added keys shown in green, removed in red, unchanged in grey\n• JSON-aware: reorders keys before diffing so only real changes show\n• Useful for comparing API responses, config files, or database snapshots\n• Handles nested objects and arrays of any depth",
+      "Compare two JSON documents side by side — keys are sorted so formatting differences don't create noise.\n\n• Added keys shown in green, removed in red, unchanged in grey\n• JSON-aware: reorders keys before diffing so only real changes show\n• Jump Prev/Next between change blocks in long documents\n• Useful for comparing API responses, config files, or database snapshots",
   },
   {
     slug: "qr-code-generator",

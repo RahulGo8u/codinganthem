@@ -203,7 +203,7 @@ export function JsonDiff() {
           <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
             <div />
             <label className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider text-center">
-              Diff
+              Comparison
             </label>
             <div className="flex justify-end">
               {hunkStarts.length > 0 && (
@@ -211,7 +211,7 @@ export function JsonDiff() {
                   <button
                     type="button"
                     onClick={goPrev}
-                    className="px-2.5 py-1 rounded-md text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
+                    className="px-2.5 py-1 rounded-md text-xs font-medium border border-[#6366f1]/45 bg-[#6366f1]/10 text-[var(--accent-text)] hover:bg-[#6366f1]/20 transition-colors"
                     aria-label="Previous difference"
                   >
                     ↑ Prev
@@ -222,7 +222,7 @@ export function JsonDiff() {
                   <button
                     type="button"
                     onClick={goNext}
-                    className="px-2.5 py-1 rounded-md text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
+                    className="px-2.5 py-1 rounded-md text-xs font-medium border border-[#22c55e]/45 bg-[#22c55e]/10 text-[#22c55e] hover:bg-[#22c55e]/20 transition-colors"
                     aria-label="Next difference"
                   >
                     ↓ Next
@@ -244,6 +244,8 @@ export function JsonDiff() {
               {rows.map((row, i) => {
                 const inActive =
                   activeRange !== null && i >= activeRange.start && i <= activeRange.end;
+                const isHunkStart = inActive && activeRange !== null && i === activeRange.start;
+                const isHunkEnd = inActive && activeRange !== null && i === activeRange.end;
                 return (
                   <div
                     key={i}
@@ -253,7 +255,9 @@ export function JsonDiff() {
                     }}
                     data-diff-row={i}
                     className={`grid grid-cols-2 ${
-                      inActive ? "ring-2 ring-inset ring-[#6366f1]/55 bg-[#6366f1]/5" : ""
+                      inActive
+                        ? `shadow-[inset_3px_0_0_0_#6366f1] ${isHunkStart ? "rounded-t-sm" : ""} ${isHunkEnd ? "rounded-b-sm" : ""}`
+                        : ""
                     }`}
                   >
                     <div

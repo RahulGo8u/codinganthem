@@ -58,7 +58,7 @@ A few tools (like URL Shortener) use a lightweight backend, and AI tools send in
 - CSS Formatter — beautify minified CSS
 - HTML Formatter — beautify HTML markup
 - JavaScript Formatter — beautify minified or messy JS
-- JSON Diff — compare two JSON documents (key-sorted, noise-free)
+- JSON Compare — compare two JSON documents (key-sorted, noise-free)
 - JSON Formatter — beautify, minify, and validate with syntax highlighting
 - JSON Statistics — node count, depth, type distribution, and size
 - SQL Formatter — format SQL queries with dialect-aware indentation
