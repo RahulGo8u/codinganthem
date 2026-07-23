@@ -407,7 +407,25 @@ export function PdfCompare() {
     [textRows]
   );
 
+  const differingPages = useMemo(
+    () => (pages ? pages.filter((p) => p.differs).map((p) => p.pageNumber) : []),
+    [pages]
+  );
+
+  const goPrevDiffPage = useCallback(() => {
+    if (differingPages.length === 0) return;
+    const earlier = [...differingPages].reverse().find((n) => n < activePage);
+    setActivePage(earlier ?? differingPages[differingPages.length - 1]);
+  }, [differingPages, activePage]);
+
+  const goNextDiffPage = useCallback(() => {
+    if (differingPages.length === 0) return;
+    const later = differingPages.find((n) => n > activePage);
+    setActivePage(later ?? differingPages[0]);
+  }, [differingPages, activePage]);
+
   const current = pages?.find((p) => p.pageNumber === activePage) ?? null;
+  const diffNavIndex = differingPages.indexOf(activePage);
   const busy = comparing || pdf1.loading || pdf2.loading;
 
   return (
@@ -559,22 +577,49 @@ export function PdfCompare() {
                 Next
               </button>
             </div>
-            <div className="flex gap-1.5" role="group" aria-label="View mode">
-              {(["overlay", "side"] as const).map((v) => (
-                <button
-                  key={v}
-                  type="button"
-                  onClick={() => setView(v)}
-                  aria-pressed={view === v}
-                  className={`px-2.5 py-1 rounded-md text-xs font-medium border transition-colors ${
-                    view === v
-                      ? "border-[#6366f1]/50 bg-[#6366f1]/15 text-[var(--accent-text)]"
-                      : "border-[var(--border)] text-[var(--text-muted)]"
-                  }`}
-                >
-                  {v === "overlay" ? "Highlight" : "Side by side"}
-                </button>
-              ))}
+            <div className="flex flex-wrap items-center gap-1.5">
+              {differingPages.length > 0 && (
+                <div className="flex items-center gap-1.5" role="group" aria-label="Jump to differing pages">
+                  <button
+                    type="button"
+                    onClick={goPrevDiffPage}
+                    className="px-2.5 py-1 rounded-md text-xs font-medium border border-[#6366f1]/45 bg-[#6366f1]/10 text-[var(--accent-text)] hover:bg-[#6366f1]/20 transition-colors"
+                    aria-label="Previous differing page"
+                  >
+                    ↑ Prev diff
+                  </button>
+                  <span className="text-xs text-[var(--text-muted)] mono tabular-nums min-w-[4.5rem] text-center">
+                    {diffNavIndex >= 0
+                      ? `${diffNavIndex + 1} of ${differingPages.length}`
+                      : `— / ${differingPages.length}`}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={goNextDiffPage}
+                    className="px-2.5 py-1 rounded-md text-xs font-medium border border-[#22c55e]/45 bg-[#22c55e]/10 text-[#22c55e] hover:bg-[#22c55e]/20 transition-colors"
+                    aria-label="Next differing page"
+                  >
+                    ↓ Next diff
+                  </button>
+                </div>
+              )}
+              <div className="flex gap-1.5" role="group" aria-label="View mode">
+                {(["overlay", "side"] as const).map((v) => (
+                  <button
+                    key={v}
+                    type="button"
+                    onClick={() => setView(v)}
+                    aria-pressed={view === v}
+                    className={`px-2.5 py-1 rounded-md text-xs font-medium border transition-colors ${
+                      view === v
+                        ? "border-[#6366f1]/50 bg-[#6366f1]/15 text-[var(--accent-text)]"
+                        : "border-[var(--border)] text-[var(--text-muted)]"
+                    }`}
+                  >
+                    {v === "overlay" ? "Highlight" : "Side by side"}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 

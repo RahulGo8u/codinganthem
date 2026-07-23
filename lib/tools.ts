@@ -100,7 +100,7 @@ export const CATEGORY_META: Record<
     title: "Text Utilities",
     tagline: "Compare, count, and transform text",
     intro:
-      "Free online text tools to test regular expressions, convert case, diff two texts, compare PDFs, and count words and characters. Fast, browser-based utilities for everyday writing, coding, and content work.",
+      "Free online text tools to test regular expressions, convert case, compare texts, compare PDFs, and count words and characters. Fast, browser-based utilities for everyday writing, coding, and content work.",
   },
   security: {
     title: "Security & Crypto Tools",
@@ -233,7 +233,7 @@ export const tools: Tool[] = [
     icon: "Regex",
     keywords: ["regex", "regexp", "regular expression", "pattern", "match", "test"],
     explainer:
-      "Test and debug regular expressions in real time — no console needed.\n\n• See all matches highlighted as you type the pattern\n• Toggle flags: global (g), case insensitive (i), multiline (m)\n• Match count and positions shown for each result\n• Works with any regex supported by JavaScript's RegExp engine",
+      "Test and debug regular expressions in real time — no console needed.\n\n• See all matches highlighted as you type the pattern\n• Jump Prev/Next between matches in long test strings ([ / ] keys)\n• Toggle flags: global (g), case insensitive (i), multiline (m)\n• Capture groups listed when your pattern uses them",
   },
   {
     slug: "case-converter",
@@ -248,14 +248,23 @@ export const tools: Tool[] = [
   },
   {
     slug: "text-diff",
-    name: "Text Diff",
-    seoTitle: "Free Online Text Compare & Diff Checker Tool",
-    description: "Compare two blocks of text and highlight every change, line by line, instantly online. Free diff checker for code, configs, and API responses.",
+    name: "Text Compare",
+    seoTitle: "Compare Two Texts Online — Free Text Diff Checker",
+    description:
+      "Compare two blocks of text and highlight every change, line by line, instantly online. Free text compare tool for code, configs, and API responses.",
     category: "text",
     icon: "GitCompare",
-    keywords: ["diff", "compare", "text", "difference", "changes"],
+    keywords: [
+      "text compare",
+      "compare text",
+      "text diff",
+      "diff",
+      "compare",
+      "difference",
+      "changes",
+    ],
     explainer:
-      "Spot exactly what changed between two texts — line by line, instantly.\n\n• Added lines highlighted in green, removed in red — same style as Git diffs\n• Paste config files, API responses, code snippets, or any two blocks of text\n• Useful for reviewing changes before committing or debugging response differences\n• No size limit — compares as much text as you paste",
+      "Spot exactly what changed between two texts — line by line, instantly.\n\n• Added lines highlighted in green, removed in red — same style as Git diffs\n• Jump Prev/Next between change blocks in long diffs ([ / ] keys)\n• Paste config files, API responses, code snippets, or any two blocks of text\n• Copy a unified diff for pasting into reviews or tickets",
   },
   {
     slug: "pdf-compare",
@@ -275,7 +284,7 @@ export const tools: Tool[] = [
     ],
     isNew: true,
     explainer:
-      "Upload two PDFs, click Compare, and see highlighted differences — layout changes, images, and wording updates.\n\n• Side-by-side pages plus a difference highlight overlay\n• Page navigator shows which pages differ\n• Text-change list when the PDF has an extractable text layer\n• 100% client-side — your PDFs never leave this device\n• Limits: 10 MB and 50 pages per file; password-protected PDFs are not supported",
+      "Upload two PDFs, click Compare, and see highlighted differences — layout changes, images, and wording updates.\n\n• Side-by-side pages plus a difference highlight overlay\n• Jump Prev/Next to pages that actually differ (skip identical ones)\n• Text-change list when the PDF has an extractable text layer\n• 100% client-side — your PDFs never leave this device\n• Limits: 10 MB and 50 pages per file; password-protected PDFs are not supported",
   },
   {
     slug: "url-encoder",

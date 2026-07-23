@@ -98,7 +98,7 @@ export default function OgImage() {
             "Color Converter",
             "Regex Tester",
             "Case Converter",
-            "Text Diff",
+            "Text Compare",
           ].map((name) => (
             <div
               key={name}

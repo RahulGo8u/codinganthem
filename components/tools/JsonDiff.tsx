@@ -4,6 +4,13 @@ import { useState, useMemo, useRef, useCallback, useEffect } from "react";
 import { diffLines } from "diff";
 import { getToolBySlug } from "@/lib/tools";
 import { Breadcrumb } from "@/components/Breadcrumb";
+import {
+  activeHunkRowClass,
+  findHunkStarts,
+  hunkRange,
+  isTypingTarget,
+  wrapIndex,
+} from "@/lib/diffHunks";
 
 const tool = getToolBySlug("json-diff")!;
 
@@ -80,23 +87,6 @@ function buildRows(leftNorm: string, rightNorm: string): Row[] {
   return rows;
 }
 
-/** Row indices where each contiguous change block begins. */
-function findHunkStarts(rows: Row[]): number[] {
-  const starts: number[] = [];
-  for (let i = 0; i < rows.length; i++) {
-    if (rows[i].kind === "change" && (i === 0 || rows[i - 1].kind !== "change")) {
-      starts.push(i);
-    }
-  }
-  return starts;
-}
-
-function hunkRange(rows: Row[], start: number): { start: number; end: number } {
-  let end = start;
-  while (end + 1 < rows.length && rows[end + 1].kind === "change") end++;
-  return { start, end };
-}
-
 export function JsonDiff() {
   const [left, setLeft] = useState("");
   const [right, setRight] = useState("");
@@ -132,6 +122,8 @@ export function JsonDiff() {
   }, [left, right]);
 
   const hunkStarts = useMemo(() => (rows ? findHunkStarts(rows) : []), [rows]);
+  const displayHunk =
+    hunkStarts.length === 0 ? 0 : wrapIndex(activeHunk, hunkStarts.length);
 
   const stats = useMemo(() => {
     if (!rows) return null;
@@ -140,15 +132,10 @@ export function JsonDiff() {
     return { added, removed };
   }, [rows]);
 
-  // Reset navigator when the diff set changes
-  useEffect(() => {
-    setActiveHunk(0);
-  }, [rows]);
-
   const scrollToHunk = useCallback(
     (hunkIndex: number) => {
       if (!rows || hunkStarts.length === 0) return;
-      const wrapped = ((hunkIndex % hunkStarts.length) + hunkStarts.length) % hunkStarts.length;
+      const wrapped = wrapIndex(hunkIndex, hunkStarts.length);
       setActiveHunk(wrapped);
       const rowIndex = hunkStarts[wrapped];
       const el = rowRefs.current.get(rowIndex);
@@ -157,13 +144,33 @@ export function JsonDiff() {
     [rows, hunkStarts]
   );
 
-  const goPrev = () => scrollToHunk(activeHunk - 1);
-  const goNext = () => scrollToHunk(activeHunk + 1);
+  const goPrev = useCallback(
+    () => scrollToHunk(displayHunk - 1),
+    [scrollToHunk, displayHunk]
+  );
+  const goNext = useCallback(
+    () => scrollToHunk(displayHunk + 1),
+    [scrollToHunk, displayHunk]
+  );
+
+  useEffect(() => {
+    if (hunkStarts.length === 0) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (isTypingTarget(e.target)) return;
+      if (e.key === "]") {
+        e.preventDefault();
+        goNext();
+      } else if (e.key === "[") {
+        e.preventDefault();
+        goPrev();
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [hunkStarts.length, goNext, goPrev]);
 
   const activeRange =
-    rows && hunkStarts.length > 0
-      ? hunkRange(rows, hunkStarts[Math.min(activeHunk, hunkStarts.length - 1)])
-      : null;
+    rows && hunkStarts.length > 0 ? hunkRange(rows, hunkStarts[displayHunk]) : null;
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-8 flex flex-col gap-6">
@@ -217,7 +224,7 @@ export function JsonDiff() {
                     ↑ Prev
                   </button>
                   <span className="text-xs text-[var(--text-muted)] mono tabular-nums min-w-[4.5rem] text-center">
-                    {activeHunk + 1} of {hunkStarts.length}
+                    {displayHunk + 1} of {hunkStarts.length}
                   </span>
                   <button
                     type="button"
@@ -254,11 +261,7 @@ export function JsonDiff() {
                       else rowRefs.current.delete(i);
                     }}
                     data-diff-row={i}
-                    className={`grid grid-cols-2 ${
-                      inActive
-                        ? `shadow-[inset_3px_0_0_0_#6366f1] ${isHunkStart ? "rounded-t-sm" : ""} ${isHunkEnd ? "rounded-b-sm" : ""}`
-                        : ""
-                    }`}
+                    className={`grid grid-cols-2 ${activeHunkRowClass(inActive, isHunkStart, isHunkEnd)}`}
                   >
                     <div
                       className={`flex border-r border-[var(--border)] ${
@@ -309,6 +312,12 @@ export function JsonDiff() {
               })}
             </div>
           </div>
+          {hunkStarts.length > 0 && (
+            <p className="text-[10px] text-[var(--text-muted)]">
+              Tip: press <span className="mono">[</span> / <span className="mono">]</span> to jump
+              between changes
+            </p>
+          )}
         </div>
       )}
 
@@ -318,6 +327,7 @@ export function JsonDiff() {
           onClick={() => {
             setLeft("");
             setRight("");
+            setActiveHunk(0);
           }}
           disabled={!left && !right}
           className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[#ef4444]/40 bg-[#ef4444]/10 text-[#ef4444] hover:bg-[#ef4444]/20 hover:border-[#ef4444]/60 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"

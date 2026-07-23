@@ -89,7 +89,7 @@ A few tools (like URL Shortener) use a lightweight backend, and AI tools send in
 - Case Converter (camelCase, snake_case, PascalCase, kebab-case, …)
 - PDF Compare — compare two PDFs with visual highlights and text changes (client-side)
 - Regex Tester — live inline match highlighting
-- Text Diff — side-by-side comparison
+- Text Compare — side-by-side comparison with jump-to-change nav
 - Word Counter — words, characters, sentences, reading time
 
 ### Visualizers
