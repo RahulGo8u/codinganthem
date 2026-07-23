@@ -200,33 +200,36 @@ export function JsonDiff() {
 
       {rows && (
         <div className="flex flex-col gap-2">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <label className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">
+          <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
+            <div />
+            <label className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider text-center">
               Diff
             </label>
-            {hunkStarts.length > 0 && (
-              <div className="flex items-center gap-1.5" role="group" aria-label="Navigate differences">
-                <button
-                  type="button"
-                  onClick={goPrev}
-                  className="px-2.5 py-1 rounded-md text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
-                  aria-label="Previous difference"
-                >
-                  ↑ Prev
-                </button>
-                <span className="text-xs text-[var(--text-muted)] mono tabular-nums min-w-[4.5rem] text-center">
-                  {activeHunk + 1} of {hunkStarts.length}
-                </span>
-                <button
-                  type="button"
-                  onClick={goNext}
-                  className="px-2.5 py-1 rounded-md text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
-                  aria-label="Next difference"
-                >
-                  ↓ Next
-                </button>
-              </div>
-            )}
+            <div className="flex justify-end">
+              {hunkStarts.length > 0 && (
+                <div className="flex items-center gap-1.5" role="group" aria-label="Navigate differences">
+                  <button
+                    type="button"
+                    onClick={goPrev}
+                    className="px-2.5 py-1 rounded-md text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
+                    aria-label="Previous difference"
+                  >
+                    ↑ Prev
+                  </button>
+                  <span className="text-xs text-[var(--text-muted)] mono tabular-nums min-w-[4.5rem] text-center">
+                    {activeHunk + 1} of {hunkStarts.length}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={goNext}
+                    className="px-2.5 py-1 rounded-md text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
+                    aria-label="Next difference"
+                  >
+                    ↓ Next
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
 
           <div
