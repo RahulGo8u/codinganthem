@@ -3,7 +3,9 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import QRCode from "qrcode";
 import { ToolShell } from "@/components/ToolShell";
+import { DownloadButton } from "@/components/DownloadButton";
 import { getToolBySlug } from "@/lib/tools";
+import { downloadUrl } from "@/lib/download";
 
 const tool = getToolBySlug("qr-code-generator")!;
 
@@ -29,10 +31,7 @@ export function QrCodeGenerator() {
 
   const handleDownload = useCallback(() => {
     if (!dataUrl) return;
-    const a = document.createElement("a");
-    a.href = dataUrl;
-    a.download = "qrcode.png";
-    a.click();
+    downloadUrl(dataUrl, "qrcode.png");
   }, [dataUrl]);
 
   return (
@@ -48,21 +47,17 @@ export function QrCodeGenerator() {
       outputLabel="QR Code"
       inputPlaceholder={"Enter any text or URL...\n\nhttps://www.codinganthem.com"}
       extraActions={
-        <>
-          <button
-            onClick={() => setInput(SAMPLE)}
-            className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
-          >
-            Load sample
-          </button>
-          <button
-            onClick={handleDownload}
-            disabled={!dataUrl}
-            className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-          >
-            Download PNG
-          </button>
-        </>
+        <button
+          onClick={() => setInput(SAMPLE)}
+          className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
+        >
+          Load sample
+        </button>
+      }
+      extraRightActions={
+        <DownloadButton onClick={handleDownload} disabled={!dataUrl} compact>
+          Download PNG
+        </DownloadButton>
       }
       options={
         <label className="flex items-center gap-2 text-[var(--text-muted)] text-xs">

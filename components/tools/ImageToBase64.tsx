@@ -3,6 +3,8 @@
 import { useState, useCallback, useRef } from "react";
 import { getToolBySlug } from "@/lib/tools";
 import { ToolPageHeader } from "@/components/ToolPageHeader";
+import { DownloadButton } from "@/components/DownloadButton";
+import { downloadBlob } from "@/lib/download";
 
 const tool = getToolBySlug("image-to-base64")!;
 
@@ -71,14 +73,8 @@ export function ImageToBase64() {
 
   const downloadBase64 = useCallback(() => {
     if (!base64Only) return;
-    const blob = new Blob([base64Only], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
     const baseName = fileName ? fileName.replace(/\.[^.]+$/, "") : "image";
-    a.href = url;
-    a.download = `${baseName}-base64.txt`;
-    a.click();
-    URL.revokeObjectURL(url);
+    downloadBlob(new Blob([base64Only], { type: "text/plain" }), `${baseName}-base64.txt`);
   }, [base64Only, fileName]);
 
   return (
@@ -155,13 +151,13 @@ export function ImageToBase64() {
             <div className="flex items-center justify-between">
               <label className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">Base64 only</label>
               <div className="flex items-center gap-2">
-                <button
+                <DownloadButton
                   onClick={downloadBase64}
                   disabled={!base64Only}
-                  className="text-xs px-2.5 py-1 rounded border transition-colors text-[var(--text-muted)] border-[var(--border)] hover:text-[var(--text-primary)] disabled:opacity-40 disabled:cursor-not-allowed"
+                  compact
                 >
                   Download
-                </button>
+                </DownloadButton>
                 <button
                   onClick={() => copy(base64Only, setCopiedBase64)}
                   disabled={!base64Only}

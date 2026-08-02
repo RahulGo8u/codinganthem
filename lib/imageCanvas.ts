@@ -1,5 +1,7 @@
 /** Shared canvas helpers for client-side image tools. */
 
+export { downloadBlob } from "@/lib/download";
+
 export const IMAGE_MAX_BYTES = 10 * 1024 * 1024;
 export const IMAGE_ACCEPT = "image/png,image/jpeg,image/webp,image/gif";
 export const IMAGE_TYPES = new Set(["image/png", "image/jpeg", "image/webp", "image/gif"]);
@@ -38,15 +40,6 @@ export function canvasToBlob(
       quality
     );
   });
-}
-
-export function downloadBlob(blob: Blob, filename: string) {
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-  a.click();
-  URL.revokeObjectURL(url);
 }
 
 export function drawCover(

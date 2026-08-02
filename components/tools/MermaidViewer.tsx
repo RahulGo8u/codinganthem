@@ -3,9 +3,11 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useTheme } from "next-themes";
 import { ToolShell } from "@/components/ToolShell";
+import { DownloadButton } from "@/components/DownloadButton";
 import { HighlightedTextarea } from "@/components/HighlightedTextarea";
 import { highlightMermaid } from "@/lib/highlight";
 import { getToolBySlug } from "@/lib/tools";
+import { downloadBlob } from "@/lib/download";
 
 const tool = getToolBySlug("mermaid-viewer")!;
 
@@ -215,13 +217,7 @@ export function MermaidViewer() {
 
   const handleDownloadSvg = useCallback(() => {
     if (!svg) return;
-    const blob = new Blob([svg], { type: "image/svg+xml" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "diagram.svg";
-    a.click();
-    URL.revokeObjectURL(url);
+    downloadBlob(new Blob([svg], { type: "image/svg+xml" }), "diagram.svg");
   }, [svg]);
 
   return (
@@ -265,24 +261,20 @@ export function MermaidViewer() {
         </label>
       }
       extraActions={
-        <>
-          <button
-            onClick={() => {
-              setSelectedExample("flowchart");
-              setInput(EXAMPLES.flowchart);
-            }}
-            className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
-          >
-            Load sample
-          </button>
-          <button
-            onClick={handleDownloadSvg}
-            disabled={!svg}
-            className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-          >
-            Download SVG
-          </button>
-        </>
+        <button
+          onClick={() => {
+            setSelectedExample("flowchart");
+            setInput(EXAMPLES.flowchart);
+          }}
+          className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
+        >
+          Load sample
+        </button>
+      }
+      extraRightActions={
+        <DownloadButton onClick={handleDownloadSvg} disabled={!svg} compact>
+          Download SVG
+        </DownloadButton>
       }
       outputContent={
         <div

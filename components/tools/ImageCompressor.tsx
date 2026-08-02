@@ -3,6 +3,7 @@
 import { useState, useCallback, useRef } from "react";
 import { getToolBySlug } from "@/lib/tools";
 import { Breadcrumb } from "@/components/Breadcrumb";
+import { DownloadButton } from "@/components/DownloadButton";
 import {
   IMAGE_ACCEPT,
   IMAGE_MAX_BYTES,
@@ -253,7 +254,7 @@ export function ImageCompressor() {
                     }`}
               </span>
               {resultUrl && <img src={resultUrl} alt="Compressed" className="max-h-64 object-contain mx-auto" />}
-              <button
+              <DownloadButton
                 disabled={!resultBlob.current}
                 onClick={() => {
                   if (!resultBlob.current || !file) return;
@@ -265,10 +266,10 @@ export function ImageCompressor() {
                   const base = file.name.replace(/\.[^.]+$/, "");
                   downloadBlob(resultBlob.current, `${base}-compressed.${ext}`);
                 }}
-                className="self-end mt-1 px-4 py-2 rounded-lg text-sm font-medium border border-[#6366f1]/40 bg-[#6366f1]/10 text-[#6366f1] hover:bg-[#6366f1]/20 disabled:opacity-40"
+                className="self-end mt-1"
               >
                 {keptOriginal ? "Download original" : "Download compressed image"}
-              </button>
+              </DownloadButton>
             </div>
           </div>
         </>

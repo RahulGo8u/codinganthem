@@ -3,6 +3,8 @@
 import { useState, useCallback, useEffect } from "react";
 import type { Tool } from "@/lib/tools";
 import { Breadcrumb } from "@/components/Breadcrumb";
+import { DownloadButton } from "@/components/DownloadButton";
+import { downloadBlob } from "@/lib/download";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 
@@ -136,13 +138,7 @@ export function ToolShell({
 
   const handleDownload = useCallback(() => {
     if (!output) return;
-    const blob = new Blob([output], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${tool.slug}-output.txt`;
-    a.click();
-    URL.revokeObjectURL(url);
+    downloadBlob(new Blob([output], { type: "text/plain" }), `${tool.slug}-output.txt`);
   }, [output, tool.slug]);
 
   const handleUpload = useCallback(() => {
@@ -302,7 +298,7 @@ export function ToolShell({
             <p className="text-xs text-[#ef4444] leading-relaxed">{uploadError}</p>
           )}
           <div className="flex items-center justify-between gap-3 flex-wrap">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2" role="group" aria-label="Input actions">
               {(!hideFileActions || showClear) && (
                 <button
                   onClick={handleClear}
@@ -323,7 +319,7 @@ export function ToolShell({
               {extraActions}
             </div>
 
-            <div className="flex items-center gap-2 flex-wrap">
+            <div className="flex items-center gap-2 flex-wrap" role="group" aria-label="Output actions">
               {extraRightActions}
               <button
                 onClick={handleShareX}
@@ -382,13 +378,13 @@ export function ToolShell({
                 <span className="hidden sm:inline">Coffee</span>
               </a>
               {!hideFileActions && !hideDownload && (
-                <button
+                <DownloadButton
                   onClick={handleDownload}
                   disabled={!output}
-                  className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  compact
                 >
                   Download
-                </button>
+                </DownloadButton>
               )}
               {(!outputContent || output !== "") && (
                 <button

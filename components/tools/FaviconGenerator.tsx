@@ -3,11 +3,12 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { getToolBySlug } from "@/lib/tools";
 import { Breadcrumb } from "@/components/Breadcrumb";
+import { DownloadButton } from "@/components/DownloadButton";
+import { downloadUrl } from "@/lib/download";
 import {
   IMAGE_ACCEPT,
   IMAGE_MAX_BYTES,
   IMAGE_TYPES,
-  downloadBlob,
   drawCover,
   formatBytes,
   loadImageFromFile,
@@ -80,17 +81,15 @@ export function FaviconGenerator() {
     }
   };
 
-  const downloadSize = async (size: number) => {
+  const downloadSize = (size: number) => {
     const dataUrl = previews[size];
     if (!dataUrl) return;
-    const res = await fetch(dataUrl);
-    const blob = await res.blob();
-    downloadBlob(blob, size === 180 ? "apple-touch-icon.png" : `favicon-${size}x${size}.png`);
+    downloadUrl(dataUrl, size === 180 ? "apple-touch-icon.png" : `favicon-${size}x${size}.png`);
   };
 
-  const downloadAll = async () => {
+  const downloadAll = () => {
     for (const size of SIZES) {
-      await downloadSize(size);
+      downloadSize(size);
     }
   };
 
@@ -172,12 +171,12 @@ export function FaviconGenerator() {
               <div className="w-12 h-12 bg-[var(--bg-elevated)]" />
             )}
             <span className="text-xs text-[var(--text-muted)]">{size === 180 ? "Apple Touch 180" : `${size}×${size}`}</span>
-            <button
-              onClick={() => void downloadSize(size)}
-              className="text-xs text-[#6366f1] hover:underline"
+            <DownloadButton
+              onClick={() => downloadSize(size)}
+              compact
             >
               Download
-            </button>
+            </DownloadButton>
           </div>
         ))}
       </div>
@@ -187,13 +186,13 @@ export function FaviconGenerator() {
           Tip: use <code className="mono">favicon-32x32.png</code> as <code className="mono">favicon.ico</code> replacement, and{" "}
           <code className="mono">apple-touch-icon.png</code> for iOS home screens.
         </p>
-        <button
-          onClick={() => void downloadAll()}
+        <DownloadButton
+          onClick={downloadAll}
           disabled={Object.keys(previews).length === 0}
-          className="self-end shrink-0 px-4 py-2 rounded-lg text-sm font-medium border border-[#6366f1]/40 bg-[#6366f1]/10 text-[#6366f1] hover:bg-[#6366f1]/20 disabled:opacity-40"
+          className="self-end shrink-0"
         >
           Download all sizes
-        </button>
+        </DownloadButton>
       </div>
     </div>
   );
