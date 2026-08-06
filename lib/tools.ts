@@ -100,7 +100,7 @@ export const CATEGORY_META: Record<
     title: "Text Utilities",
     tagline: "Compare, count, and transform text",
     intro:
-      "Free online text tools to test regular expressions, convert case, compare texts, compare PDFs, and count words and characters. Fast, browser-based utilities for everyday writing, coding, and content work.",
+      "Free online text tools to test regular expressions, convert case, compare texts, compare or unlock PDFs, and count words and characters. Fast, browser-based utilities for everyday writing, coding, and content work.",
   },
   security: {
     title: "Security & Crypto Tools",
@@ -282,9 +282,28 @@ export const tools: Tool[] = [
       "compare two pdfs",
       "pdf checker",
     ],
-    isNew: true,
     explainer:
       "Upload two PDFs, click Compare, and see highlighted differences — layout changes, images, and wording updates.\n\n• Side-by-side pages plus a difference highlight overlay\n• Jump Prev/Next to pages that actually differ (skip identical ones)\n• Text-change list when the PDF has an extractable text layer\n• 100% client-side — your PDFs never leave this device\n• Limits: 10 MB and 50 pages per file; password-protected PDFs are not supported",
+  },
+  {
+    slug: "pdf-unlock",
+    name: "PDF Unlock",
+    seoTitle: "Unlock Password-Protected PDF Online — Free PDF Decrypt",
+    description:
+      "Remove a password from a locked PDF and download an unlocked copy. Free PDF unlock tool — runs entirely in your browser, files never leave your device.",
+    category: "text",
+    icon: "Unlock",
+    keywords: [
+      "pdf unlock",
+      "unlock pdf",
+      "remove pdf password",
+      "decrypt pdf",
+      "pdf password remover",
+      "unprotect pdf",
+    ],
+    isNew: true,
+    explainer:
+      "Upload a password-protected PDF, enter the password, and download an unlocked copy with no encryption.\n\n• Works with user (open) passwords and owner-restriction PDFs\n• Powered by qpdf in WebAssembly — full-fidelity decrypt, not a re-render\n• 100% client-side — your PDF and password never leave this device\n• You must know the password; this tool does not crack or brute-force PDFs\n• Limit: 10 MB per file",
   },
   {
     slug: "url-encoder",

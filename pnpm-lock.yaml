@@ -69,6 +69,9 @@ importers:
       pdfjs-dist:
         specifier: ^5.7.284
         version: 5.7.284
+      pdfstudio:
+        specifier: ^0.4.0
+        version: 0.4.0
       qrcode:
         specifier: ^1.5.4
         version: 1.5.4
@@ -2657,6 +2660,10 @@ packages:
   pdfjs-dist@5.7.284:
     resolution: {integrity: sha512-h4EdYQczmGhbOlqc3PPZwxevn7ApdWPbovAuWXOB/DjIyigSnwfy2oze7c6mRcSr9XgLp3eN3EeL4DyySTPMFw==}
     engines: {node: '>=22.13.0 || >=24'}
+
+  pdfstudio@0.4.0:
+    resolution: {integrity: sha512-yFHlp/VHxKmrYxYA45ACkh24c4mCBa/Al3EmajnlBnN9FzfynZz63sR2do2kBH34XoTAQSXy+ywijAcq0DUcSQ==}
+    engines: {node: '>=18'}
 
   picocolors@1.1.1:
     resolution: {integrity: sha512-xceH2snhtb5M9liqDsmEw56le376mTZkEX/jEb/RxNFyegNul7eNslCXP9FDj/Lcu0X8KEyMceP2ntpaHrDEVA==}
@@ -5745,6 +5752,8 @@ snapshots:
   pdfjs-dist@5.7.284:
     optionalDependencies:
       '@napi-rs/canvas': 0.1.100
+
+  pdfstudio@0.4.0: {}
 
   picocolors@1.1.1: {}
 

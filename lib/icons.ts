@@ -43,6 +43,7 @@ import {
   Tags,
   Terminal,
   Timer,
+  Unlock,
 } from "lucide-react";
 import type { LucideProps } from "lucide-react";
 
@@ -93,6 +94,7 @@ export const ICON_MAP = {
   Tags,
   Terminal,
   Timer,
+  Unlock,
 } as const;
 
 export type IconName = keyof typeof ICON_MAP;

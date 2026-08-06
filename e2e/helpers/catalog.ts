@@ -59,6 +59,7 @@ export const DEDICATED_INTERACTION_SLUGS = [
   "json-diff",
   "text-diff",
   "pdf-compare",
+  "pdf-unlock",
   "regex-tester",
   // Generators / custom / image / API
   "uuid-generator",

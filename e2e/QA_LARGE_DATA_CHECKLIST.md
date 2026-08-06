@@ -2,7 +2,7 @@
 
 Manual pass/fail matrix for CodingAnthem tools.
 
-**Automated coverage:** `npm run test:e2e` runs load smoke for all 60 tools plus happy-path interaction (Load sample / Generate / upload / mocked API) for every slug. Deep large-payload and hunk-nav checks remain for JSON/Text/PDF Compare and Regex Tester.
+**Automated coverage:** `npm run test:e2e` runs load smoke for all tools plus happy-path interaction (Load sample / Generate / upload / mocked API) for every slug. Deep large-payload and hunk-nav checks remain for JSON/Text/PDF Compare and Regex Tester.
 
 **How to use this checklist:** for each tool, paste/upload the large-input recipe below, confirm the expected behavior, tick Pass/Fail.
 

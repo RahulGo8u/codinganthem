@@ -43,6 +43,11 @@ const TOOL_MAP: Record<string, React.ComponentType> = {
       import("@/components/tools/PdfCompare").then((m) => ({ default: m.PdfCompare })),
     { ssr: false }
   ),
+  "pdf-unlock": dynamic(
+    () =>
+      import("@/components/tools/PdfUnlock").then((m) => ({ default: m.PdfUnlock })),
+    { ssr: false }
+  ),
   "url-encoder": dynamic(() =>
     import("@/components/tools/UrlEncoderDecoder").then((m) => ({ default: m.UrlEncoderDecoder }))
   ),
