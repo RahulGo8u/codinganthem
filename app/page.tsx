@@ -27,12 +27,17 @@ const HOMEPAGE_FAQS = [
   },
   {
     question: "How many tools does CodingAnthem offer?",
-    answer: `${tools.length} tools across formatters, encoders, generators, converters, security, and more — all free, all instant.`,
+    answer: `${tools.length} free tools across formatters, encoders, generators, converters, security, images, Web3, AI, and more.`,
   },
   {
-    question: "Can I use CodingAnthem alongside AI tools like ChatGPT or GitHub Copilot?",
+    question: "Which tools send my input to a server?",
     answer:
-      "Yes. Paste JSON, JWTs, SQL, or any AI-generated output directly into a tool to validate, format, or convert it — most tools process everything locally in your browser.",
+      "URL Shortener stores the destination so the short link can redirect. AI Code Explainer, AI Text-to-SQL, and AI Error Explainer send the text you submit to Google's Gemini API. Every other tool runs in your browser.",
+  },
+  {
+    question: "Does CodingAnthem include Ethereum tools?",
+    answer:
+      "Yes. Web3 tools convert Wei, Gwei, and Ether, estimate gas, validate EIP-55 address checksums, and calculate Keccak-256 hashes, function selectors, and event topics. They run locally. Never paste a private key or seed phrase into any online tool.",
   },
 ];
 

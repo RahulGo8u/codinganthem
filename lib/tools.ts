@@ -1040,3 +1040,28 @@ export function getDataSafetyFaqAnswer(tool: Tool): string {
   }
   return `${tool.name} sends your input to a backend service (or third-party API) to work, so it isn't purely local like most CodingAnthem tools. We only send what's needed to produce the result, and don't use it for anything else — see the Privacy Policy for exactly what's sent and why.`;
 }
+
+export interface ToolFaq {
+  question: string;
+  answer: string;
+}
+
+/** Visible FAQ copy and FAQ structured data for a tool page. */
+export function getToolFaqs(tool: Tool): ToolFaq[] {
+  const explainerParts = tool.explainer.split("\n\n");
+  const summary = explainerParts[0] ?? tool.description;
+  const bulletText = explainerParts
+    .slice(1)
+    .join("\n")
+    .split("\n")
+    .map((bullet) => bullet.replace(/^•\s*/, "").trim())
+    .filter(Boolean)
+    .join(". ");
+
+  return [
+    { question: `What is ${tool.name}?`, answer: summary },
+    ...(bulletText ? [{ question: `How do I use ${tool.name}?`, answer: bulletText }] : []),
+    { question: `Is ${tool.name} free?`, answer: getIsFreeFaqAnswer(tool) },
+    { question: `Is my data safe when I use ${tool.name}?`, answer: getDataSafetyFaqAnswer(tool) },
+  ];
+}

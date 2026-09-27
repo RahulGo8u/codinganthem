@@ -3,7 +3,7 @@
 import { notFound } from "next/navigation";
 import dynamic from "next/dynamic";
 import { addRecentTool } from "@/components/CommandPalette";
-import { getToolBySlug, getRelatedTools } from "@/lib/tools";
+import { getToolBySlug, getRelatedTools, getToolFaqs } from "@/lib/tools";
 import { ToolCard } from "@/components/ToolCard";
 import { useEffect } from "react";
 
@@ -233,6 +233,7 @@ export function ToolPageClient({ slug }: { slug: string }) {
   if (!ToolComponent) return notFound();
 
   const related = getRelatedTools(slug, tool.category);
+  const faqs = getToolFaqs(tool);
 
   return (
     <>
@@ -252,15 +253,26 @@ export function ToolPageClient({ slug }: { slug: string }) {
         </div>
       )}
 
-      {tool.explainer && (
-        <div className="max-w-7xl mx-auto px-6 pb-16">
+      {faqs.length > 0 && (
+        <div className="max-w-3xl mx-auto px-6 pb-16">
           <div className="border-t border-[var(--border)] pt-8">
-            <h2 className="text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)] mb-3">
-              About {tool.name}
-            </h2>
-            <p className="text-sm text-[var(--text-muted)] leading-relaxed max-w-3xl whitespace-pre-line">
-              {tool.explainer}
-            </p>
+            <h2 className="text-sm font-semibold mb-4">Frequently asked questions</h2>
+            <div className="flex flex-col gap-2">
+              {faqs.map(({ question, answer }) => (
+                <details
+                  key={question}
+                  className="group rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] px-4 py-3 open:bg-[var(--bg-elevated)] transition-colors"
+                >
+                  <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-sm font-medium text-[var(--text-primary)]">
+                    {question}
+                    <span className="shrink-0 text-[var(--text-muted)] transition-transform duration-150 group-open:rotate-45">
+                      +
+                    </span>
+                  </summary>
+                  <p className="mt-3 text-xs leading-relaxed text-[var(--text-muted)]">{answer}</p>
+                </details>
+              ))}
+            </div>
           </div>
         </div>
       )}

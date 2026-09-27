@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { getToolBySlug, getIsFreeFaqAnswer, getDataSafetyFaqAnswer, tools } from "@/lib/tools";
+import { getToolBySlug, getToolFaqs, tools } from "@/lib/tools";
 import { ToolPageClient } from "./ToolPageClient";
 
 interface Props {
@@ -67,15 +67,7 @@ export default async function ToolPage({ params }: Props) {
     },
   };
 
-  const explainerParts = tool.explainer.split("\n\n");
-  const summary = explainerParts[0] ?? tool.description;
-  const bulletText = explainerParts[1]
-    ? explainerParts[1]
-        .split("\n")
-        .map((b) => b.replace(/^•\s*/, "").trim())
-        .filter(Boolean)
-        .join(". ")
-    : null;
+  const toolFaqs = getToolFaqs(tool);
 
   const breadcrumbJsonLd = {
     "@context": "https://schema.org",
@@ -99,44 +91,14 @@ export default async function ToolPage({ params }: Props) {
   const faqJsonLd = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
-    mainEntity: [
-      {
-        "@type": "Question",
-        name: `What is ${tool.name}?`,
-        acceptedAnswer: {
-          "@type": "Answer",
-          text: summary,
-        },
+    mainEntity: toolFaqs.map(({ question, answer }) => ({
+      "@type": "Question",
+      name: question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: answer,
       },
-      ...(bulletText
-        ? [
-            {
-              "@type": "Question",
-              name: `How do I use ${tool.name}?`,
-              acceptedAnswer: {
-                "@type": "Answer",
-                text: bulletText,
-              },
-            },
-          ]
-        : []),
-      {
-        "@type": "Question",
-        name: `Is ${tool.name} free?`,
-        acceptedAnswer: {
-          "@type": "Answer",
-          text: getIsFreeFaqAnswer(tool),
-        },
-      },
-      {
-        "@type": "Question",
-        name: `Is my data safe when I use ${tool.name}?`,
-        acceptedAnswer: {
-          "@type": "Answer",
-          text: getDataSafetyFaqAnswer(tool),
-        },
-      },
-    ],
+    })),
   };
 
   return (

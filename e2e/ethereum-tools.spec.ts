@@ -34,6 +34,9 @@ test.describe("Ethereum developer tools", () => {
       .getByRole("textbox", { name: /^ethereum address$/i })
       .fill("0x52908400098527886E0F7030069857D2E4169EE7");
     await expect(page.getByText("Valid EIP-55 checksum")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Frequently asked questions" })).toBeVisible();
+    await expect(page.getByText("Is Ethereum Address Checksum free?")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "About Ethereum Address Checksum" })).toHaveCount(0);
   });
 
   test("calculates Ethereum Keccak-256 vectors", () => {

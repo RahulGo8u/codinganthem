@@ -4,6 +4,10 @@ test.describe("Critical smoke", () => {
   test("homepage loads", async ({ page }) => {
     await page.goto("/");
     await expect(page.getByText(/codinganthem/i).first()).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Frequently asked questions" })).toBeVisible();
+    await expect(page.getByText("Which tools send my input to a server?")).toBeVisible();
+    await expect(page.getByText("Does CodingAnthem include Ethereum tools?")).toBeVisible();
+    await expect(page.getByText(/alongside AI tools/)).toHaveCount(0);
   });
 
   test("JSON Formatter formats large-ish JSON", async ({ page }) => {
