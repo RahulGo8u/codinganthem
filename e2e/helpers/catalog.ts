@@ -82,6 +82,11 @@ export const DEDICATED_INTERACTION_SLUGS = [
   "ai-code-explainer",
   "ai-sql-generator",
   "ai-error-explainer",
+  "json-schema-generator",
+  "cron-builder",
+  "hmac-generator",
+  "http-status-codes",
+  "cidr-calculator",
 ] as const;
 
 export const INTERACTION_SLUGS = new Set<string>([

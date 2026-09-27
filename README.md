@@ -8,7 +8,7 @@
 
 🔗 [www.codinganthem.com](https://www.codinganthem.com) · [X / Twitter](https://x.com/codinganthem) · [YouTube](https://www.youtube.com/@codinganthem)
 
-A few tools (like URL Shortener) use a lightweight backend, and AI tools send input to Google's Gemini API — always noted on the tool page.
+A few tools (like URL Shortener) use a lightweight backend. AI tools send input to Google's Gemini API and say so on the tool page.
 
 ## Top tools
 
@@ -31,10 +31,12 @@ A few tools (like URL Shortener) use a lightweight backend, and AI tools send in
 - AI Text-to-SQL Generator — describe a query in plain English and get a ready-to-use SQL statement, powered by Gemini
 - Prompt Template Filler — fill in {{variables}} in a prompt template and open the result directly in ChatGPT
 - Token Counter & Estimator — count tokens and estimate API cost for GPT, Claude, and Gemini models
+- JSON Schema Generator — turn sample JSON into JSON Schema plus OpenAI, Claude, and Gemini tool definitions (runs in the browser)
 
 ### Converters
 - Color Contrast Checker — check WCAG contrast ratio between two colors for accessibility
 - Color Converter (HEX ↔ RGB ↔ HSL)
+- Cron Expression Builder — visual cron generator with next run times
 - Cron Expression Parser
 - CSV to JSON
 - JSON to CSV
@@ -79,6 +81,7 @@ A few tools (like URL Shortener) use a lightweight backend, and AI tools send in
 ### Security
 - Bcrypt Generator — generate and verify bcrypt password hashes
 - Hash Generator (MD5, SHA-1, SHA-256, SHA-512)
+- HMAC Generator — HMAC-SHA256 and HMAC-SHA512 signatures in the browser
 - JWT Decoder — inspect header, payload, signature
 - JWT Generator — sign tokens with HS256/384/512
 - JWT Validator — verify JWT signature and expiry
@@ -98,7 +101,9 @@ A few tools (like URL Shortener) use a lightweight backend, and AI tools send in
 - Mermaid Diagram Viewer — render flowcharts, sequence, ER, class, and Gantt diagrams with zoom, pan, and fullscreen
 
 ### Web
+- CIDR Calculator — IPv4 network, broadcast, host range, and netmask
 - cURL to Fetch — convert a curl command to a JavaScript fetch() call
+- HTTP Status Codes — searchable 1xx–5xx reference
 - HTML Entities Encoder / Decoder
 - Meta Tag Generator — SEO, Open Graph, and Twitter Card tags with live preview
 - Slug Generator
@@ -148,7 +153,7 @@ npm run lint    # lint
 
 ## Privacy
 
-Most tools run client-side in your browser using JavaScript and Web APIs — nothing is transmitted anywhere. A small number of tools (like URL Shortener) require server-side storage to work; those tools only send the minimum data needed to function, and this is always disclosed on the tool page. The AI tools send your input to Google's Gemini API to generate a response — a distinct, third-party data flow, separate from the client-side and server-side categories above. There are no accounts, and no tracking beyond privacy-respecting analytics. Full details: [`/privacy`](https://www.codinganthem.com/privacy).
+Most tools run client-side in your browser using JavaScript and Web APIs — nothing is transmitted anywhere. A small number of tools (like URL Shortener) require server-side storage to work; those tools only send the minimum data needed to function. What they store is described in the [Privacy Policy](https://www.codinganthem.com/privacy). AI tools send your input to Google's Gemini API and show that on the tool page before you submit. There are no accounts, and no tracking beyond privacy-respecting analytics.
 
 ## Support
 

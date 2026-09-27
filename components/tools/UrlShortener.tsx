@@ -4,7 +4,6 @@ import { useState } from "react";
 import { Link, Loader2, CheckCircle, Copy, ExternalLink, AlertCircle } from "lucide-react";
 import { validateUrl } from "@/lib/urlValidation";
 import { ToolPageHeader } from "@/components/ToolPageHeader";
-import { DataFlowNotice } from "@/components/DataFlowNotice";
 import { getToolBySlug } from "@/lib/tools";
 
 const tool = getToolBySlug("url-shortener")!;
@@ -109,8 +108,6 @@ export function UrlShortener() {
       <ToolPageHeader tool={tool} />
 
       <div className="w-full max-w-2xl mx-auto flex flex-col gap-6">
-        <DataFlowNotice destination="our server (URL, chosen expiry, and click counts are stored)" />
-
         {/* Input form — hidden once a result exists */}
         {!result && (
           <form

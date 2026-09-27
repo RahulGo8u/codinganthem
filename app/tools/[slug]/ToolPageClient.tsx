@@ -171,6 +171,9 @@ const TOOL_MAP: Record<string, React.ComponentType> = {
   "ai-error-explainer": dynamic(() =>
     import("@/components/tools/AiErrorExplainer").then((m) => ({ default: m.AiErrorExplainer }))
   ),
+  "json-schema-generator": dynamic(() =>
+    import("@/components/tools/JsonSchemaGenerator").then((m) => ({ default: m.JsonSchemaGenerator }))
+  ),
   "eth-unit-converter": dynamic(() =>
     import("@/components/tools/EthUnitConverter").then((m) => ({ default: m.EthUnitConverter }))
   ),
@@ -194,6 +197,18 @@ const TOOL_MAP: Record<string, React.ComponentType> = {
   ),
   "chmod-calculator": dynamic(() =>
     import("@/components/tools/ChmodCalculator").then((m) => ({ default: m.ChmodCalculator }))
+  ),
+  "cron-builder": dynamic(() =>
+    import("@/components/tools/CronBuilder").then((m) => ({ default: m.CronBuilder }))
+  ),
+  "hmac-generator": dynamic(() =>
+    import("@/components/tools/HmacGenerator").then((m) => ({ default: m.HmacGenerator }))
+  ),
+  "http-status-codes": dynamic(() =>
+    import("@/components/tools/HttpStatusCodes").then((m) => ({ default: m.HttpStatusCodes }))
+  ),
+  "cidr-calculator": dynamic(() =>
+    import("@/components/tools/CidrCalculator").then((m) => ({ default: m.CidrCalculator }))
   ),
 };
 

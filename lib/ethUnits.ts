@@ -8,18 +8,20 @@
 export interface EthUnit {
   key: string;
   label: string;
+  symbol: string;
+  alias?: string;
   /** Decimal places relative to Wei (e.g. Ether is 10^18 Wei). */
   decimals: number;
 }
 
 export const ETH_UNITS: EthUnit[] = [
-  { key: "wei", label: "Wei", decimals: 0 },
-  { key: "kwei", label: "Kwei", decimals: 3 },
-  { key: "mwei", label: "Mwei", decimals: 6 },
-  { key: "gwei", label: "Gwei", decimals: 9 },
-  { key: "szabo", label: "Szabo", decimals: 12 },
-  { key: "finney", label: "Finney", decimals: 15 },
-  { key: "ether", label: "Ether", decimals: 18 },
+  { key: "wei", label: "Wei", symbol: "wei", decimals: 0 },
+  { key: "kwei", label: "Kwei", symbol: "Kwei", alias: "Babbage", decimals: 3 },
+  { key: "mwei", label: "Mwei", symbol: "Mwei", alias: "Lovelace", decimals: 6 },
+  { key: "gwei", label: "Gwei", symbol: "Gwei", alias: "Shannon", decimals: 9 },
+  { key: "szabo", label: "Szabo", symbol: "szabo", decimals: 12 },
+  { key: "finney", label: "Finney", symbol: "finney", decimals: 15 },
+  { key: "ether", label: "Ether", symbol: "ETH", decimals: 18 },
 ];
 
 /**
@@ -89,7 +91,9 @@ export interface QuickFillOption {
 }
 
 export const QUICK_FILL_OPTIONS: QuickFillOption[] = [
+  { label: "0.1 ETH", unitKey: "ether", value: "0.1" },
   { label: "1 ETH", unitKey: "ether", value: "1" },
-  { label: "20 Gwei gas", unitKey: "gwei", value: "20" },
-  { label: "21000 Wei base gas", unitKey: "wei", value: "21000" },
+  { label: "10 Gwei", unitKey: "gwei", value: "10" },
+  { label: "30 Gwei", unitKey: "gwei", value: "30" },
+  { label: "100 Gwei", unitKey: "gwei", value: "100" },
 ];

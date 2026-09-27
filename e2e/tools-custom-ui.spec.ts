@@ -42,9 +42,22 @@ test.describe("Custom UI tools", () => {
     await assertToolHeading(page, "ETH Unit Converter");
     await page.getByRole("button", { name: "1 ETH", exact: true }).click();
 
-    const weiInput = page.locator("label", { hasText: /^Wei$/ }).locator("..").locator("input");
-    const etherInput = page.locator("label", { hasText: /^Ether$/ }).locator("..").locator("input");
+    const weiInput = page.getByRole("textbox", { name: "Wei amount", exact: true });
+    const etherInput = page.getByRole("textbox", { name: "Ether amount", exact: true });
     await expect(etherInput).toHaveValue("1");
     await expect(weiInput).toHaveValue("1000000000000000000");
+  });
+
+  test("eth-unit-converter accepts grouped Wei and estimates gas exactly", async ({ page }) => {
+    await gotoTool(page, "eth-unit-converter");
+
+    const weiInput = page.getByRole("textbox", { name: "Wei amount", exact: true });
+    await weiInput.fill("1,000,000,000");
+    await expect(page.getByRole("textbox", { name: "Gwei amount", exact: true })).toHaveValue("1");
+
+    await page.getByLabel("Gas limit").fill("21000");
+    await page.getByLabel("Max gas price in Gwei").fill("20");
+    await expect(page.getByText("0.00042 ETH", { exact: true })).toBeVisible();
+    await expect(page.getByText("420,000,000,000,000", { exact: true })).toBeVisible();
   });
 });

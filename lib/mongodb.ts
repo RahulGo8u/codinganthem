@@ -7,7 +7,6 @@ import mongoose from "mongoose";
 
 // Cache connection across hot reloads in dev and across serverless invocations
 declare global {
-  // eslint-disable-next-line no-var
   var _mongooseCache: {
     conn: typeof mongoose | null;
     promise: Promise<typeof mongoose> | null;
@@ -29,10 +28,16 @@ export async function connectDB(): Promise<typeof mongoose> {
     cache.promise = mongoose.connect(uri, {
       dbName: "codinganthem",
       bufferCommands: false,
+      maxPoolSize: 5,
+      // Atlas hostnames publish IPv6 addresses that Vercel functions often
+      // cannot reach. Forcing IPv4 avoids a multi-second connect timeout
+      // before the driver falls back.
+      family: 4,
       // Fail fast and predictably on an outage instead of hanging until
       // Vercel's own function timeout kicks in.
-      serverSelectionTimeoutMS: 8_000,
-      socketTimeoutMS: 15_000,
+      serverSelectionTimeoutMS: 5_000,
+      connectTimeoutMS: 5_000,
+      socketTimeoutMS: 10_000,
     });
   }
 

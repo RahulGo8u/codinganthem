@@ -4,7 +4,7 @@ import { tools, CATEGORY_ORDER } from "@/lib/tools";
 const BASE = "https://www.codinganthem.com";
 // Bump this only when tool content/pages meaningfully change, so the sitemap's
 // lastmod stays a truthful freshness signal instead of resetting on every deploy.
-const LAST_MODIFIED = "2026-08-06";
+const LAST_MODIFIED = "2026-09-27";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const staticPages: MetadataRoute.Sitemap = [

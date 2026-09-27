@@ -124,7 +124,7 @@ export const CATEGORY_META: Record<
     title: "AI Developer Tools",
     tagline: "Prompt tooling, token counting, and AI code help",
     intro:
-      "Free AI-powered developer tools: fill in prompt templates, count tokens and estimate API cost for GPT, Claude, and Gemini, and get AI explanations for code, SQL, and error messages. Some tools send your input to an AI API to work — see each tool's description and our Privacy Policy for details.",
+      "Free AI developer tools: generate JSON Schema and OpenAI, Claude, and Gemini tool definitions in your browser, fill prompt templates, count tokens and estimate API cost, and get explanations for code, SQL, and error messages. The explanation tools send your input to an AI API — see each tool and our Privacy Policy.",
   },
   web3: {
     title: "Web3 & Ethereum Tools",
@@ -460,6 +460,18 @@ export const tools: Tool[] = [
       "Decode any cron expression into plain English — no more guessing what * * * * * means.\n\n• Supports standard 5-field and extended 6-field (with seconds) cron syntax\n• Handles *, */n, ranges (n-m), and lists (n,m)\n• Shows the next 5 scheduled run times\n• Useful for debugging crontabs, CI schedules, and cloud functions",
   },
   {
+    slug: "cron-builder",
+    name: "Cron Expression Builder",
+    seoTitle: "Cron Expression Generator — Free Online Cron Job Builder",
+    description: "Build a cron expression visually and see the next run times. Free cron generator for weekdays, hourly jobs, and custom schedules.",
+    category: "converters",
+    icon: "Clock",
+    isNew: true,
+    keywords: ["cron generator", "cron builder", "crontab generator", "cron expression", "schedule builder"],
+    explainer:
+      "Build a 5-field cron expression from minute, hour, day, month, and weekday controls.\n\n• Live expression with a plain-English summary and the next five run times\n• Preset patterns for weekdays, ranges, and every-N schedules\n• Uses the same cron parser as the Cron Expression Parser — nothing is sent to a server",
+  },
+  {
     slug: "string-escape",
     name: "String Escape / Unescape",
     seoTitle: "String Escape & Unescape Tool — Free Online",
@@ -771,16 +783,38 @@ export const tools: Tool[] = [
       "Paste any cryptic error message or stack trace and get a plain-English diagnosis of what went wrong, its likely cause, and a suggested fix, powered by Google's Gemini AI. Works across languages and environments — just select the closest match if you know it. Your error message is sent to Google's Gemini API to generate the explanation — see the Privacy Policy for details.",
   },
   {
+    slug: "json-schema-generator",
+    name: "JSON Schema Generator",
+    seoTitle: "JSON Schema Generator — AI Tool Calls for OpenAI, Claude & Gemini",
+    description:
+      "Generate JSON Schema, TypeScript, Zod, and Python types from sample JSON, plus OpenAI, Anthropic, and Gemini tool definitions. Free and private in your browser.",
+    category: "ai",
+    icon: "Braces",
+    isNew: true,
+    keywords: [
+      "json schema",
+      "json schema generator",
+      "openai function calling",
+      "anthropic tool use",
+      "gemini function declaration",
+      "zod",
+      "typescript",
+      "structured output",
+    ],
+    explainer:
+      "Turn a sample JSON document into a Draft 2020-12 JSON Schema, then export the same shape as an OpenAI, Anthropic, or Gemini tool definition — entirely in your browser.\n\n• Detects emails, UUIDs, URLs, dates, and date-times, and keeps integers exact\n• OpenAI output uses strict mode: every property is required and extra properties are rejected\n• Also emits TypeScript interfaces, Zod schemas, and Python TypedDicts from the same sample\n• Nothing you paste is uploaded",
+  },
+  {
     slug: "eth-unit-converter",
     name: "ETH Unit Converter",
     seoTitle: "ETH Unit Converter — Free Wei, Gwei & Ether Calculator",
-    description: "Convert between Wei, Gwei, and Ether with exact BigInt precision, instantly online. Free Ethereum unit converter — no rounding errors, no sign-up.",
+    description: "Convert Wei, Gwei, and Ether with exact precision, then estimate Ethereum gas fees. Free ETH unit calculator — no rounding errors or sign-up.",
     category: "web3",
     icon: "Coins",
     keywords: ["eth", "wei", "gwei", "ether", "ethereum", "unit converter", "gas price", "web3"],
     isNew: true,
     explainer:
-      "Convert between Wei, Kwei, Mwei, Gwei, Szabo, Finney, and Ether instantly — all seven fields stay in sync as you type.\n\n• Uses BigInt arithmetic, not floating-point, so large values (like 1 ETH = 1,000,000,000,000,000,000 Wei) are always exact\n• Quick-fill chips for common values: 1 ETH, a typical 20 Gwei gas price, and the 21000 Wei base gas cost of a simple transfer\n• Useful for reading gas estimates, RPC logs, and contract values that come back in raw Wei\n• Runs entirely in your browser — never paste a private key or seed phrase into this or any online tool",
+      "Convert between Wei, Kwei, Mwei, Gwei, Szabo, Finney, and Ether instantly — every field stays in sync as you type.\n\n• Uses BigInt arithmetic, not floating-point, so large values (like 1 ETH = 1,000,000,000,000,000,000 Wei) are always exact\n• Common ETH and Gwei presets, readable grouped values, denomination aliases, and one-click copying\n• Built-in gas fee estimator multiplies gas limit by max gas price without rounding\n• Useful for reading gas estimates, RPC logs, and contract values that come back in raw Wei\n• Runs entirely in your browser — never paste a private key or seed phrase into this or any online tool",
   },
   {
     slug: "image-compressor",
@@ -865,6 +899,42 @@ export const tools: Tool[] = [
     isNew: true,
     explainer:
       "Toggle read/write/execute for owner, group, and public — instantly see octal (e.g. 755), symbolic (rwxr-xr-x), and a ready-to-paste chmod command.\n\n• Presets for 644, 755, 600, 700, and 777\n• Optional setuid, setgid, and sticky bit\n• Edit octal directly to update the checkboxes",
+  },
+  {
+    slug: "hmac-generator",
+    name: "HMAC Generator",
+    seoTitle: "HMAC Generator — Free SHA-256 and SHA-512 Signature Tool",
+    description: "Create HMAC-SHA256 and HMAC-SHA512 signatures in hex or Base64. Free webhook signing tool that runs in your browser.",
+    category: "security",
+    icon: "KeySquare",
+    isNew: true,
+    keywords: ["hmac generator", "hmac sha256", "hmac sha512", "webhook signature", "stripe signature"],
+    explainer:
+      "Sign a message with a secret using HMAC-SHA256 or HMAC-SHA512 and copy the hex or Base64 signature.\n\n• Useful for checking Stripe, GitHub, Slack, and Twilio webhook signatures\n• The secret stays masked and is never sent to a server\n• Signing uses the browser Web Crypto API",
+  },
+  {
+    slug: "http-status-codes",
+    name: "HTTP Status Codes",
+    seoTitle: "HTTP Status Codes — Free Searchable Reference",
+    description: "Look up HTTP status codes from 1xx through 5xx. Search by code or name and copy the number instantly.",
+    category: "web",
+    icon: "Globe",
+    isNew: true,
+    keywords: ["http status codes", "404", "500", "401 vs 403", "http response codes"],
+    explainer:
+      "Search the status codes you actually meet in APIs and browsers, from 200 OK to 504 Gateway Timeout.\n\n• Filter by class: informational, success, redirect, client error, and server error\n• Copy a code in one click\n• Short explanations for the common codes, with no account and no upload",
+  },
+  {
+    slug: "cidr-calculator",
+    name: "CIDR Calculator",
+    seoTitle: "CIDR / Subnet Calculator — Free IPv4 Network Tool",
+    description: "Calculate IPv4 network, broadcast, host range, and netmask from a CIDR block. Free subnet calculator in your browser.",
+    category: "web",
+    icon: "Network",
+    isNew: true,
+    keywords: ["cidr calculator", "subnet calculator", "ip subnet", "netmask", "192.168.1.0/24"],
+    explainer:
+      "Enter an IPv4 CIDR such as 192.168.1.0/24 and see the network, broadcast, first and last host, netmask, wildcard, and usable host count.\n\n• Handles /31 point-to-point links and /32 single hosts\n• Copy any address or count\n• Calculated locally — nothing is sent to a server",
   },
 ];
 

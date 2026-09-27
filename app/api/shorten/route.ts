@@ -10,6 +10,7 @@ import {
   generateSlug,
   RESERVED_SLUGS,
 } from "@/lib/urlValidation";
+import { publicShortLinkOrigin } from "@/lib/shortLink";
 
 // Colocate with the MongoDB Atlas cluster (AWS Mumbai / ap-south-1) to avoid
 // cross-region round trips on every connection + query.
@@ -171,7 +172,7 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "https://codinganthem.com";
+  const baseUrl = publicShortLinkOrigin();
 
   return NextResponse.json(
     {
