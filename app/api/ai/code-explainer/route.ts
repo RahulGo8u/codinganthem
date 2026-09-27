@@ -82,7 +82,6 @@ export async function POST(req: NextRequest) {
 
   const record = body as Record<string, unknown>;
   const code = typeof record.code === "string" ? record.code.trim() : "";
-  const language = typeof record.language === "string" ? record.language.trim() : "";
 
   if (!code) {
     return NextResponse.json({ error: "Please paste some code to explain." }, { status: 422 });
@@ -103,9 +102,7 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const userContent = delimitUserInput(
-      language ? `Language: ${language}\n\n${code}` : code
-    );
+    const userContent = delimitUserInput(code);
     const result = await generateStructured<CodeExplainerResult>({
       systemPrompt: SYSTEM_PROMPT,
       userContent,

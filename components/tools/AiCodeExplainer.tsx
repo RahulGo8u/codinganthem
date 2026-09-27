@@ -24,7 +24,6 @@ interface ExplainResult {
 
 export function AiCodeExplainer() {
   const [code, setCode] = useState("");
-  const [language, setLanguage] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [result, setResult] = useState<ExplainResult | null>(null);
@@ -49,7 +48,7 @@ export function AiCodeExplainer() {
       const res = await fetch("/api/ai/code-explainer", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code: trimmed, language: language.trim() || undefined }),
+        body: JSON.stringify({ code: trimmed }),
       });
       const data = await res.json();
 
@@ -83,7 +82,6 @@ export function AiCodeExplainer() {
             type="button"
             onClick={() => {
               setCode(SAMPLE_CODE);
-              setLanguage("TypeScript");
               setResult(null);
               setError("");
             }}
@@ -93,20 +91,6 @@ export function AiCodeExplainer() {
           </button>
         }
       />
-
-      <div className="flex flex-wrap items-center gap-3 px-4 py-2.5 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] text-sm">
-        <label className="flex items-center gap-2 text-xs text-[var(--text-muted)]">
-          Language (optional)
-          <input
-            type="text"
-            value={language}
-            onChange={(e) => setLanguage(e.target.value)}
-            placeholder="auto-detect"
-            spellCheck={false}
-            className="w-28 h-7 px-2 rounded-md border border-[var(--border)] bg-[var(--bg-elevated)] text-xs text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none"
-          />
-        </label>
-      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div className="flex flex-col gap-2">

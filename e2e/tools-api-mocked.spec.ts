@@ -37,6 +37,7 @@ test.describe("Backend tools (mocked APIs)", () => {
 
     await gotoTool(page, "ai-code-explainer");
     await assertToolHeading(page, "AI Code Explainer");
+    await expect(page.getByText("Language (optional)")).toHaveCount(0);
     await page.locator("textarea").first().fill("function add(a,b){return a+b}");
     await page.getByRole("button", { name: /Explain Code/i }).click();
     await expect(page.getByText("Adds two numbers.")).toBeVisible();
