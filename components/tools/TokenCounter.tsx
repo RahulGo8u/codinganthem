@@ -1,46 +1,36 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { Tiktoken } from "js-tiktoken/lite";
 import { ToolShell } from "@/components/ToolShell";
 import { getToolBySlug } from "@/lib/tools";
+import {
+  calculateCost,
+  countTextStats,
+  estimateTokens,
+  formatCost,
+  formatTokenCount,
+} from "@/lib/tokenCounter";
+import {
+  getTokenModel,
+  TOKEN_MODELS,
+  TOKEN_PRICING_DATE,
+  TOKEN_PROVIDERS,
+  type TokenModel,
+} from "@/lib/tokenModels";
 
 const tool = getToolBySlug("token-counter")!;
-
-// Pricing snapshot — bump this date whenever the table below is updated.
-// Provider pricing changes frequently; this is a snapshot, not a live feed.
-const PRICE_DATE = "2026-07-04";
 
 const SAMPLE =
   "You are a helpful assistant. Summarize the following customer support ticket in two sentences, then suggest a next action for the support agent to take.";
 
-type TokenizerKind = "o200k_base" | "cl100k_base" | "estimate";
-
-interface ModelDef {
-  id: string;
-  label: string;
-  provider: string;
-  tokenizer: TokenizerKind;
-  contextWindow: number;
-  inputPrice: number; // USD per 1M input tokens
-  outputPrice: number; // USD per 1M output tokens
-}
-
-const MODELS: ModelDef[] = [
-  { id: "gpt-4o", label: "GPT-4o", provider: "OpenAI", tokenizer: "o200k_base", contextWindow: 128_000, inputPrice: 2.5, outputPrice: 10 },
-  { id: "gpt-4o-mini", label: "GPT-4o mini", provider: "OpenAI", tokenizer: "o200k_base", contextWindow: 128_000, inputPrice: 0.15, outputPrice: 0.6 },
-  { id: "gpt-4.1", label: "GPT-4.1", provider: "OpenAI", tokenizer: "o200k_base", contextWindow: 1_000_000, inputPrice: 2, outputPrice: 8 },
-  { id: "gpt-3.5-turbo", label: "GPT-3.5 Turbo", provider: "OpenAI", tokenizer: "cl100k_base", contextWindow: 16_000, inputPrice: 0.5, outputPrice: 1.5 },
-  { id: "claude-sonnet", label: "Claude Sonnet", provider: "Anthropic", tokenizer: "estimate", contextWindow: 200_000, inputPrice: 3, outputPrice: 15 },
-  { id: "claude-haiku", label: "Claude Haiku", provider: "Anthropic", tokenizer: "estimate", contextWindow: 200_000, inputPrice: 1, outputPrice: 5 },
-  { id: "gemini-2.5-flash", label: "Gemini 2.5 Flash", provider: "Google", tokenizer: "estimate", contextWindow: 1_000_000, inputPrice: 0.3, outputPrice: 2.5 },
-  { id: "gemini-2.5-pro", label: "Gemini 2.5 Pro", provider: "Google", tokenizer: "estimate", contextWindow: 1_000_000, inputPrice: 1.25, outputPrice: 10 },
+const DEFAULT_COMPARE_IDS = [
+  "gpt-5.6-terra",
+  "claude-sonnet-5",
+  "gemini-3.8-flash",
+  "deepseek-flash",
 ];
 
-const PROVIDERS = ["OpenAI", "Anthropic", "Google"];
-
-// Cache loaded tokenizers at module scope so switching models never re-imports
-// the (large) rank tables. Ranks are bundled from js-tiktoken — no CDN/CSP.
 const encoderCache = new Map<string, Promise<Tiktoken>>();
 
 async function getEncoder(tokenizer: "o200k_base" | "cl100k_base"): Promise<Tiktoken> {
@@ -53,40 +43,53 @@ async function getEncoder(tokenizer: "o200k_base" | "cl100k_base"): Promise<Tikt
           ? (await import("js-tiktoken/ranks/o200k_base")).default
           : (await import("js-tiktoken/ranks/cl100k_base")).default;
       return new Tiktoken(ranks);
-    })().catch((err) => {
+    })().catch((error) => {
       encoderCache.delete(tokenizer);
-      throw err;
+      throw error;
     });
     encoderCache.set(tokenizer, cached);
   }
   return cached;
 }
 
-function formatCost(n: number): string {
-  if (n <= 0) return "$0.00";
-  if (n < 0.000001) return "< $0.000001";
-  if (n < 1) return `$${n.toFixed(6)}`;
-  return `$${n.toFixed(2)}`;
+function tokensForModel(model: TokenModel, input: string, localTokenCount: number): number {
+  if (model.tokenizer !== "estimate") return localTokenCount;
+  return estimateTokens(input, model.estimateCharsPerToken ?? 4);
+}
+
+function numberFromInput(value: string, fallback: number, max: number): number {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) return fallback;
+  return Math.min(max, Math.max(0, Math.round(parsed)));
 }
 
 export function TokenCounter() {
   const [input, setInput] = useState("");
-  const [modelId, setModelId] = useState("gpt-4o");
+  const [modelId, setModelId] = useState("gpt-5.6-terra");
   const [tokenCount, setTokenCount] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | undefined>();
+  const [provider, setProvider] =
+    useState<(typeof TOKEN_PROVIDERS)[number]>("All");
+  const [modelSearch, setModelSearch] = useState("");
+  const [outputTokens, setOutputTokens] = useState(500);
+  const [cachedPercent, setCachedPercent] = useState(0);
+  const [batch, setBatch] = useState(false);
+  const [requestsPerDay, setRequestsPerDay] = useState(1_000);
+  const [compareIds, setCompareIds] = useState(DEFAULT_COMPARE_IDS);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const reqRef = useRef(0);
+  const requestRef = useRef(0);
 
-  const model = MODELS.find((m) => m.id === modelId) ?? MODELS[0];
+  const model = getTokenModel(modelId);
+  const textStats = useMemo(() => countTextStats(input), [input]);
 
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
 
     debounceRef.current = setTimeout(() => {
-      const id = ++reqRef.current;
+      const requestId = ++requestRef.current;
 
-      if (!input.trim()) {
+      if (!input) {
         setTokenCount(0);
         setError(undefined);
         setLoading(false);
@@ -94,7 +97,7 @@ export function TokenCounter() {
       }
 
       if (model.tokenizer === "estimate") {
-        setTokenCount(Math.ceil(input.length / 4));
+        setTokenCount(estimateTokens(input, model.estimateCharsPerToken ?? 4));
         setError(undefined);
         setLoading(false);
         return;
@@ -102,34 +105,169 @@ export function TokenCounter() {
 
       setLoading(true);
       getEncoder(model.tokenizer)
-        .then((enc) => {
-          if (id !== reqRef.current) return;
-          setTokenCount(enc.encode(input).length);
+        .then((encoder) => {
+          if (requestId !== requestRef.current) return;
+          setTokenCount(encoder.encode(input).length);
           setError(undefined);
         })
         .catch(() => {
-          if (id !== reqRef.current) return;
+          if (requestId !== requestRef.current) return;
           setTokenCount(0);
-          setError("Failed to load the tokenizer. Please try again.");
+          setError("Failed to load the local tokenizer. Please try again.");
         })
         .finally(() => {
-          if (id === reqRef.current) setLoading(false);
+          if (requestId === requestRef.current) setLoading(false);
         });
-    }, 150);
+    }, 120);
 
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
     };
   }, [input, model]);
 
-  const contextPct = Math.min(100, (tokenCount / model.contextWindow) * 100);
-  const promptCost = (tokenCount / 1_000_000) * model.inputPrice;
-  const cost1k = promptCost * 1_000;
-  const cost100k = promptCost * 100_000;
+  const filteredModels = useMemo(() => {
+    const query = modelSearch.trim().toLowerCase();
+    return TOKEN_MODELS.filter(
+      (candidate) =>
+        (provider === "All" || candidate.provider === provider) &&
+        (!query ||
+          candidate.label.toLowerCase().includes(query) ||
+          candidate.provider.toLowerCase().includes(query) ||
+          candidate.id.includes(query))
+    );
+  }, [modelSearch, provider]);
 
-  const output = input.trim()
-    ? `${tokenCount.toLocaleString()} tokens (${model.label}, ${model.tokenizer === "estimate" ? "estimate" : "exact"}) — ${contextPct.toFixed(1)}% of ${model.contextWindow.toLocaleString()} token context window`
-    : "";
+  const activeBatch = batch && Boolean(model.batchDiscount);
+  const activeCachedPercent = model.cachedInputPrice ? cachedPercent : 0;
+  const estimate = calculateCost(model, {
+    inputTokens: tokenCount,
+    outputTokens,
+    cachedPercent: activeCachedPercent,
+    batch: activeBatch,
+    requestsPerDay,
+  });
+
+  const totalTokens = tokenCount + outputTokens;
+  const contextPercent = Math.min(100, (totalTokens / model.contextWindow) * 100);
+  const remainingTokens = Math.max(0, model.contextWindow - totalTokens);
+  const contextOverflow = totalTokens > model.contextWindow;
+  const outputOverflow = outputTokens > model.maxOutput;
+  const accuracyLabel =
+    model.tokenizer === "estimate" ? "Estimated" : "Exact plain text";
+  const sliderMax = Math.min(model.maxOutput, 32_000);
+  const sliderCapped = model.maxOutput > 32_000;
+
+  const comparedModels = useMemo(() => {
+    const ids = compareIds.includes(model.id)
+      ? compareIds
+      : [model.id, ...compareIds].slice(0, 4);
+    return ids
+      .map((id) => getTokenModel(id))
+      .map((candidate) => {
+        const count = tokensForModel(candidate, input, tokenCount);
+        const cost = calculateCost(candidate, {
+          inputTokens: count,
+          outputTokens: Math.min(outputTokens, candidate.maxOutput),
+          cachedPercent,
+          batch,
+          requestsPerDay,
+        });
+        return {
+          model: candidate,
+          count,
+          cost,
+          fits: count + Math.min(outputTokens, candidate.maxOutput) <= candidate.contextWindow,
+        };
+      })
+      .sort((a, b) => a.cost.costPerRequest - b.cost.costPerRequest);
+  }, [
+    batch,
+    cachedPercent,
+    compareIds,
+    input,
+    model.id,
+    outputTokens,
+    requestsPerDay,
+    tokenCount,
+  ]);
+
+  const output = useMemo(() => {
+    if (!input) return "";
+    const lines = [
+      `Token & cost analysis — ${model.label} (${model.provider})`,
+      "",
+      `Input tokens: ${tokenCount.toLocaleString()} (${accuracyLabel}${loading ? ", updating…" : ""})`,
+      `Characters: ${textStats.characters.toLocaleString()}`,
+      `Words: ${textStats.words.toLocaleString()}`,
+      `Lines: ${textStats.lines.toLocaleString()}`,
+      `Expected output tokens: ${outputTokens.toLocaleString()}`,
+      `Context used: ${totalTokens.toLocaleString()} / ${model.contextWindow.toLocaleString()} (${contextPercent.toFixed(2)}%)`,
+      contextOverflow
+        ? `Over context by ${(totalTokens - model.contextWindow).toLocaleString()} tokens`
+        : `Remaining context: ${remainingTokens.toLocaleString()} tokens`,
+      outputOverflow
+        ? `Requested output exceeds max ${model.maxOutput.toLocaleString()} tokens`
+        : "",
+      "",
+      `Cached input: ${activeCachedPercent}%`,
+      `Batch API: ${activeBatch ? "yes" : "no"}`,
+      `Requests / day: ${requestsPerDay.toLocaleString()}`,
+      `Input cost: ${formatCost(estimate.inputCost)}`,
+      `Output cost: ${formatCost(estimate.outputCost)}`,
+      `Per request: ${formatCost(estimate.costPerRequest)}`,
+      `30-day total: ${formatCost(estimate.monthlyCost)}`,
+      estimate.longContextPricing ? "Long-context pricing applies." : "",
+      "",
+      "Model comparison (lowest cost first):",
+      ...comparedModels.map(
+        (row) =>
+          `- ${row.model.label} (${row.model.provider}): ${row.count.toLocaleString()} tokens · ${formatCost(row.cost.costPerRequest)}/req · ${formatCost(row.cost.monthlyCost)}/mo · fits=${row.fits ? "yes" : "no"}`
+      ),
+      "",
+      `Prices checked ${TOKEN_PRICING_DATE}. Source: ${model.sourceUrl}`,
+      model.note,
+      "Forecast excludes taxes, tool-call fees, cache-write/storage charges, free tiers, and regional pricing.",
+    ];
+    return lines.filter((line, i, arr) => !(line === "" && arr[i - 1] === "")).join("\n");
+  }, [
+    accuracyLabel,
+    activeBatch,
+    activeCachedPercent,
+    comparedModels,
+    contextOverflow,
+    contextPercent,
+    estimate.inputCost,
+    estimate.longContextPricing,
+    estimate.costPerRequest,
+    estimate.monthlyCost,
+    estimate.outputCost,
+    input,
+    loading,
+    model.contextWindow,
+    model.label,
+    model.maxOutput,
+    model.note,
+    model.provider,
+    model.sourceUrl,
+    outputOverflow,
+    outputTokens,
+    remainingTokens,
+    requestsPerDay,
+    textStats.characters,
+    textStats.lines,
+    textStats.words,
+    tokenCount,
+    totalTokens,
+  ]);
+
+  function toggleCompare(id: string) {
+    setCompareIds((current) => {
+      if (current.includes(id)) {
+        return current.length === 1 ? current : current.filter((item) => item !== id);
+      }
+      return [...current, id].slice(-4);
+    });
+  }
 
   return (
     <ToolShell
@@ -140,12 +278,13 @@ export function TokenCounter() {
       error={error}
       hideFileActions
       showClear
-      inputLabel="Text"
-      outputLabel="Result"
-      inputPlaceholder="Paste your prompt or text here..."
-      outputPlaceholder="Paste text above to see the token count and cost estimate..."
+      inputLabel="Prompt or text"
+      outputLabel="Token & cost analysis"
+      inputPlaceholder="Paste a prompt, document, code, or JSON here..."
+      outputPlaceholder="Paste text above to analyze tokens, context fit, and API cost..."
       extraActions={
         <button
+          type="button"
           onClick={() => setInput(SAMPLE)}
           className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
         >
@@ -153,93 +292,373 @@ export function TokenCounter() {
         </button>
       }
       options={
-        <div className="flex flex-col gap-2 w-full">
-          {PROVIDERS.map((provider) => (
-            <div key={provider} className="flex flex-wrap items-center gap-x-2 gap-y-1.5">
-              <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--text-muted)] w-16 shrink-0">
-                {provider}
-              </span>
-              {MODELS.filter((m) => m.provider === provider).map((m) => (
+        <div className="flex flex-col gap-3 w-full">
+          <div className="flex flex-wrap items-center gap-1.5">
+            {TOKEN_PROVIDERS.map((item) => (
+              <button
+                key={item}
+                type="button"
+                onClick={() => setProvider(item)}
+                className={`px-2.5 py-1 rounded-full text-xs border transition-colors ${
+                  provider === item
+                    ? "bg-[#6366f1]/15 text-[var(--accent-text)] border-[#6366f1]/40"
+                    : "text-[var(--text-muted)] border-[var(--border)] hover:text-[var(--text-primary)]"
+                }`}
+              >
+                {item}
+              </button>
+            ))}
+            <input
+              type="search"
+              aria-label="Search models"
+              value={modelSearch}
+              onChange={(event) => setModelSearch(event.target.value)}
+              placeholder="Search models…"
+              className="ml-auto min-w-36 rounded-lg border border-[var(--border)] bg-[var(--bg-elevated)] px-2.5 py-1 text-xs"
+            />
+          </div>
+
+          <div className="flex gap-2 overflow-x-auto pb-1">
+            {filteredModels.map((candidate) => (
+              <div
+                key={candidate.id}
+                className={`shrink-0 rounded-lg border p-2 transition-colors ${
+                  candidate.id === model.id
+                    ? "border-[#6366f1]/60 bg-[#6366f1]/10"
+                    : "border-[var(--border)] bg-[var(--bg-surface)]"
+                }`}
+              >
                 <button
-                  key={m.id}
-                  onClick={() => setModelId(m.id)}
-                  className={`px-2.5 py-1 rounded-full text-xs border transition-colors ${
-                    modelId === m.id
-                      ? "bg-[#6366f1]/15 text-[#6366f1] border-[#6366f1]/40"
-                      : "text-[var(--text-muted)] border-[var(--border)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)]"
-                  }`}
+                  type="button"
+                  onClick={() => setModelId(candidate.id)}
+                  aria-pressed={candidate.id === model.id}
+                  className="block text-left"
                 >
-                  {m.label}
+                  <span className="block text-[10px] uppercase tracking-wider text-[var(--text-muted)]">
+                    {candidate.provider}
+                  </span>
+                  <span className="block text-xs font-medium text-[var(--text-primary)]">
+                    {candidate.label}
+                  </span>
+                  <span className="block text-[10px] text-[var(--text-muted)] mt-0.5">
+                    {formatTokenCount(candidate.contextWindow)} context
+                  </span>
                 </button>
-              ))}
-            </div>
-          ))}
+                <label className="mt-1.5 flex items-center gap-1 text-[10px] text-[var(--text-muted)] cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={compareIds.includes(candidate.id)}
+                    onChange={() => toggleCompare(candidate.id)}
+                    className="accent-[#6366f1]"
+                  />
+                  Compare
+                </label>
+              </div>
+            ))}
+            {filteredModels.length === 0 && (
+              <span className="py-3 text-xs text-[var(--text-muted)]">
+                No matching models.
+              </span>
+            )}
+          </div>
         </div>
       }
       outputContent={
-        input.trim() ? (
-          <div className="p-4 flex flex-col gap-5">
-            {/* Token count */}
-            <div className="flex items-baseline gap-2 flex-wrap">
-              <span className="text-3xl font-semibold text-[var(--text-primary)] mono">
-                {loading ? "…" : tokenCount.toLocaleString()}
+        input ? (
+          <div className="flex flex-col gap-5">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              {[
+                ["Input tokens", loading ? "…" : tokenCount.toLocaleString()],
+                ["Characters", textStats.characters.toLocaleString()],
+                ["Words", textStats.words.toLocaleString()],
+                ["Lines", textStats.lines.toLocaleString()],
+              ].map(([label, value]) => (
+                <div key={label} className="result-card flex flex-col gap-1">
+                  <span className="text-[10px] uppercase tracking-wider text-[var(--text-muted)]">
+                    {label}
+                  </span>
+                  <span className="text-lg font-semibold mono text-[var(--text-primary)]">
+                    {value}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className={`badge ${model.tokenizer === "estimate" ? "" : "badge-success"}`}>
+                {accuracyLabel}
               </span>
-              <span className="text-sm text-[var(--text-muted)]">tokens</span>
-              <span className={`badge ${model.tokenizer === "estimate" ? "" : "badge-success"}`} style={model.tokenizer === "estimate" ? { color: "#f59e0b", background: "rgba(245,158,11,0.1)", borderColor: "rgba(245,158,11,0.4)" } : undefined}>
-                {model.tokenizer === "estimate" ? "Estimate" : "Exact"}
+              <span className="text-xs text-[var(--text-muted)]">
+                {textStats.words
+                  ? `${(tokenCount / textStats.words).toFixed(2)} tokens/word`
+                  : "0 tokens/word"}
+              </span>
+              <span className="text-xs text-[var(--text-muted)]">·</span>
+              <span className="text-xs text-[var(--text-muted)]">
+                {tokenCount
+                  ? `${(textStats.characters / tokenCount).toFixed(2)} chars/token`
+                  : "0 chars/token"}
               </span>
             </div>
 
-            {/* Context window bar */}
-            <div className="result-card flex flex-col gap-1.5">
-              <div className="flex items-center justify-between text-xs text-[var(--text-muted)]">
-                <span>Context window used</span>
-                <span className="mono">
-                  {tokenCount.toLocaleString()} / {model.contextWindow.toLocaleString()} ({contextPct.toFixed(1)}%)
-                </span>
-              </div>
-              <div className="w-full h-1.5 rounded-full bg-[var(--bg-elevated)] overflow-hidden">
-                <div
-                  className="h-full rounded-full bg-[var(--accent)] transition-all duration-300"
-                  style={{ width: `${contextPct}%` }}
+            <div className="result-card flex flex-col gap-3">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <p className="text-xs font-medium text-[var(--text-primary)]">Expected output</p>
+                  <p className="text-[10px] text-[var(--text-muted)]">
+                    Include response and reasoning tokens in the cost forecast.
+                  </p>
+                </div>
+                <input
+                  aria-label="Expected output tokens"
+                  type="number"
+                  min={0}
+                  max={model.maxOutput}
+                  value={outputTokens}
+                  onChange={(event) =>
+                    setOutputTokens(
+                      numberFromInput(event.target.value, 0, model.maxOutput)
+                    )
+                  }
+                  className="w-28 rounded-lg border border-[var(--border)] bg-[var(--bg-elevated)] px-2 py-1.5 text-right text-xs mono"
                 />
               </div>
+              <input
+                aria-label="Expected output tokens slider"
+                aria-valuemin={0}
+                aria-valuemax={sliderMax}
+                aria-valuenow={Math.min(outputTokens, sliderMax)}
+                aria-valuetext={`${Math.min(outputTokens, sliderMax).toLocaleString()} of ${sliderMax.toLocaleString()} tokens on slider`}
+                type="range"
+                min={0}
+                max={sliderMax}
+                step={100}
+                value={Math.min(outputTokens, sliderMax)}
+                onChange={(event) => setOutputTokens(Number(event.target.value))}
+                className="w-full accent-[#6366f1]"
+              />
+              <p className="text-[10px] text-[var(--text-muted)]">
+                Slider range: 0–{sliderMax.toLocaleString()} tokens
+                {sliderCapped
+                  ? ` (use the number field for up to ${model.maxOutput.toLocaleString()}).`
+                  : "."}{" "}
+                Current: {outputTokens.toLocaleString()}.
+              </p>
             </div>
 
-            {/* Cost for this prompt */}
-            <div className="result-card flex flex-col gap-1">
-              <span className="text-xs text-[var(--text-muted)]">Cost for this prompt (input only)</span>
-              <span className="text-lg font-semibold text-[var(--text-primary)] mono">{formatCost(promptCost)}</span>
-            </div>
-
-            {/* Cost at volume */}
-            <div className="result-card flex flex-col gap-3">
-              <span className="text-[10px] font-medium uppercase tracking-wider text-[var(--text-muted)]">
-                At volume (input cost only)
-              </span>
-              <div className="flex gap-6">
-                <div className="flex flex-col gap-0.5">
-                  <span className="text-xs text-[var(--text-muted)]">1,000 requests</span>
-                  <span className="text-sm font-medium text-[var(--text-primary)] mono">{formatCost(cost1k)}</span>
-                </div>
-                <div className="flex flex-col gap-0.5">
-                  <span className="text-xs text-[var(--text-muted)]">100,000 requests</span>
-                  <span className="text-sm font-medium text-[var(--text-primary)] mono">{formatCost(cost100k)}</span>
-                </div>
+            <div className="result-card flex flex-col gap-2">
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-[var(--text-muted)]">Context used (input + output)</span>
+                <span className="mono text-[var(--text-primary)]">
+                  {totalTokens.toLocaleString()} / {model.contextWindow.toLocaleString()}{" "}
+                  ({contextPercent.toFixed(2)}%)
+                </span>
               </div>
-              <p className="text-[10px] text-[var(--text-muted)] leading-relaxed">
-                Prices as of {PRICE_DATE}, sourced from public provider pricing pages. Output-token cost
-                is not included since response length cannot be known from a prompt alone. Verify
-                against your provider&apos;s billing dashboard before budgeting.
+              <div className="w-full h-2 rounded-full bg-[var(--bg-elevated)] overflow-hidden">
+                <div
+                  className={`h-full rounded-full transition-all duration-300 ${
+                    contextOverflow ? "bg-[#ef4444]" : "bg-[var(--accent)]"
+                  }`}
+                  style={{ width: `${contextPercent}%` }}
+                />
+              </div>
+              <p className={`text-[10px] ${contextOverflow ? "text-[#ef4444]" : "text-[var(--text-muted)]"}`}>
+                {contextOverflow
+                  ? `Over context limit by ${(totalTokens - model.contextWindow).toLocaleString()} tokens.`
+                  : `${remainingTokens.toLocaleString()} tokens remain in the context window.`}
+                {outputOverflow
+                  ? ` Requested output exceeds this model's ${model.maxOutput.toLocaleString()}-token maximum.`
+                  : ""}
               </p>
             </div>
 
-            {model.tokenizer === "estimate" && (
-              <p className="text-[10px] text-[#f59e0b] leading-relaxed">
-                {model.provider} does not publish a public tokenizer, so this count is a
-                character-based approximation (~4 characters per token) rather than an exact count.
+            <div className="result-card flex flex-col gap-4">
+              <div className="grid sm:grid-cols-3 gap-3">
+                <label className="flex flex-col gap-1">
+                  <span className="text-[10px] uppercase tracking-wider text-[var(--text-muted)]">
+                    Cached input
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <input
+                      aria-label="Cached input percentage"
+                      type="range"
+                      min={0}
+                      max={100}
+                      step={5}
+                      value={cachedPercent}
+                      disabled={!model.cachedInputPrice}
+                      onChange={(event) => setCachedPercent(Number(event.target.value))}
+                      className="min-w-0 flex-1 accent-[#6366f1] disabled:opacity-40"
+                    />
+                    <span className="w-9 text-right text-xs mono">{cachedPercent}%</span>
+                  </div>
+                </label>
+                <label className="flex flex-col gap-1">
+                  <span className="text-[10px] uppercase tracking-wider text-[var(--text-muted)]">
+                    Requests / day
+                  </span>
+                  <input
+                    aria-label="Requests per day"
+                    type="number"
+                    min={0}
+                    max={10_000_000}
+                    value={requestsPerDay}
+                    onChange={(event) =>
+                      setRequestsPerDay(
+                        numberFromInput(event.target.value, 0, 10_000_000)
+                      )
+                    }
+                    className="rounded-lg border border-[var(--border)] bg-[var(--bg-elevated)] px-2 py-1.5 text-xs mono"
+                  />
+                </label>
+                <label className="flex items-center gap-2 self-end rounded-lg border border-[var(--border)] px-3 py-1.5 text-xs text-[var(--text-muted)]">
+                  <input
+                    type="checkbox"
+                    checked={activeBatch}
+                    disabled={!model.batchDiscount}
+                    onChange={(event) => setBatch(event.target.checked)}
+                    className="accent-[#6366f1]"
+                  />
+                  Batch API
+                  {model.batchDiscount
+                    ? ` (−${model.batchDiscount * 100}%)`
+                    : " unavailable"}
+                </label>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 border-t border-[var(--border)] pt-3">
+                {[
+                  ["Input", formatCost(estimate.inputCost)],
+                  ["Output", formatCost(estimate.outputCost)],
+                  ["Per request", formatCost(estimate.costPerRequest)],
+                  ["30-day total", formatCost(estimate.monthlyCost)],
+                ].map(([label, value]) => (
+                  <div key={label}>
+                    <p className="text-[10px] text-[var(--text-muted)]">{label}</p>
+                    <p
+                      data-testid={label === "30-day total" ? "monthly-cost" : undefined}
+                      className="text-sm font-semibold mono text-[var(--text-primary)]"
+                    >
+                      {value}
+                    </p>
+                  </div>
+                ))}
+              </div>
+              {estimate.longContextPricing && (
+                <p className="text-[10px] text-[#f59e0b]">
+                  Long-context pricing applies to this request.
+                </p>
+              )}
+            </div>
+
+            <div className="result-card flex flex-col gap-3">
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--text-muted)]">
+                  Model comparison
+                </span>
+                <span className="text-[10px] text-[var(--text-muted)]">
+                  Lowest projected cost first
+                </span>
+              </div>
+              <ul className="flex flex-col gap-2 sm:hidden">
+                {comparedModels.map((row) => (
+                  <li
+                    key={row.model.id}
+                    className="rounded-lg border border-[var(--border)] bg-[var(--bg-elevated)] p-3 text-xs"
+                  >
+                    <p className="font-medium text-[var(--text-primary)]">{row.model.label}</p>
+                    <p className="text-[10px] text-[var(--text-muted)] mt-0.5">
+                      {row.model.provider} ·{" "}
+                      {row.model.tokenizer === "estimate" ? "estimate" : "local text"}
+                    </p>
+                    <dl className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1">
+                      <div>
+                        <dt className="text-[10px] text-[var(--text-muted)]">Tokens</dt>
+                        <dd className="mono">{row.count.toLocaleString()}</dd>
+                      </div>
+                      <div>
+                        <dt className="text-[10px] text-[var(--text-muted)]">Per request</dt>
+                        <dd className="mono">{formatCost(row.cost.costPerRequest)}</dd>
+                      </div>
+                      <div>
+                        <dt className="text-[10px] text-[var(--text-muted)]">Monthly</dt>
+                        <dd className="mono">{formatCost(row.cost.monthlyCost)}</dd>
+                      </div>
+                      <div>
+                        <dt className="text-[10px] text-[var(--text-muted)]">Fits context</dt>
+                        <dd className={row.fits ? "text-[#22c55e]" : "text-[#ef4444]"}>
+                          {row.fits ? "Yes" : "No"}
+                        </dd>
+                      </div>
+                    </dl>
+                  </li>
+                ))}
+              </ul>
+              <div className="overflow-x-auto hidden sm:block">
+                <table className="w-full min-w-[540px] text-xs">
+                  <caption className="sr-only">
+                    Model comparison by projected cost
+                  </caption>
+                  <thead>
+                    <tr className="text-left text-[10px] uppercase tracking-wider text-[var(--text-muted)]">
+                      <th className="pb-2 font-medium">Model</th>
+                      <th className="pb-2 font-medium text-right">Tokens</th>
+                      <th className="pb-2 font-medium text-right">Per request</th>
+                      <th className="pb-2 font-medium text-right">Monthly</th>
+                      <th className="pb-2 font-medium text-right">Fits</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {comparedModels.map((row) => (
+                      <tr key={row.model.id} className="border-t border-[var(--border)]">
+                        <td className="py-2">
+                          <span className="font-medium text-[var(--text-primary)]">
+                            {row.model.label}
+                          </span>
+                          <span className="block text-[10px] text-[var(--text-muted)]">
+                            {row.model.provider} · {row.model.tokenizer === "estimate" ? "estimate" : "local text"}
+                          </span>
+                        </td>
+                        <td className="py-2 text-right mono">{row.count.toLocaleString()}</td>
+                        <td className="py-2 text-right mono">
+                          {formatCost(row.cost.costPerRequest)}
+                        </td>
+                        <td className="py-2 text-right mono">
+                          {formatCost(row.cost.monthlyCost)}
+                        </td>
+                        <td className={`py-2 text-right ${row.fits ? "text-[#22c55e]" : "text-[#ef4444]"}`}>
+                          {row.fits ? "Yes" : "No"}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div className="text-[10px] text-[var(--text-muted)] leading-relaxed space-y-1">
+              <p>
+                Prices checked {TOKEN_PRICING_DATE}.{" "}
+                <a
+                  href={model.sourceUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[var(--accent-text)] hover:underline"
+                >
+                  Official {model.provider} source
+                </a>
+                . {model.note}
               </p>
-            )}
+              <p>
+                {model.tokenizer === "estimate"
+                  ? `${model.provider} does not provide a browser-ready tokenizer for this model, so the local count is a transparent character-based estimate.`
+                  : "The bundled tokenizer exactly encodes this plain text locally; API message formatting, tools, files, and hidden model overhead can add tokens."}
+              </p>
+              <p>
+                Forecast excludes taxes, tool-call fees, cache-write/storage charges, free tiers,
+                and provider-specific regional pricing. Verify billing data before budgeting.
+              </p>
+            </div>
           </div>
         ) : undefined
       }

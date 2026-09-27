@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useId } from "react";
 import type { Tool } from "@/lib/tools";
 import { Breadcrumb } from "@/components/Breadcrumb";
+import { DataFlowNotice } from "@/components/DataFlowNotice";
 import { DownloadButton } from "@/components/DownloadButton";
 import { downloadBlob } from "@/lib/download";
 
@@ -62,6 +63,11 @@ interface ToolShellProps {
   showClear?: boolean;
   /** Hide the input pane entirely — output takes full width (e.g. UUID / password generators) */
   hideInputPane?: boolean;
+  /** Optional actions rendered beside the title, keeping samples above the fold. */
+  headerActions?: React.ReactNode;
+  /** Override the text download name and MIME type. */
+  downloadFileName?: string;
+  downloadMimeType?: string;
 }
 
 export function ToolShell({
@@ -85,15 +91,20 @@ export function ToolShell({
   hideDownload = false,
   showClear = false,
   hideInputPane = false,
+  headerActions,
+  downloadFileName,
+  downloadMimeType = "text/plain",
 }: ToolShellProps) {
   const [copied, setCopied] = useState(false);
   const [shared, setShared] = useState(false);
-  const [canNativeShare, setCanNativeShare] = useState(false);
+  const [canNativeShare] = useState(
+    () => typeof navigator !== "undefined" && typeof navigator.share === "function"
+  );
   const [uploadError, setUploadError] = useState<string | null>(null);
-
-  useEffect(() => {
-    setCanNativeShare(typeof navigator !== "undefined" && typeof navigator.share === "function");
-  }, []);
+  const [mobilePane, setMobilePane] = useState<"input" | "output">("input");
+  const [dragging, setDragging] = useState(false);
+  const inputId = useId();
+  const outputId = useId();
 
   const handleCopy = useCallback(async () => {
     if (!output) return;
@@ -138,52 +149,54 @@ export function ToolShell({
 
   const handleDownload = useCallback(() => {
     if (!output) return;
-    downloadBlob(new Blob([output], { type: "text/plain" }), `${tool.slug}-output.txt`);
-  }, [output, tool.slug]);
+    downloadBlob(
+      new Blob([output], { type: downloadMimeType }),
+      downloadFileName ?? `${tool.slug}-output.txt`
+    );
+  }, [downloadFileName, downloadMimeType, output, tool.slug]);
+
+  const readTextFile = useCallback((file: File) => {
+    if (file.size > MAX_FILE_SIZE) {
+      setUploadError(
+        `File too large (${(file.size / 1024 / 1024).toFixed(1)} MB). Maximum is 5 MB.`
+      );
+      return;
+    }
+
+    const ext = file.name.split(".").pop()?.toLowerCase() ?? "";
+    if (!ALLOWED_EXTENSIONS.has(ext)) {
+      setUploadError(
+        `".${ext}" files are not supported. Choose a plain-text file such as JSON, YAML, CSV, XML, Markdown, or source code.`
+      );
+      return;
+    }
+
+    const isMimeAllowed =
+      ALLOWED_MIME_PREFIXES.some((prefix) => file.type.startsWith(prefix)) ||
+      ALLOWED_MIME_TYPES.has(file.type) ||
+      file.type === "";
+    if (!isMimeAllowed) {
+      setUploadError("Only text-based files are supported.");
+      return;
+    }
+
+    setUploadError(null);
+    const reader = new FileReader();
+    reader.onload = (event) => onInputChange((event.target?.result as string) ?? "");
+    reader.onerror = () => setUploadError("Failed to read file. Please try again.");
+    reader.readAsText(file);
+  }, [onInputChange]);
 
   const handleUpload = useCallback(() => {
-    const input_el = document.createElement("input");
-    input_el.type = "file";
-    input_el.accept = "text/*,.json,.jsonl,.xml,.yaml,.yml,.csv,.tsv,.md,.mdx,.toml,.ini,.cfg,.conf,.graphql,.gql,.sql,.mmd,.mermaid";
-    input_el.onchange = (e) => {
-      const file = (e.target as HTMLInputElement).files?.[0];
-      if (!file) return;
-
-      if (file.size > MAX_FILE_SIZE) {
-        setUploadError(
-          `File too large (${(file.size / 1024 / 1024).toFixed(1)} MB). Maximum is 5 MB.`
-        );
-        return;
-      }
-
-      const ext = file.name.split(".").pop()?.toLowerCase() ?? "";
-      if (!ALLOWED_EXTENSIONS.has(ext)) {
-        setUploadError(
-          `".${ext}" files are not supported. Only plain-text files are allowed (JSON, YAML, CSV, XML, Markdown, source code, etc.).`
-        );
-        return;
-      }
-
-      const isMimeAllowed =
-        ALLOWED_MIME_PREFIXES.some((p) => file.type.startsWith(p)) ||
-        ALLOWED_MIME_TYPES.has(file.type) ||
-        file.type === "";
-
-      if (!isMimeAllowed) {
-        setUploadError(
-          "Only text-based files are supported (JSON, XML, CSV, YAML, TXT, etc.)."
-        );
-        return;
-      }
-
-      setUploadError(null);
-      const reader = new FileReader();
-      reader.onload = (ev) => onInputChange((ev.target?.result as string) ?? "");
-      reader.onerror = () => setUploadError("Failed to read file. Please try again.");
-      reader.readAsText(file);
+    const fileInput = document.createElement("input");
+    fileInput.type = "file";
+    fileInput.accept = "text/*,.json,.jsonl,.xml,.yaml,.yml,.csv,.tsv,.md,.mdx,.toml,.ini,.cfg,.conf,.graphql,.gql,.sql,.mmd,.mermaid";
+    fileInput.onchange = (event) => {
+      const file = (event.target as HTMLInputElement).files?.[0];
+      if (file) readTextFile(file);
     };
-    input_el.click();
-  }, [onInputChange]);
+    fileInput.click();
+  }, [readTextFile]);
 
   const handleClear = useCallback(() => {
     onInputChange("");
@@ -197,7 +210,7 @@ export function ToolShell({
     <div className="max-w-7xl mx-auto px-6 py-8 flex flex-col gap-6 pb-24">
       {/* Header */}
       <div className="flex flex-col gap-3">
-        <Breadcrumb current={tool.name} asHeading={false} />
+        <Breadcrumb current={tool.name} category={tool.category} asHeading={false} />
 
         {/* Title row */}
         <div className="flex items-start justify-between gap-4 flex-wrap">
@@ -211,9 +224,16 @@ export function ToolShell({
               </p>
             )}
           </div>
-          {badges && <div className="flex items-center gap-2 flex-wrap shrink-0">{badges}</div>}
+          {(badges || headerActions) && (
+            <div className="flex items-center gap-2 flex-wrap shrink-0">
+              {badges}
+              {headerActions}
+            </div>
+          )}
         </div>
       </div>
+
+      {tool.dataFlow === "server" && <DataFlowNotice destination="our server or the configured AI provider" />}
 
       {/* Options bar */}
       {options && (
@@ -222,12 +242,37 @@ export function ToolShell({
         </div>
       )}
 
+      {!hideInputPane && (
+        <div
+          role="tablist"
+          aria-label="Tool panes"
+          className="grid grid-cols-2 gap-1 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] p-1 lg:hidden"
+        >
+          {(["input", "output"] as const).map((pane) => (
+            <button
+              key={pane}
+              type="button"
+              role="tab"
+              aria-selected={mobilePane === pane}
+              onClick={() => setMobilePane(pane)}
+              className={`rounded-md px-3 py-2 text-xs font-medium transition-colors ${
+                mobilePane === pane
+                  ? "bg-[var(--bg-elevated)] text-[var(--text-primary)]"
+                  : "text-[var(--text-muted)]"
+              }`}
+            >
+              {pane === "input" ? inputLabel : outputLabel}
+            </button>
+          ))}
+        </div>
+      )}
+
       {/* Panes */}
       <div className={`grid grid-cols-1 gap-4 ${hideInputPane ? "" : "lg:grid-cols-2"}`}>
         {/* Input */}
-        {!hideInputPane && <div className="flex flex-col gap-2">
+        {!hideInputPane && <div className={`${mobilePane === "input" ? "flex" : "hidden"} lg:flex flex-col gap-2`}>
           <div className="flex items-center justify-between">
-            <label className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">
+            <label htmlFor={inputId} className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">
               {inputLabel}
             </label>
             {charCount > 0 && (
@@ -236,55 +281,74 @@ export function ToolShell({
               </span>
             )}
           </div>
-          <div className={`relative flex-1 rounded-lg border ${error ? "border-[#ef4444]" : "border-[var(--border)]"} bg-[var(--bg-surface)] overflow-hidden`}>
+          <div
+            onDragOver={(event) => {
+              if (hideFileActions) return;
+              event.preventDefault();
+              setDragging(true);
+            }}
+            onDragLeave={() => setDragging(false)}
+            onDrop={(event) => {
+              if (hideFileActions) return;
+              event.preventDefault();
+              setDragging(false);
+              const file = event.dataTransfer.files?.[0];
+              if (file) readTextFile(file);
+            }}
+            className={`relative flex-1 rounded-lg border ${
+              error
+                ? "border-[#ef4444]"
+                : dragging
+                  ? "border-[#6366f1]"
+                  : "border-[var(--border)]"
+            } bg-[var(--bg-surface)] overflow-hidden`}
+          >
             {inputContent ? (
               <div className="w-full min-h-[320px] h-full">{inputContent}</div>
             ) : (
               <textarea
+                id={inputId}
                 value={input}
                 onChange={(e) => onInputChange(e.target.value)}
                 placeholder={inputPlaceholder}
                 spellCheck={false}
-                className="mono w-full min-h-[320px] h-full p-4 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] bg-transparent resize-none focus:outline-none leading-relaxed"
+                aria-invalid={Boolean(error)}
+                aria-describedby={error ? `${inputId}-error` : undefined}
+                className="mono w-full min-h-[240px] sm:min-h-[320px] h-full p-4 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] bg-transparent resize-y focus:outline-none leading-relaxed"
               />
+            )}
+            {dragging && (
+              <div className="pointer-events-none absolute inset-0 grid place-items-center bg-[var(--bg-surface)]/90 text-sm font-medium text-[var(--accent-text)]">
+                Drop file to load
+              </div>
             )}
           </div>
           {error && (
-            <p className="text-xs text-[#ef4444] leading-relaxed">{error}</p>
+            <p id={`${inputId}-error`} role="alert" className="text-xs text-[#ef4444] leading-relaxed">{error}</p>
+          )}
+          {uploadError && (
+            <p role="alert" className="text-xs text-[#ef4444] leading-relaxed">{uploadError}</p>
           )}
         </div>}
 
         {/* Output */}
-        <div className="flex flex-col gap-2">
+        <div className={`${hideInputPane || mobilePane === "output" ? "flex" : "hidden"} lg:flex flex-col gap-2`}>
           <div className="flex items-center justify-between">
-            <label className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">
+            <label htmlFor={outputId} className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">
               {outputLabel}
             </label>
-            {(!outputContent || output !== "") && (
-              <button
-                onClick={handleCopy}
-                disabled={!output}
-                title="Copy to clipboard"
-                className="flex items-center gap-1 text-xs text-[#22c55e] hover:text-[#16a34a] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-              >
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
-                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-                </svg>
-                {copied ? "Copied" : "Copy"}
-              </button>
-            )}
           </div>
           <div className="relative flex-1 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] overflow-hidden">
             {outputContent ? (
               <div className="w-full min-h-[320px] p-4">{outputContent}</div>
             ) : (
               <textarea
+                id={outputId}
                 value={output}
                 readOnly
                 placeholder={outputPlaceholder}
                 spellCheck={false}
-                className="mono w-full min-h-[320px] h-full p-4 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] bg-transparent resize-none focus:outline-none leading-relaxed"
+                className="mono w-full min-h-[240px] sm:min-h-[320px] h-full p-4 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] bg-transparent resize-y focus:outline-none leading-relaxed"
               />
             )}
           </div>
@@ -292,11 +356,8 @@ export function ToolShell({
       </div>
 
       {/* Sticky action bar */}
-      <div className="sticky bottom-0 -mx-6 mt-2 border-t border-[var(--border)] bg-[var(--bg-base)]/90 backdrop-blur-md">
-        <div className="px-6 py-3 flex flex-col gap-2">
-          {uploadError && (
-            <p className="text-xs text-[#ef4444] leading-relaxed">{uploadError}</p>
-          )}
+      <div className="sticky bottom-0 z-20 -mx-6 mt-2 border-t border-[var(--border)] bg-[var(--bg-base)]/90 backdrop-blur-md">
+        <div className="px-6 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] flex flex-col gap-2">
           <div className="flex items-center justify-between gap-3 flex-wrap">
             <div className="flex items-center gap-2" role="group" aria-label="Input actions">
               {(!hideFileActions || showClear) && (
@@ -321,62 +382,6 @@ export function ToolShell({
 
             <div className="flex items-center gap-2 flex-wrap" role="group" aria-label="Output actions">
               {extraRightActions}
-              <button
-                onClick={handleShareX}
-                title="Share on X"
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
-              >
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.227-8.26L1.99 2.25h7.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-                </svg>
-                <span className="hidden sm:inline">Share</span>
-              </button>
-              {canNativeShare && (
-                <button
-                  onClick={handleNativeShare}
-                  title="Share via device"
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
-                >
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                    <circle cx="18" cy="5" r="3" />
-                    <circle cx="6" cy="12" r="3" />
-                    <circle cx="18" cy="19" r="3" />
-                    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
-                    <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
-                  </svg>
-                </button>
-              )}
-              <button
-                onClick={handleCopyUrl}
-                title="Copy link to this tool"
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
-                  shared
-                    ? "border-[#22c55e]/40 text-[#22c55e]"
-                    : "border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)]"
-                }`}
-              >
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
-                  <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
-                </svg>
-                {shared ? "Copied!" : "Copy URL"}
-              </button>
-              <a
-                href="https://buymeacoffee.com/codinganthem"
-                target="_blank"
-                rel="noopener noreferrer"
-                title="Support CodingAnthem"
-                className="flex items-center gap-1.5 px-2 py-1.5 text-xs text-[var(--text-muted)] hover:text-[#f59e0b] transition-colors"
-              >
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                  <path d="M18 8h1a4 4 0 0 1 0 8h-1" />
-                  <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z" />
-                  <line x1="6" y1="1" x2="6" y2="4" />
-                  <line x1="10" y1="1" x2="10" y2="4" />
-                  <line x1="14" y1="1" x2="14" y2="4" />
-                </svg>
-                <span className="hidden sm:inline">Coffee</span>
-              </a>
               {!hideFileActions && !hideDownload && (
                 <DownloadButton
                   onClick={handleDownload}
@@ -395,8 +400,32 @@ export function ToolShell({
                   {copied ? "Copied ✓" : "Copy"}
                 </button>
               )}
+              <details className="relative">
+                <summary className="list-none cursor-pointer px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)]">
+                  More
+                </summary>
+                <div className="absolute bottom-full right-0 mb-2 min-w-40 rounded-lg border border-[var(--border)] bg-[var(--bg-elevated)] p-1.5 flex flex-col z-30">
+                  <button type="button" onClick={handleCopyUrl} className="text-left rounded px-2 py-1.5 text-xs text-[var(--text-muted)] hover:bg-[var(--bg-surface)] hover:text-[var(--text-primary)]">
+                    {shared ? "Link copied" : "Copy tool link"}
+                  </button>
+                  <button type="button" onClick={handleShareX} className="text-left rounded px-2 py-1.5 text-xs text-[var(--text-muted)] hover:bg-[var(--bg-surface)] hover:text-[var(--text-primary)]">
+                    Share on X
+                  </button>
+                  {canNativeShare && (
+                    <button type="button" onClick={() => void handleNativeShare()} className="text-left rounded px-2 py-1.5 text-xs text-[var(--text-muted)] hover:bg-[var(--bg-surface)] hover:text-[var(--text-primary)]">
+                      Share via device
+                    </button>
+                  )}
+                  <a href="https://buymeacoffee.com/codinganthem" target="_blank" rel="noopener noreferrer" className="rounded px-2 py-1.5 text-xs text-[var(--text-muted)] hover:bg-[var(--bg-surface)] hover:text-[#f59e0b]">
+                    Buy me a coffee
+                  </a>
+                </div>
+              </details>
             </div>
           </div>
+          <span className="sr-only" aria-live="polite">
+            {copied ? "Output copied to clipboard" : shared ? "Tool link copied" : ""}
+          </span>
         </div>
       </div>
     </div>

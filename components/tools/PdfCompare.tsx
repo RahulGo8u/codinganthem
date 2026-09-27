@@ -224,6 +224,8 @@ export function PdfCompare() {
   const loadGen = useRef({ 1: 0, 2: 0 });
   const pdf1Ref = useRef(pdf1);
   const pdf2Ref = useRef(pdf2);
+  const compareButtonRef = useRef<HTMLButtonElement>(null);
+  const cancelButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     pdf1Ref.current = pdf1;
@@ -245,6 +247,8 @@ export function PdfCompare() {
     runId.current += 1;
     setComparing(false);
     setProgress("");
+    // Return focus to Compare after cancel for keyboard / SR flow
+    queueMicrotask(() => compareButtonRef.current?.focus());
   }, []);
 
   const assignFile = useCallback(
@@ -346,6 +350,7 @@ export function PdfCompare() {
     setTextStats(null);
     setHasTextLayer(false);
     setProgress("Preparing…");
+    queueMicrotask(() => cancelButtonRef.current?.focus());
 
     try {
       const docA = pdf1.loaded.doc;
@@ -389,7 +394,10 @@ export function PdfCompare() {
       setError(e instanceof Error ? e.message : "Compare failed.");
       setProgress("");
     } finally {
-      if (id === runId.current) setComparing(false);
+      if (id === runId.current) {
+        setComparing(false);
+        queueMicrotask(() => compareButtonRef.current?.focus());
+      }
     }
   }, [pdf1.loaded, pdf2.loaded]);
 
@@ -463,15 +471,18 @@ export function PdfCompare() {
 
       <div className="flex flex-wrap items-center gap-2">
         <button
+          ref={compareButtonRef}
           type="button"
           onClick={() => void runCompare()}
           disabled={!canCompare}
+          aria-busy={comparing}
           className="px-4 py-2 rounded-lg text-sm font-medium border border-[#6366f1]/40 bg-[#6366f1]/10 text-[var(--accent-text)] hover:bg-[#6366f1]/20 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
         >
           {comparing ? "Comparing…" : "Compare"}
         </button>
         {comparing && (
           <button
+            ref={cancelButtonRef}
             type="button"
             onClick={cancelCompare}
             className="px-3 py-2 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
@@ -495,11 +506,9 @@ export function PdfCompare() {
         >
           Clear
         </button>
-        {progress && (
-          <span className="text-xs text-[var(--text-muted)]" aria-live="polite">
-            {progress}
-          </span>
-        )}
+        <span className="text-xs text-[var(--text-muted)]" aria-live="polite" role="status">
+          {progress || (comparing ? "Comparing…" : "")}
+        </span>
       </div>
 
       {error && (
@@ -545,34 +554,56 @@ export function PdfCompare() {
                 type="button"
                 onClick={() => setActivePage((p) => Math.max(1, p - 1))}
                 disabled={activePage <= 1}
-                className="px-2.5 py-1 rounded-md text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:bg-[var(--bg-elevated)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                aria-label="Previous page"
+                className="px-2.5 py-1.5 rounded-md text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:bg-[var(--bg-elevated)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
               >
                 Prev
               </button>
-              {pages.map((p) => (
-                <button
-                  key={p.pageNumber}
-                  type="button"
-                  onClick={() => setActivePage(p.pageNumber)}
-                  aria-current={activePage === p.pageNumber ? "page" : undefined}
-                  aria-label={`Page ${p.pageNumber}${p.differs ? ", differs" : ", identical"}`}
-                  className={`px-2.5 py-1 rounded-md text-xs font-medium border transition-colors ${
-                    activePage === p.pageNumber
-                      ? "border-[#6366f1]/50 bg-[#6366f1]/15 text-[var(--accent-text)]"
-                      : p.differs
-                        ? "border-[#ef4444]/40 text-[#ef4444] hover:bg-[#ef4444]/10"
-                        : "border-[var(--border)] text-[var(--text-muted)] hover:bg-[var(--bg-elevated)]"
-                  }`}
-                >
-                  {p.pageNumber}
-                  {p.differs ? " ●" : ""}
-                </button>
-              ))}
+              {pages.length > 12 ? (
+                <label className="flex items-center gap-2 text-xs text-[var(--text-muted)]">
+                  <span className="sr-only">Page</span>
+                  <select
+                    value={activePage}
+                    onChange={(e) => setActivePage(Number(e.target.value))}
+                    aria-label={`Page ${activePage} of ${pages.length}`}
+                    className="rounded-md border border-[var(--border)] bg-[var(--bg-elevated)] px-2 py-1.5 text-xs text-[var(--text-primary)]"
+                  >
+                    {pages.map((p) => (
+                      <option key={p.pageNumber} value={p.pageNumber}>
+                        Page {p.pageNumber}
+                        {p.differs ? " (differs)" : ""}
+                      </option>
+                    ))}
+                  </select>
+                  <span className="mono tabular-nums">of {pages.length}</span>
+                </label>
+              ) : (
+                pages.map((p) => (
+                  <button
+                    key={p.pageNumber}
+                    type="button"
+                    onClick={() => setActivePage(p.pageNumber)}
+                    aria-current={activePage === p.pageNumber ? "page" : undefined}
+                    aria-label={`Page ${p.pageNumber}${p.differs ? ", differs" : ", identical"}`}
+                    className={`px-2.5 py-1.5 rounded-md text-xs font-medium border transition-colors ${
+                      activePage === p.pageNumber
+                        ? "border-[#6366f1]/50 bg-[#6366f1]/15 text-[var(--accent-text)]"
+                        : p.differs
+                          ? "border-[#ef4444]/40 text-[#ef4444] hover:bg-[#ef4444]/10"
+                          : "border-[var(--border)] text-[var(--text-muted)] hover:bg-[var(--bg-elevated)]"
+                    }`}
+                  >
+                    {p.pageNumber}
+                    {p.differs ? " ●" : ""}
+                  </button>
+                ))
+              )}
               <button
                 type="button"
                 onClick={() => setActivePage((p) => Math.min(pages.length, p + 1))}
                 disabled={activePage >= pages.length}
-                className="px-2.5 py-1 rounded-md text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:bg-[var(--bg-elevated)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                aria-label="Next page"
+                className="px-2.5 py-1.5 rounded-md text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:bg-[var(--bg-elevated)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
               >
                 Next
               </button>

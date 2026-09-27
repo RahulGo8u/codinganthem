@@ -162,15 +162,17 @@ const asserts: Record<(typeof LOAD_SAMPLE_SLUGS)[number], AssertFn> = {
   },
   "prompt-template-filler": async (page) => {
     await ensureSample(page);
-    await expectReadonlyOutputNonEmpty(page);
+    await expect(page.locator("pre").filter({ hasText: /Write a|email/i })).toBeVisible();
   },
   "token-counter": async (page) => {
     await ensureSample(page);
-    await page.getByRole("button", { name: "GPT-4o", exact: true }).click();
-    await expect(page.getByText("Failed to load the tokenizer")).toHaveCount(0);
-    await expect(page.getByText(/\d[\d,]*\s*tokens|Exact/i).first()).toBeVisible({
+    await page.getByRole("button", { name: /GPT-5.6 Terra/ }).click();
+    await expect(page.getByText("Failed to load the local tokenizer")).toHaveCount(0);
+    await expect(page.getByText("Exact plain text")).toBeVisible({
       timeout: 20_000,
     });
+    await expect(page.getByText("Model comparison", { exact: true })).toBeVisible();
+    await expect(page.getByText("30-day total").first()).toBeVisible();
   },
   "xml-to-json": async (page) => {
     await ensureSample(page);

@@ -27,7 +27,7 @@ test.describe("PDF Unlock", () => {
     await page.getByPlaceholder(/enter the pdf password/i).fill("wrong-password");
     await page.getByRole("button", { name: "Unlock PDF" }).click();
 
-    await expect(page.getByText(/incorrect password/i)).toBeVisible();
+    await expect(page.getByText(/wrong|incorrect password/i)).toBeVisible();
   });
 
   test("reports when a PDF is not password-protected", async ({ page }) => {

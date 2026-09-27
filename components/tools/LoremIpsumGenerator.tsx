@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import { ToolShell } from "@/components/ToolShell";
+import { SegmentedControl } from "@/components/SegmentedControl";
 import { getToolBySlug } from "@/lib/tools";
 
 const tool = getToolBySlug("lorem-ipsum")!;
@@ -19,6 +20,8 @@ const WORDS = [
   "unde","omnis","iste","natus","error","voluptatem","accusantium","doloremque",
   "laudantium","totam","rem","aperiam","eaque","ipsa","quae","ab","illo","inventore",
 ];
+
+const PARA_PRESETS = ["1", "3", "5"] as const;
 
 function randomWord(exclude?: string): string {
   let w: string;
@@ -43,16 +46,25 @@ export function LoremIpsumGenerator() {
   const [paragraphs, setParagraphs] = useState(3);
   const [output, setOutput] = useState("");
 
-  const generate = useCallback(() => {
-    const result = Array.from({ length: paragraphs }, () => generateParagraph(4 + Math.floor(Math.random() * 3)));
+  const generate = useCallback((n?: number) => {
+    const count = n ?? paragraphs;
+    const result = Array.from({ length: count }, () => generateParagraph(4 + Math.floor(Math.random() * 3)));
     setOutput(result.join("\n\n"));
   }, [paragraphs]);
 
   useEffect(() => {
-    generate();
     // Intentionally mount-only so changing paragraph count doesn't surprise-overwrite.
+    void Promise.resolve().then(() => generate());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const stats = useMemo(() => {
+    if (!output) return null;
+    const words = output.trim() ? output.trim().split(/\s+/).length : 0;
+    return { words, chars: output.length };
+  }, [output]);
+
+  const paraKey = String(paragraphs) as (typeof PARA_PRESETS)[number];
 
   return (
     <ToolShell
@@ -67,6 +79,7 @@ export function LoremIpsumGenerator() {
       extraActions={
         <>
           <button
+            type="button"
             onClick={() => setOutput("")}
             disabled={!output}
             className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[#ef4444]/40 bg-[#ef4444]/10 text-[#ef4444] hover:bg-[#ef4444]/20 hover:border-[#ef4444]/60 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
@@ -74,7 +87,8 @@ export function LoremIpsumGenerator() {
             Clear
           </button>
           <button
-            onClick={generate}
+            type="button"
+            onClick={() => generate()}
             className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
           >
             Regenerate
@@ -94,12 +108,32 @@ export function LoremIpsumGenerator() {
               className="w-14 bg-[var(--bg-elevated)] border border-[var(--border)] rounded px-2 py-1 text-xs text-[var(--text-primary)]"
             />
           </label>
+          <SegmentedControl
+            label="Paragraph presets"
+            compact
+            value={paraKey}
+            onChange={(v) => {
+              const n = Number(v);
+              setParagraphs(n);
+              generate(n);
+            }}
+            segments={PARA_PRESETS.map((p) => ({ value: p, label: `${p}` }))}
+          />
           <button
-            onClick={generate}
-            className="px-4 py-1.5 rounded-lg text-xs font-medium bg-[#6366f1]/15 border border-[#6366f1]/40 text-[#6366f1] hover:bg-[#6366f1]/25 transition-colors"
+            type="button"
+            onClick={() => generate()}
+            className="px-4 py-2 rounded-lg text-sm font-semibold bg-[#6366f1] text-white hover:bg-[#5558e6] transition-colors"
           >
             Generate
           </button>
+          {stats && (
+            <span className="text-xs text-[var(--text-muted)]">
+              {stats.words.toLocaleString()} words · {stats.chars.toLocaleString()} characters
+            </span>
+          )}
+          <span className="text-[11px] text-[var(--text-muted)]">
+            Count changes apply on Generate (or preset)
+          </span>
         </div>
       }
     />

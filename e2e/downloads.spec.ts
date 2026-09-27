@@ -32,10 +32,10 @@ test.describe("Downloads", () => {
     await expectDownload(page, "Download SVG", /^diagram\.svg$/);
   });
 
-  test("default text output downloads", async ({ page }) => {
+  test("Base64 downloads with a useful extension", async ({ page }) => {
     await gotoTool(page, "base64");
     await page.getByRole("button", { name: "Load sample" }).click();
-    await expectDownload(page, "Download", /^base64-output\.txt$/);
+    await expectDownload(page, "Download", /^encoded\.b64\.txt$/);
   });
 
   test("image compressor output downloads", async ({ page }) => {

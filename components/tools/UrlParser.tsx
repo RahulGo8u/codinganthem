@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { ToolShell } from "@/components/ToolShell";
+import { CopyButton } from "@/components/CopyButton";
 import { getToolBySlug } from "@/lib/tools";
 
 const tool = getToolBySlug("url-parser")!;
@@ -13,12 +14,19 @@ interface ParsedUrl {
   pathname: string;
   params: [string, string][];
   hash: string;
+  origin: string;
 }
 
 function parseUrl(raw: string): ParsedUrl {
   const url = new URL(raw.trim());
+  // Preserve duplicate query keys via getAll on each unique key order of appearance
   const params: [string, string][] = [];
-  url.searchParams.forEach((value, key) => params.push([key, value]));
+  const seen = new Set<string>();
+  url.searchParams.forEach((_, key) => {
+    if (seen.has(key)) return;
+    seen.add(key);
+    url.searchParams.getAll(key).forEach((value) => params.push([key, value]));
+  });
   return {
     protocol: url.protocol.replace(":", ""),
     hostname: url.hostname,
@@ -26,6 +34,7 @@ function parseUrl(raw: string): ParsedUrl {
     pathname: url.pathname,
     params,
     hash: url.hash.replace("#", ""),
+    origin: url.origin,
   };
 }
 
@@ -35,6 +44,7 @@ const FIELD_LABELS: { key: keyof Omit<ParsedUrl, "params">; label: string }[] = 
   { key: "port", label: "Port" },
   { key: "pathname", label: "Path" },
   { key: "hash", label: "Hash" },
+  { key: "origin", label: "Origin" },
 ];
 
 export function UrlParser() {
@@ -45,28 +55,57 @@ export function UrlParser() {
     try {
       return { parsed: parseUrl(input), error: undefined };
     } catch {
-      return { parsed: null, error: "Invalid URL — make sure it includes a protocol (e.g. https://)." };
+      return {
+        parsed: null,
+        error: "Invalid URL — make sure it includes a protocol (e.g. https://).",
+      };
     }
   }, [input]);
+
+  const output = parsed
+    ? [
+        ...FIELD_LABELS.filter(({ key }) => parsed[key]).map(
+          ({ key, label }) => `${label}: ${parsed[key]}`
+        ),
+        ...parsed.params.map(([k, v]) => `${k}=${v}`),
+      ].join("\n")
+    : "";
 
   return (
     <ToolShell
       tool={tool}
       input={input}
-      output=""
+      output={output}
       onInputChange={setInput}
       error={error}
       hideFileActions
       showClear
+      downloadFileName="parsed-url.txt"
       inputLabel="URL"
       outputLabel="Components"
       extraActions={
-        <button
-          onClick={() => setInput("https://www.example.com:8080/path/to/page?q=hello+world&page=2&sort=desc#section")}
-          className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
-        >
-          Load sample
-        </button>
+        <>
+          <button
+            type="button"
+            onClick={() =>
+              setInput(
+                "https://www.example.com:8080/path/to/page?q=hello+world&page=2&sort=desc&tag=a&tag=b#section"
+              )
+            }
+            className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
+          >
+            Load sample
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              if (typeof window !== "undefined") setInput(window.location.href);
+            }}
+            className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
+          >
+            Use current page
+          </button>
+        </>
       }
       inputPlaceholder="https://www.example.com/path?q=hello&page=2#section"
       outputContent={
@@ -75,9 +114,17 @@ export function UrlParser() {
             <div className="result-card flex flex-col divide-y divide-[var(--border)]">
               {FIELD_LABELS.map(({ key, label }) =>
                 parsed[key] ? (
-                  <div key={key} className="flex items-start gap-3 py-2.5 first:pt-0 last:pb-0">
-                    <span className="text-xs text-[var(--text-muted)] w-24 shrink-0 pt-0.5">{label}</span>
-                    <span className="text-xs text-[var(--text-primary)] mono break-all">{parsed[key]}</span>
+                  <div
+                    key={key}
+                    className="flex items-start gap-3 py-2.5 first:pt-0 last:pb-0"
+                  >
+                    <span className="text-xs text-[var(--text-muted)] w-24 shrink-0 pt-0.5">
+                      {label}
+                    </span>
+                    <span className="text-xs text-[var(--text-primary)] mono break-all flex-1">
+                      {parsed[key]}
+                    </span>
+                    <CopyButton value={parsed[key]} compact label="Copy" className="shrink-0" />
                   </div>
                 ) : null
               )}
@@ -87,10 +134,15 @@ export function UrlParser() {
                 <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--text-muted)] mb-1">
                   Query Params
                 </span>
-                {parsed.params.map(([k, v]) => (
-                  <div key={k} className="flex items-start gap-3">
-                    <span className="text-xs text-[var(--accent)] mono w-32 shrink-0 truncate">{k}</span>
-                    <span className="text-xs text-[var(--text-primary)] mono break-all">{v}</span>
+                {parsed.params.map(([k, v], i) => (
+                  <div key={`${k}-${i}`} className="flex items-start gap-3">
+                    <span className="text-xs text-[var(--accent)] mono w-32 shrink-0 truncate">
+                      {k}
+                    </span>
+                    <span className="text-xs text-[var(--text-primary)] mono break-all flex-1">
+                      {v}
+                    </span>
+                    <CopyButton value={v} compact label="Copy" className="shrink-0" />
                   </div>
                 ))}
               </div>

@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { getToolBySlug } from "@/lib/tools";
 import { ToolPageHeader } from "@/components/ToolPageHeader";
+import { CopyButton } from "@/components/CopyButton";
 
 const tool = getToolBySlug("totp-generator")!;
 
@@ -65,10 +66,11 @@ async function generateTotp(secret: string, counter: number): Promise<string> {
 
 export function TotpGenerator() {
   const [secret, setSecret] = useState(SAMPLE_SECRET);
+  const [issuer, setIssuer] = useState("CodingAnthem");
+  const [account, setAccount] = useState("user@example.com");
   const [code, setCode] = useState("");
   const [error, setError] = useState<string | undefined>();
   const [now, setNow] = useState(() => Date.now());
-  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     const id = setInterval(() => setNow(Date.now()), 1000);
@@ -80,12 +82,17 @@ export function TotpGenerator() {
   const secondsLeft = PERIOD - secondsElapsed;
 
   useEffect(() => {
-    if (!secret.trim()) {
-      setCode("");
-      setError(undefined);
-      return;
-    }
     let cancelled = false;
+    if (!secret.trim()) {
+      void Promise.resolve().then(() => {
+        if (cancelled) return;
+        setCode("");
+        setError(undefined);
+      });
+      return () => {
+        cancelled = true;
+      };
+    }
     generateTotp(secret, counter)
       .then((otp) => {
         if (!cancelled) {
@@ -104,19 +111,22 @@ export function TotpGenerator() {
     };
   }, [secret, counter]);
 
-  const handleCopy = useCallback(async () => {
-    if (!code) return;
-    try {
-      await navigator.clipboard.writeText(code);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
-    } catch {
-      setCopied(false);
-    }
-  }, [code]);
+  const otpauthUri = useMemo(() => {
+    if (!secret.trim()) return "";
+    const label = encodeURIComponent(`${issuer || "App"}:${account || "account"}`);
+    const params = new URLSearchParams({
+      secret: secret.replace(/\s+/g, "").toUpperCase(),
+      issuer: issuer || "App",
+      algorithm: "SHA1",
+      digits: String(DIGITS),
+      period: String(PERIOD),
+    });
+    return `otpauth://totp/${label}?${params.toString()}`;
+  }, [secret, issuer, account]);
 
   const ringCircumference = useMemo(() => 2 * Math.PI * 28, []);
   const ringOffset = ringCircumference * (1 - secondsLeft / PERIOD);
+  const urgent = secondsLeft <= 5;
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-8 flex flex-col gap-6">
@@ -125,7 +135,11 @@ export function TotpGenerator() {
         trailing={
           <button
             type="button"
-            onClick={() => setSecret(SAMPLE_SECRET)}
+            onClick={() => {
+              setSecret(SAMPLE_SECRET);
+              setIssuer("CodingAnthem");
+              setAccount("user@example.com");
+            }}
             className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
           >
             Load sample
@@ -133,56 +147,119 @@ export function TotpGenerator() {
         }
       />
 
-      {/* Secret input */}
-      <div className="flex flex-col gap-2 max-w-xl">
-        <label className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">
-          Base32 Secret Key
-        </label>
-        <input
-          type="text"
-          value={secret}
-          onChange={(e) => setSecret(e.target.value)}
-          spellCheck={false}
-          placeholder="JBSWY3DPEHPK3PXP"
-          className={`mono w-full px-4 py-3 rounded-lg border ${error ? "border-[#ef4444]" : "border-[var(--border)]"} bg-[var(--bg-surface)] text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none`}
-        />
-        {error && <p role="alert" className="text-xs text-[#ef4444] leading-relaxed">{error}</p>}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl">
+        <div className="flex flex-col gap-2 sm:col-span-2">
+          <label htmlFor="totp-secret" className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">
+            Base32 Secret Key
+          </label>
+          <input
+            id="totp-secret"
+            type="text"
+            value={secret}
+            onChange={(e) => setSecret(e.target.value)}
+            spellCheck={false}
+            placeholder="JBSWY3DPEHPK3PXP"
+            className={`mono w-full px-4 py-3 rounded-lg border ${error ? "border-[#ef4444]" : "border-[var(--border)]"} bg-[var(--bg-surface)] text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none`}
+          />
+          {error && <p role="alert" className="text-xs text-[#ef4444] leading-relaxed">{error}</p>}
+        </div>
+        <div className="flex flex-col gap-2">
+          <label htmlFor="totp-issuer" className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">
+            Issuer
+          </label>
+          <input
+            id="totp-issuer"
+            type="text"
+            value={issuer}
+            onChange={(e) => setIssuer(e.target.value)}
+            placeholder="My App"
+            className="w-full px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] text-sm text-[var(--text-primary)] focus:outline-none"
+          />
+        </div>
+        <div className="flex flex-col gap-2">
+          <label htmlFor="totp-account" className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">
+            Account name
+          </label>
+          <input
+            id="totp-account"
+            type="text"
+            value={account}
+            onChange={(e) => setAccount(e.target.value)}
+            placeholder="user@example.com"
+            className="w-full px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] text-sm text-[var(--text-primary)] focus:outline-none"
+          />
+        </div>
       </div>
 
-      {/* Code display */}
       <div className="flex flex-col items-center gap-6 py-10 rounded-xl border border-[var(--border)] bg-[var(--bg-surface)]">
-        <div className="relative w-20 h-20 flex items-center justify-center">
-          <svg width="64" height="64" viewBox="0 0 64 64" className="-rotate-90">
+        <div
+          className="relative w-20 h-20 flex items-center justify-center"
+          role="timer"
+          aria-live="polite"
+          aria-atomic="true"
+          aria-label={`${secondsLeft} seconds remaining in this code period`}
+        >
+          <svg width="64" height="64" viewBox="0 0 64 64" className="-rotate-90" aria-hidden="true">
             <circle cx="32" cy="32" r="28" fill="none" stroke="var(--border)" strokeWidth="4" />
             <circle
               cx="32"
               cy="32"
               r="28"
               fill="none"
-              stroke="#6366f1"
+              stroke={urgent ? "#ef4444" : "#6366f1"}
               strokeWidth="4"
               strokeLinecap="round"
               strokeDasharray={ringCircumference}
               strokeDashoffset={ringOffset}
-              style={{ transition: "stroke-dashoffset 1s linear" }}
+              style={{ transition: "stroke-dashoffset 1s linear, stroke 0.2s" }}
             />
           </svg>
-          <span className="absolute text-sm font-semibold text-[var(--text-primary)]">{secondsLeft}s</span>
+          <span className={`absolute text-sm font-semibold ${urgent ? "text-[#ef4444]" : "text-[var(--text-primary)]"}`}>
+            {secondsLeft}s
+          </span>
         </div>
 
-        <button
-          onClick={handleCopy}
-          disabled={!code}
-          className="mono text-5xl font-semibold tracking-[0.2em] text-[var(--text-primary)] hover:text-[#6366f1] disabled:hover:text-[var(--text-primary)] transition-colors disabled:cursor-not-allowed"
-          title="Click to copy"
-        >
-          {code || "------"}
-        </button>
-
-        <span className={`text-xs font-medium transition-colors ${copied ? "text-[#22c55e]" : "text-[var(--text-muted)]"}`}>
-          {copied ? "Copied ✓" : "Click the code to copy"}
-        </span>
+        <div className="flex flex-col items-center gap-3">
+          <button
+            type="button"
+            onClick={() => {
+              if (!code) return;
+              void navigator.clipboard.writeText(code);
+            }}
+            disabled={!code}
+            title="Click to copy code"
+            className={`mono text-5xl font-semibold tracking-[0.2em] text-[var(--text-primary)] hover:text-[#6366f1] disabled:hover:text-[var(--text-primary)] transition-colors disabled:cursor-not-allowed ${
+              urgent ? "animate-pulse" : ""
+            }`}
+          >
+            {code || "------"}
+          </button>
+          <span id="totp-copy-hint" className="sr-only">
+            Click the code or use Copy code to copy the one-time password
+          </span>
+          <CopyButton
+            value={code}
+            label="Copy code"
+            copiedLabel="Copied"
+            className="min-w-[7rem]"
+          />
+        </div>
       </div>
+
+      {otpauthUri && !error && (
+        <div className="max-w-2xl rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] p-4 flex flex-col gap-2">
+          <div className="flex items-center justify-between gap-3">
+            <span className="text-xs font-medium uppercase tracking-wider text-[var(--text-muted)]">
+              Authenticator setup URI
+            </span>
+            <CopyButton value={otpauthUri} label="Copy URI" compact />
+          </div>
+          <code className="mono text-xs text-[var(--text-primary)] break-all leading-relaxed">{otpauthUri}</code>
+          <p className="text-[11px] text-[var(--text-muted)] leading-relaxed">
+            SHA-1 · {DIGITS} digits · {PERIOD}s period (RFC 6238). Paste this URI into an authenticator app or QR generator.
+          </p>
+        </div>
+      )}
     </div>
   );
 }

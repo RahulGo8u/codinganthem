@@ -14,6 +14,8 @@ export function BcryptGenerator() {
   const [hash, setHash] = useState("");
   const [hashBusy, setHashBusy] = useState(false);
   const [hashError, setHashError] = useState<string | null>(null);
+  const [showPlain, setShowPlain] = useState(false);
+  const [showVerifyPlain, setShowVerifyPlain] = useState(false);
 
   const [verifyPlain, setVerifyPlain] = useState("");
   const [verifyHash, setVerifyHash] = useState("");
@@ -121,13 +123,25 @@ export function BcryptGenerator() {
             <h2 className="text-sm font-semibold text-[var(--text-primary)]">Generate hash</h2>
             <label className="flex flex-col gap-1.5 text-xs text-[var(--text-muted)]">
               Plain text / password
-              <input
-                type="text"
-                value={plain}
-                onChange={(e) => setPlain(e.target.value)}
-                placeholder="Enter text to hash"
-                className="rounded-lg border border-[var(--border)] bg-[var(--bg-elevated)] px-3 py-2 text-sm text-[var(--text-primary)]"
-              />
+              <div className="relative">
+                <input
+                  type={showPlain ? "text" : "password"}
+                  value={plain}
+                  onChange={(e) => setPlain(e.target.value)}
+                  placeholder="Enter text to hash"
+                  autoComplete="new-password"
+                  className="w-full rounded-lg border border-[var(--border)] bg-[var(--bg-elevated)] px-3 py-2 pr-16 text-sm text-[var(--text-primary)]"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPlain((v) => !v)}
+                  aria-label={showPlain ? "Hide password" : "Show password"}
+                  aria-pressed={showPlain}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-xs font-medium text-[var(--text-muted)] hover:text-[var(--text-primary)]"
+                >
+                  {showPlain ? "Hide" : "Show"}
+                </button>
+              </div>
             </label>
             <label className="flex items-center gap-3 text-xs text-[var(--text-muted)]">
               Cost factor (rounds)
@@ -137,6 +151,7 @@ export function BcryptGenerator() {
                 max={14}
                 value={rounds}
                 onChange={(e) => setRounds(Number(e.target.value))}
+                aria-valuetext={`${rounds} rounds`}
                 className="flex-1 max-w-xs"
               />
               <span className="mono text-[var(--text-primary)] w-6">{rounds}</span>
@@ -145,13 +160,15 @@ export function BcryptGenerator() {
               10–12 is typical for production. Higher rounds are slower but harder to brute-force.
             </p>
             <button
+              type="button"
               onClick={() => void generate()}
               disabled={hashBusy || !plain}
+              aria-busy={hashBusy}
               className="self-start px-4 py-2 rounded-lg text-sm font-medium border border-[#6366f1]/40 bg-[#6366f1]/10 text-[#6366f1] hover:bg-[#6366f1]/20 disabled:opacity-40"
             >
               {hashBusy ? "Hashing…" : "Generate bcrypt hash"}
             </button>
-            {hashError && <p className="text-xs text-[#ef4444]">{hashError}</p>}
+            {hashError && <p className="text-xs text-[#ef4444]" role="alert">{hashError}</p>}
             {hash && (
               <div className="flex items-start gap-3 rounded-lg border border-[var(--border)] bg-[var(--bg-elevated)] p-3">
                 <code className="mono text-xs text-[var(--text-primary)] break-all flex-1">{hash}</code>
@@ -164,16 +181,28 @@ export function BcryptGenerator() {
             <h2 className="text-sm font-semibold text-[var(--text-primary)]">Verify hash</h2>
             <label className="flex flex-col gap-1.5 text-xs text-[var(--text-muted)]">
               Plain text
-              <input
-                type="text"
-                value={verifyPlain}
-                onChange={(e) => {
-                  setVerifyPlain(e.target.value);
-                  setVerifyResult(null);
-                }}
-                placeholder="Original text"
-                className="rounded-lg border border-[var(--border)] bg-[var(--bg-elevated)] px-3 py-2 text-sm text-[var(--text-primary)]"
-              />
+              <div className="relative">
+                <input
+                  type={showVerifyPlain ? "text" : "password"}
+                  value={verifyPlain}
+                  onChange={(e) => {
+                    setVerifyPlain(e.target.value);
+                    setVerifyResult(null);
+                  }}
+                  placeholder="Original text"
+                  autoComplete="off"
+                  className="w-full rounded-lg border border-[var(--border)] bg-[var(--bg-elevated)] px-3 py-2 pr-16 text-sm text-[var(--text-primary)]"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowVerifyPlain((v) => !v)}
+                  aria-label={showVerifyPlain ? "Hide verify password" : "Show verify password"}
+                  aria-pressed={showVerifyPlain}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-xs font-medium text-[var(--text-muted)] hover:text-[var(--text-primary)]"
+                >
+                  {showVerifyPlain ? "Hide" : "Show"}
+                </button>
+              </div>
             </label>
             <label className="flex flex-col gap-1.5 text-xs text-[var(--text-muted)]">
               Bcrypt hash

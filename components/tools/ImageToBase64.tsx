@@ -1,8 +1,10 @@
 "use client";
 
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback } from "react";
 import { getToolBySlug } from "@/lib/tools";
 import { ToolPageHeader } from "@/components/ToolPageHeader";
+import { FileDropzone } from "@/components/FileDropzone";
+import { CopyButton } from "@/components/CopyButton";
 import { DownloadButton } from "@/components/DownloadButton";
 import { downloadBlob } from "@/lib/download";
 
@@ -16,10 +18,6 @@ export function ImageToBase64() {
   const [fileName, setFileName] = useState("");
   const [fileSize, setFileSize] = useState(0);
   const [error, setError] = useState<string | null>(null);
-  const [copiedDataUrl, setCopiedDataUrl] = useState(false);
-  const [copiedBase64, setCopiedBase64] = useState(false);
-  const [isDragging, setIsDragging] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
 
   const processFile = useCallback((file: File) => {
     setError(null);
@@ -41,34 +39,18 @@ export function ImageToBase64() {
     reader.readAsDataURL(file);
   }, []);
 
-  const handleFileInput = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) processFile(file);
-  }, [processFile]);
-
-  const handleDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-    const file = e.dataTransfer.files?.[0];
-    if (file) processFile(file);
-  }, [processFile]);
-
   const base64Only = dataUrl ? dataUrl.split(",")[1] : "";
-
-  const copy = useCallback(async (text: string, setCopied: (v: boolean) => void) => {
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
-    } catch { /* silent */ }
-  }, []);
+  const encodedBytes = base64Only ? Math.ceil((base64Only.length * 3) / 4) : 0;
+  const inflation =
+    fileSize > 0 && encodedBytes > 0
+      ? Math.round(((base64Only.length / fileSize) - 1) * 100)
+      : null;
 
   const clear = useCallback(() => {
     setDataUrl(null);
     setFileName("");
     setFileSize(0);
     setError(null);
-    if (inputRef.current) inputRef.current.value = "";
   }, []);
 
   const downloadBase64 = useCallback(() => {
@@ -82,60 +64,57 @@ export function ImageToBase64() {
       <ToolPageHeader tool={tool} />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* Upload area */}
         <div className="flex flex-col gap-2">
-          <label className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">Image</label>
-          <div
-            onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
-            onDragLeave={() => setIsDragging(false)}
-            onDrop={handleDrop}
-            onClick={() => inputRef.current?.click()}
-            className={`flex flex-col items-center justify-center min-h-[280px] rounded-lg border-2 border-dashed cursor-pointer transition-colors ${
-              isDragging
-                ? "border-[#6366f1] bg-[#6366f1]/10"
-                : "border-[var(--border)] bg-[var(--bg-surface)] hover:border-[#6366f1]/50 hover:bg-[var(--bg-elevated)]"
-            }`}
+          <label className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">
+            Image
+          </label>
+          <FileDropzone
+            accept="image/png,image/jpeg,image/gif,image/webp,image/svg+xml"
+            onFile={processFile}
+            title={
+              dataUrl
+                ? "Drop another image or click to replace"
+                : "Drop an image here or click to upload"
+            }
+            description="PNG, JPG, GIF, WebP, SVG · Max 5 MB"
           >
             {dataUrl ? (
-              /* eslint-disable-next-line @next/next/no-img-element */
-              <img src={dataUrl} alt="Preview" className="max-h-[260px] max-w-full object-contain rounded p-2" />
-            ) : (
-              <div className="flex flex-col items-center gap-3 p-6 text-center">
-                <div className="w-12 h-12 rounded-full bg-[#6366f1]/10 flex items-center justify-center">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <rect x="3" y="3" width="18" height="18" rx="2" />
-                    <circle cx="8.5" cy="8.5" r="1.5" />
-                    <polyline points="21 15 16 10 5 21" />
-                  </svg>
-                </div>
-                <p className="text-sm text-[var(--text-muted)]">Drop an image here or click to upload</p>
-                <p className="text-xs text-[var(--text-muted)] opacity-60">PNG, JPG, GIF, WebP, SVG · Max 5 MB</p>
+              <div className="flex flex-col items-center gap-3">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={dataUrl}
+                  alt="Selected image preview"
+                  className="max-h-[220px] max-w-full object-contain rounded p-2"
+                />
+                <span className="inline-flex rounded-lg border border-[var(--border)] px-3 py-1.5 text-xs font-medium text-[var(--text-primary)]">
+                  Replace image
+                </span>
               </div>
-            )}
-          </div>
-          <input ref={inputRef} type="file" accept="image/*" className="hidden" onChange={handleFileInput} />
-          {error && <p role="alert" className="text-xs text-[#ef4444] leading-relaxed">{error}</p>}
+            ) : undefined}
+          </FileDropzone>
+          {error && (
+            <p role="alert" className="text-xs text-[#ef4444] leading-relaxed">
+              {error}
+            </p>
+          )}
           {dataUrl && (
-            <div className="flex items-center justify-between text-xs text-[var(--text-muted)]">
+            <div className="flex items-center justify-between gap-2 text-xs text-[var(--text-muted)]">
               <span className="truncate max-w-[200px]">{fileName}</span>
-              <span>{(fileSize / 1024).toFixed(1)} KB</span>
+              <span>
+                {(fileSize / 1024).toFixed(1)} KB
+                {inflation != null ? ` · +${inflation}% as Base64` : ""}
+              </span>
             </div>
           )}
         </div>
 
-        {/* Output */}
         <div className="flex flex-col gap-4">
-          {/* Data URL */}
           <div className="flex flex-col gap-2">
-            <div className="flex items-center justify-between">
-              <label className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">Data URL</label>
-              <button
-                onClick={() => copy(dataUrl ?? "", setCopiedDataUrl)}
-                disabled={!dataUrl}
-                className={`text-xs px-2.5 py-1 rounded border transition-colors ${copiedDataUrl ? "text-[#22c55e] border-[#22c55e]/40" : "text-[var(--text-muted)] border-[var(--border)] hover:text-[var(--text-primary)] disabled:opacity-40 disabled:cursor-not-allowed"}`}
-              >
-                {copiedDataUrl ? "Copied ✓" : "Copy"}
-              </button>
+            <div className="flex items-center justify-between gap-2">
+              <label className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">
+                Data URL
+              </label>
+              <CopyButton value={dataUrl ?? ""} compact label="Copy" />
             </div>
             <textarea
               readOnly
@@ -146,25 +125,16 @@ export function ImageToBase64() {
             />
           </div>
 
-          {/* Base64 only */}
           <div className="flex flex-col gap-2">
-            <div className="flex items-center justify-between">
-              <label className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">Base64 only</label>
+            <div className="flex items-center justify-between gap-2">
+              <label className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">
+                Base64 only
+              </label>
               <div className="flex items-center gap-2">
-                <DownloadButton
-                  onClick={downloadBase64}
-                  disabled={!base64Only}
-                  compact
-                >
+                <DownloadButton onClick={downloadBase64} disabled={!base64Only} compact>
                   Download
                 </DownloadButton>
-                <button
-                  onClick={() => copy(base64Only, setCopiedBase64)}
-                  disabled={!base64Only}
-                  className={`text-xs px-2.5 py-1 rounded border transition-colors ${copiedBase64 ? "text-[#22c55e] border-[#22c55e]/40" : "text-[var(--text-muted)] border-[var(--border)] hover:text-[var(--text-primary)] disabled:opacity-40 disabled:cursor-not-allowed"}`}
-                >
-                  {copiedBase64 ? "Copied ✓" : "Copy"}
-                </button>
+                <CopyButton value={base64Only} compact label="Copy" />
               </div>
             </div>
             <textarea
@@ -178,10 +148,10 @@ export function ImageToBase64() {
         </div>
       </div>
 
-      {/* Actions */}
       {dataUrl && (
         <div className="flex gap-2">
           <button
+            type="button"
             onClick={clear}
             className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[#ef4444]/40 bg-[#ef4444]/10 text-[#ef4444] hover:bg-[#ef4444]/20 hover:border-[#ef4444]/60 transition-colors"
           >

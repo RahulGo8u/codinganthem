@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Sparkles, Loader2, AlertCircle, Copy } from "lucide-react";
 import { ToolPageHeader } from "@/components/ToolPageHeader";
 import { AiDisclaimer } from "@/components/AiDisclaimer";
+import { DataFlowNotice } from "@/components/DataFlowNotice";
 import { getToolBySlug } from "@/lib/tools";
 
 const tool = getToolBySlug("ai-code-explainer")!;
@@ -75,7 +76,7 @@ export function AiCodeExplainer() {
   const charCount = code.length;
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-8 flex flex-col gap-6">
+    <div className="max-w-7xl mx-auto px-6 py-8 flex flex-col gap-6 pb-24">
       <ToolPageHeader
         tool={tool}
         trailing={
@@ -93,6 +94,8 @@ export function AiCodeExplainer() {
           </button>
         }
       />
+
+      <DataFlowNotice destination="Google Gemini (via our server)" />
 
       <div className="flex flex-wrap items-center gap-3 px-4 py-2.5 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] text-sm">
         <label className="flex items-center gap-2 text-xs text-[var(--text-muted)]">
@@ -124,7 +127,7 @@ export function AiCodeExplainer() {
             placeholder="Paste a function, class, or any code snippet..."
             spellCheck={false}
             maxLength={MAX_CODE_CHARS}
-            className="mono min-h-[320px] p-4 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] resize-none focus:outline-none leading-relaxed"
+            className="mono min-h-[240px] sm:min-h-[320px] p-4 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] resize-y focus:outline-none leading-relaxed"
           />
         </div>
 
@@ -132,7 +135,11 @@ export function AiCodeExplainer() {
           <label className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">
             Explanation
           </label>
-          <div className="min-h-[320px] p-4 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] overflow-auto flex flex-col gap-4">
+          <div
+            className="min-h-[240px] sm:min-h-[320px] p-4 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] overflow-auto flex flex-col gap-4"
+            aria-busy={loading}
+            aria-live="polite"
+          >
             {result ? (
               <>
                 <div className="flex flex-col gap-3 flex-1">
@@ -148,6 +155,7 @@ export function AiCodeExplainer() {
                 <div className="flex items-center justify-between gap-3 pt-2 border-t border-[var(--border)]">
                   <AiDisclaimer />
                   <button
+                    type="button"
                     onClick={handleCopy}
                     className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border shrink-0 transition-all ${
                       copied
@@ -155,7 +163,7 @@ export function AiCodeExplainer() {
                         : "border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)]"
                     }`}
                   >
-                    <Copy size={12} />
+                    <Copy size={12} aria-hidden="true" />
                     {copied ? "Copied!" : "Copy"}
                   </button>
                 </div>
@@ -171,28 +179,32 @@ export function AiCodeExplainer() {
 
       {error && (
         <div role="alert" className="flex items-start gap-2 px-3 py-2.5 rounded-lg border border-[#ef4444]/40 bg-[#ef4444]/10 text-xs text-[#ef4444] leading-relaxed">
-          <AlertCircle size={14} className="shrink-0 mt-0.5" />
+          <AlertCircle size={14} className="shrink-0 mt-0.5" aria-hidden="true" />
           <span>{error}</span>
         </div>
       )}
 
-      <button
-        onClick={handleExplain}
-        disabled={loading || !code.trim()}
-        className="flex items-center justify-center gap-2 h-10 rounded-lg bg-[#6366f1] text-white text-sm font-medium hover:bg-[#4f46e5] disabled:opacity-50 disabled:cursor-not-allowed transition-colors w-full max-w-xs mx-auto"
-      >
-        {loading ? (
-          <>
-            <Loader2 size={14} className="animate-spin" />
-            Explaining...
-          </>
-        ) : (
-          <>
-            <Sparkles size={14} />
-            Explain Code
-          </>
-        )}
-      </button>
+      <div className="sticky bottom-0 z-20 -mx-6 border-t border-[var(--border)] bg-[var(--bg-base)]/90 backdrop-blur-md px-6 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+        <button
+          type="button"
+          onClick={handleExplain}
+          disabled={loading || !code.trim()}
+          aria-busy={loading}
+          className="flex items-center justify-center gap-2 h-11 w-full sm:max-w-xs sm:mx-auto rounded-lg bg-[#6366f1] text-white text-sm font-medium hover:bg-[#4f46e5] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        >
+          {loading ? (
+            <>
+              <Loader2 size={14} className="animate-spin" aria-hidden="true" />
+              Explaining...
+            </>
+          ) : (
+            <>
+              <Sparkles size={14} aria-hidden="true" />
+              Explain Code
+            </>
+          )}
+        </button>
+      </div>
     </div>
   );
 }

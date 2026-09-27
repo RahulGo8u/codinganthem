@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Link, Loader2, CheckCircle, Copy, ExternalLink, AlertCircle } from "lucide-react";
 import { validateUrl } from "@/lib/urlValidation";
 import { ToolPageHeader } from "@/components/ToolPageHeader";
+import { DataFlowNotice } from "@/components/DataFlowNotice";
 import { getToolBySlug } from "@/lib/tools";
 
 const tool = getToolBySlug("url-shortener")!;
@@ -108,26 +109,35 @@ export function UrlShortener() {
       <ToolPageHeader tool={tool} />
 
       <div className="w-full max-w-2xl mx-auto flex flex-col gap-6">
+        <DataFlowNotice destination="our server (URL, chosen expiry, and click counts are stored)" />
+
         {/* Input form — hidden once a result exists */}
         {!result && (
-          <div className="flex flex-col gap-4">
+          <form
+            className="flex flex-col gap-4"
+            aria-busy={loading}
+            onSubmit={(e) => {
+              e.preventDefault();
+              void handleShorten();
+            }}
+          >
             {/* URL to shorten */}
             <div className="flex flex-col gap-2">
               <label className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">
                 Paste the URL to be shortened
               </label>
               <div className={`flex items-center gap-2 rounded-lg border ${urlError ? "border-[#ef4444]" : "border-[var(--border)]"} bg-[var(--bg-surface)] px-3`}>
-                <Link size={14} className="text-[var(--text-muted)] shrink-0" />
+                <Link size={14} className="text-[var(--text-muted)] shrink-0" aria-hidden="true" />
                 <input
                   type="url"
                   value={url}
                   onChange={(e) => { setUrl(e.target.value); setUrlError(""); }}
                   onBlur={handleUrlBlur}
-                  onKeyDown={(e) => e.key === "Enter" && handleShorten()}
                   placeholder="https://example.com/very/long/url"
                   spellCheck={false}
                   autoFocus
-                  className="flex-1 h-11 bg-transparent text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none"
+                  disabled={loading}
+                  className="flex-1 h-11 bg-transparent text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none disabled:opacity-60"
                 />
               </div>
               {urlError && (
@@ -140,12 +150,15 @@ export function UrlShortener() {
               <label className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">
                 Expires
               </label>
-              <div className="flex flex-wrap gap-1.5">
+              <div className="flex flex-wrap gap-1.5" role="group" aria-label="Link expiry">
                 {EXPIRY_OPTIONS.map((opt) => (
                   <button
                     key={opt.value}
+                    type="button"
                     onClick={() => setExpiry(opt.value)}
-                    className={`px-3 py-1.5 rounded-full text-xs border transition-colors ${
+                    aria-pressed={expiry === opt.value}
+                    disabled={loading}
+                    className={`px-3 py-1.5 rounded-full text-xs border transition-colors disabled:opacity-50 ${
                       expiry === opt.value
                         ? "bg-[#6366f1]/15 text-[#6366f1] border-[#6366f1]/40"
                         : "bg-[var(--bg-surface)] text-[var(--text-muted)] border-[var(--border)] hover:text-[var(--text-primary)]"
@@ -159,31 +172,35 @@ export function UrlShortener() {
 
             {/* Submission error banner */}
             {error && (
-              <div className="flex items-start gap-2 px-3 py-2.5 rounded-lg border border-[#ef4444]/40 bg-[#ef4444]/10 text-xs text-[#ef4444] leading-relaxed">
-                <AlertCircle size={14} className="shrink-0 mt-0.5" />
+              <div role="alert" className="flex items-start gap-2 px-3 py-2.5 rounded-lg border border-[#ef4444]/40 bg-[#ef4444]/10 text-xs text-[#ef4444] leading-relaxed">
+                <AlertCircle size={14} className="shrink-0 mt-0.5" aria-hidden="true" />
                 <span>{error}</span>
               </div>
             )}
 
             {/* Shorten button */}
             <button
-              onClick={handleShorten}
+              type="submit"
               disabled={loading || !url.trim()}
-              className="flex items-center justify-center gap-2 h-10 rounded-lg bg-[#6366f1] text-white text-sm font-medium hover:bg-[#4f46e5] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              aria-busy={loading}
+              className="flex items-center justify-center gap-2 h-11 rounded-lg bg-[#6366f1] text-white text-sm font-medium hover:bg-[#4f46e5] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {loading ? (
                 <>
-                  <Loader2 size={14} className="animate-spin" />
+                  <Loader2 size={14} className="animate-spin" aria-hidden="true" />
                   Shortening...
                 </>
               ) : (
                 <>
-                  <Link size={14} />
+                  <Link size={14} aria-hidden="true" />
                   Shorten URL
                 </>
               )}
             </button>
-          </div>
+            <span className="sr-only" aria-live="polite">
+              {loading ? "Creating short URL" : ""}
+            </span>
+          </form>
         )}
 
         {/* Result panel — only shown after a successful shorten */}

@@ -1,9 +1,11 @@
 "use client";
 
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { getToolBySlug } from "@/lib/tools";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { DownloadButton } from "@/components/DownloadButton";
+import { FileDropzone } from "@/components/FileDropzone";
+import { SegmentedControl } from "@/components/SegmentedControl";
 import {
   IMAGE_ACCEPT,
   IMAGE_MAX_BYTES,
@@ -22,6 +24,16 @@ const SIZE_PRESETS = [
   { label: "512×512", w: 512, h: 512 },
 ] as const;
 
+type FitMode = "exact" | "fit";
+
+function fitWithin(srcW: number, srcH: number, boxW: number, boxH: number) {
+  const scale = Math.min(boxW / srcW, boxH / srcH);
+  return {
+    w: Math.max(1, Math.round(srcW * scale)),
+    h: Math.max(1, Math.round(srcH * scale)),
+  };
+}
+
 export function ImageResizer() {
   const [file, setFile] = useState<File | null>(null);
   const [imgEl, setImgEl] = useState<HTMLImageElement | null>(null);
@@ -29,13 +41,13 @@ export function ImageResizer() {
   const [width, setWidth] = useState(0);
   const [height, setHeight] = useState(0);
   const [lock, setLock] = useState(true);
+  const [fitMode, setFitMode] = useState<FitMode>("exact");
   const [resultUrl, setResultUrl] = useState<string | null>(null);
   const [resultSize, setResultSize] = useState(0);
   const [error, setError] = useState<string | null>(null);
-  const [dragging, setDragging] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
   const resultBlob = useRef<Blob | null>(null);
   const ratioRef = useRef(1);
+  const debounceRef = useRef<number | null>(null);
 
   const resize = useCallback(async (img: HTMLImageElement, w: number, h: number, source: File) => {
     if (w < 1 || h < 1) return;
@@ -53,6 +65,22 @@ export function ImageResizer() {
       if (prev) URL.revokeObjectURL(prev);
       return URL.createObjectURL(blob);
     });
+  }, []);
+
+  const scheduleResize = useCallback(
+    (img: HTMLImageElement, w: number, h: number, source: File) => {
+      if (debounceRef.current) window.clearTimeout(debounceRef.current);
+      debounceRef.current = window.setTimeout(() => {
+        void resize(img, w, h, source);
+      }, 200);
+    },
+    [resize]
+  );
+
+  useEffect(() => {
+    return () => {
+      if (debounceRef.current) window.clearTimeout(debounceRef.current);
+    };
   }, []);
 
   const processFile = useCallback(
@@ -89,22 +117,38 @@ export function ImageResizer() {
     setWidth(w);
     const h = lock ? Math.max(1, Math.round(w / ratioRef.current)) : height;
     if (lock) setHeight(h);
-    if (imgEl && file) void resize(imgEl, w, lock ? h : height, file);
+    if (imgEl && file) scheduleResize(imgEl, w, lock ? h : height, file);
   };
 
   const applyHeight = (h: number) => {
     setHeight(h);
     const w = lock ? Math.max(1, Math.round(h * ratioRef.current)) : width;
     if (lock) setWidth(w);
-    if (imgEl && file) void resize(imgEl, lock ? w : width, h, file);
+    if (imgEl && file) scheduleResize(imgEl, lock ? w : width, h, file);
   };
 
   const applyPreset = (w: number, h: number) => {
-    setLock(false);
-    setWidth(w);
-    setHeight(h);
-    if (imgEl && file) void resize(imgEl, w, h, file);
+    if (!imgEl || !file) {
+      setWidth(w);
+      setHeight(h);
+      return;
+    }
+    if (fitMode === "fit") {
+      const fitted = fitWithin(imgEl.naturalWidth, imgEl.naturalHeight, w, h);
+      setLock(true);
+      setWidth(fitted.w);
+      setHeight(fitted.h);
+      scheduleResize(imgEl, fitted.w, fitted.h, file);
+    } else {
+      setLock(false);
+      setWidth(w);
+      setHeight(h);
+      scheduleResize(imgEl, w, h, file);
+    }
   };
+
+  const isUpscaling =
+    !!imgEl && (width > imgEl.naturalWidth || height > imgEl.naturalHeight);
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-8 flex flex-col gap-6 pb-24">
@@ -116,27 +160,12 @@ export function ImageResizer() {
         </div>
       </div>
 
-      <div
-        onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
-        onDragLeave={() => setDragging(false)}
-        onDrop={(e) => {
-          e.preventDefault();
-          setDragging(false);
-          const f = e.dataTransfer.files?.[0];
-          if (f) void processFile(f);
-        }}
-        onClick={() => inputRef.current?.click()}
-        className={`rounded-xl border-2 border-dashed p-10 text-center cursor-pointer transition-colors ${
-          dragging ? "border-[#6366f1] bg-[#6366f1]/10" : "border-[var(--border)] bg-[var(--bg-surface)] hover:border-[#6366f1]/40"
-        }`}
-      >
-        <p className="text-sm font-medium text-[var(--text-primary)]">Drop an image here or click to upload</p>
-        <p className="text-xs text-[var(--text-muted)] mt-1">PNG, JPG, WebP, GIF · max 10 MB</p>
-        <input ref={inputRef} type="file" accept={IMAGE_ACCEPT} className="hidden" onChange={(e) => {
-          const f = e.target.files?.[0];
-          if (f) void processFile(f);
-        }} />
-      </div>
+      <FileDropzone
+        accept={IMAGE_ACCEPT}
+        onFile={(f) => void processFile(f)}
+        title="Drop an image here or click to upload"
+        description="PNG, JPG, WebP, GIF · max 10 MB"
+      />
 
       {error && <p role="alert" className="text-sm text-[#ef4444]">{error}</p>}
 
@@ -170,10 +199,34 @@ export function ImageResizer() {
                 <input type="checkbox" checked={lock} onChange={(e) => setLock(e.target.checked)} />
                 Lock aspect ratio
               </label>
+              <div className="flex flex-col gap-1 pb-1">
+                <span className="text-[10px] uppercase tracking-wider text-[var(--text-muted)]">Preset mode</span>
+                <SegmentedControl
+                  label="Fit mode"
+                  compact
+                  value={fitMode}
+                  onChange={setFitMode}
+                  segments={[
+                    { value: "exact", label: "Exact" },
+                    { value: "fit", label: "Fit within" },
+                  ]}
+                />
+              </div>
               <span className="text-xs text-[var(--text-muted)] pb-1.5">
-                Original {imgEl.naturalWidth}×{imgEl.naturalHeight} · {formatBytes(file.size)} → {formatBytes(resultSize)}
+                Original {imgEl.naturalWidth}×{imgEl.naturalHeight} · {formatBytes(file.size)}
+                {file.type ? ` · ${file.type.replace("image/", "").toUpperCase()}` : ""} → {formatBytes(resultSize)}
               </span>
             </div>
+            <p className="text-[11px] text-[var(--text-muted)] leading-relaxed">
+              {fitMode === "exact"
+                ? "Exact presets stretch to the target size and unlock aspect ratio (may distort)."
+                : "Fit within scales down (or up) to fit inside the box while keeping aspect ratio."}
+            </p>
+            {isUpscaling && (
+              <p role="status" className="text-xs text-[#f59e0b] leading-relaxed">
+                Upscaling beyond the original {imgEl.naturalWidth}×{imgEl.naturalHeight} — output may look soft or blurry.
+              </p>
+            )}
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-[10px] uppercase tracking-wider text-[var(--text-muted)]">Presets</span>
               {SIZE_PRESETS.map((p) => (
@@ -196,13 +249,15 @@ export function ImageResizer() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] p-4 flex flex-col gap-2">
               <span className="text-xs uppercase tracking-wider text-[var(--text-muted)]">Original</span>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               {preview && <img src={preview} alt="Original" className="max-h-64 object-contain mx-auto" />}
             </div>
             <div className="rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] p-4 flex flex-col gap-2">
               <span className="text-xs uppercase tracking-wider text-[var(--text-muted)]">Resized · {width}×{height}</span>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               {resultUrl && <img src={resultUrl} alt="Resized" className="max-h-64 object-contain mx-auto" />}
               <DownloadButton
-                disabled={!resultBlob.current}
+                disabled={!resultUrl}
                 onClick={() => {
                   if (!resultBlob.current || !file) return;
                   const ext = file.name.split(".").pop() || "jpg";

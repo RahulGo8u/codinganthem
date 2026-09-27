@@ -4,6 +4,8 @@ Manual pass/fail matrix for CodingAnthem tools.
 
 **Automated coverage:** `npm run test:e2e` runs load smoke for all tools plus happy-path interaction (Load sample / Generate / upload / mocked API) for every slug. Deep large-payload and hunk-nav checks remain for JSON/Text/PDF Compare and Regex Tester.
 
+**Shared UX coverage:** `e2e/ux-consistency.spec.ts` verifies mobile pane tabs, category breadcrumbs, server data-flow disclosure, Markdown sanitization, and masked secret fields.
+
 **How to use this checklist:** for each tool, paste/upload the large-input recipe below, confirm the expected behavior, tick Pass/Fail.
 
 **Global expects:** page loads; no blank screen; UI stays responsive (progress shown if >3s); Clear / reset works; no uncaught console errors for happy path.
@@ -58,7 +60,7 @@ Manual pass/fail matrix for CodingAnthem tools.
 | ☐ | ☐ | SQL IN Generator | `/tools/sql-in-generator` | Large structured document (50KB+) | Renders correct output; no crash |
 | ☐ | ☐ | String Escape / Unescape | `/tools/string-escape` | Long string / medium file | Renders correct output; no crash |
 | ☐ | ☐ | Text Compare | `/tools/text-diff` | e2e/fixtures/large-a.txt vs large-b.txt (~400 lines) | Stats + Comparison panel; Prev/Next hunks; last hunk reachable without full manual scroll |
-| ☐ | ☐ | Token Counter & Estimator | `/tools/token-counter` | 5–20KB prompt; GPT-4o Exact badge | Exact tokens for GPT (no tokenizer error) |
+| ☐ | ☐ | Token Counter & Estimator | `/tools/token-counter` | 5–20KB prompt; GPT-5.6 Terra local tokenizer; multiple comparison models | Token count completes; context/cost forecast updates; no tokenizer error |
 | ☐ | ☐ | TOTP / OTP Generator | `/tools/totp-generator` | Long token/hash input | Renders correct output; no crash |
 | ☐ | ☐ | Unix Timestamp Converter | `/tools/timestamp-converter` | Large structured document (50KB+) | Renders correct output; no crash |
 | ☐ | ☐ | URL Encoder / Decoder | `/tools/url-encoder` | Long URL / HTML / meta content | Renders correct output; no crash |

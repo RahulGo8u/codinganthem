@@ -3,12 +3,28 @@
 import { useMemo, useState, useCallback } from "react";
 import { getToolBySlug } from "@/lib/tools";
 import { Breadcrumb } from "@/components/Breadcrumb";
+import { CopyButton } from "@/components/CopyButton";
 import { CopyChip } from "@/components/CopyChip";
 
 const tool = getToolBySlug("meta-tag-generator")!;
 
+const TITLE_LIMIT = 60;
+const DESC_LIMIT = 160;
+
 function escapeAttr(s: string) {
   return s.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
+}
+
+function lengthHint(len: number, limit: number): { text: string; tone: "ok" | "warn" | "over" } {
+  if (len > limit) return { text: `${len}/${limit} — over recommended length`, tone: "over" };
+  if (len > limit * 0.9) return { text: `${len}/${limit} — near recommended limit`, tone: "warn" };
+  return { text: `${len}/${limit} characters recommended`, tone: "ok" };
+}
+
+function hintClass(tone: "ok" | "warn" | "over") {
+  if (tone === "over") return "text-[#ef4444]";
+  if (tone === "warn") return "text-[#f59e0b]";
+  return "opacity-80";
 }
 
 export function MetaTagGenerator() {
@@ -21,7 +37,9 @@ export function MetaTagGenerator() {
   const [siteName, setSiteName] = useState("CodingAnthem");
   const [twitter, setTwitter] = useState("@codinganthem");
   const [robots, setRobots] = useState("index, follow");
-  const [copied, setCopied] = useState(false);
+
+  const titleHint = lengthHint(title.length, TITLE_LIMIT);
+  const descHint = lengthHint(description.length, DESC_LIMIT);
 
   const html = useMemo(() => {
     const lines = [
@@ -50,40 +68,35 @@ export function MetaTagGenerator() {
     return lines.join("\n");
   }, [title, description, url, image, siteName, twitter, robots]);
 
-  const copyAll = useCallback(async () => {
-    try {
-      await navigator.clipboard.writeText(html);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
-    } catch {
-      /* silent */
-    }
-  }, [html]);
-
-  const field = (
-    label: string,
-    value: string,
-    onChange: (v: string) => void,
-    opts?: { multiline?: boolean; hint?: string }
-  ) => (
-    <label className="flex flex-col gap-1.5 text-xs text-[var(--text-muted)]">
-      {label}
-      {opts?.multiline ? (
-        <textarea
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          rows={3}
-          className="rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] px-3 py-2 text-sm text-[var(--text-primary)] resize-y"
-        />
-      ) : (
-        <input
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          className="rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] px-3 py-2 text-sm text-[var(--text-primary)]"
-        />
-      )}
-      {opts?.hint && <span className="text-[10px] opacity-80">{opts.hint}</span>}
-    </label>
+  const field = useCallback(
+    (
+      label: string,
+      value: string,
+      onChange: (v: string) => void,
+      opts?: { multiline?: boolean; hint?: string; hintTone?: "ok" | "warn" | "over" }
+    ) => (
+      <label className="flex flex-col gap-1.5 text-xs text-[var(--text-muted)]">
+        {label}
+        {opts?.multiline ? (
+          <textarea
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            rows={3}
+            className="rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] px-3 py-2 text-sm text-[var(--text-primary)] resize-y"
+          />
+        ) : (
+          <input
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            className="rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] px-3 py-2 text-sm text-[var(--text-primary)]"
+          />
+        )}
+        {opts?.hint && (
+          <span className={`text-[10px] ${hintClass(opts.hintTone ?? "ok")}`}>{opts.hint}</span>
+        )}
+      </label>
+    ),
+    []
   );
 
   return (
@@ -98,10 +111,14 @@ export function MetaTagGenerator() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="flex flex-col gap-3">
-          {field("Page title", title, setTitle, { hint: `${title.length}/60 characters recommended` })}
+          {field("Page title", title, setTitle, {
+            hint: titleHint.text,
+            hintTone: titleHint.tone,
+          })}
           {field("Meta description", description, setDescription, {
             multiline: true,
-            hint: `${description.length}/160 characters recommended`,
+            hint: descHint.text,
+            hintTone: descHint.tone,
           })}
           {field("Canonical URL", url, setUrl)}
           {field("OG / Twitter image URL", image, setImage)}
@@ -111,20 +128,33 @@ export function MetaTagGenerator() {
         </div>
 
         <div className="flex flex-col gap-4">
-          <div className="rounded-lg border border-[var(--border)] bg-white p-4 flex flex-col gap-3">
-            <span className="text-xs uppercase tracking-wider text-zinc-500">Google preview</span>
+          {/* Theme-safe SERP chrome: always light (like Google), labeled as preview */}
+          <div className="rounded-lg border border-[var(--border)] bg-[#ffffff] p-4 flex flex-col gap-3 shadow-sm">
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-xs uppercase tracking-wider text-[#71717a]">Google preview</span>
+              <span className="text-[10px] text-[#71717a]">Light preview chrome</span>
+            </div>
             <div className="flex flex-col gap-1">
               <span className="text-sm text-[#1a0dab] truncate">{title || "Page title"}</span>
               <span className="text-xs text-[#006621] truncate">{url || "https://example.com"}</span>
-              <span className="text-xs text-zinc-600 leading-relaxed line-clamp-2">
+              <span className="text-xs text-[#4d5156] leading-relaxed line-clamp-2">
                 {description || "Meta description appears here."}
               </span>
             </div>
+            {(titleHint.tone !== "ok" || descHint.tone !== "ok") && (
+              <p className="text-[10px] text-[#b45309] leading-relaxed" role="status">
+                {titleHint.tone === "over" && "Title exceeds ~60 characters and may truncate in SERPs. "}
+                {titleHint.tone === "warn" && "Title is near the ~60 character limit. "}
+                {descHint.tone === "over" && "Description exceeds ~160 characters and may truncate. "}
+                {descHint.tone === "warn" && "Description is near the ~160 character limit."}
+              </p>
+            )}
           </div>
 
           <div className="rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] overflow-hidden">
             <div className="h-36 bg-[var(--bg-elevated)] flex items-center justify-center text-xs text-[var(--text-muted)] border-b border-[var(--border)] overflow-hidden">
               {image ? (
+                // eslint-disable-next-line @next/next/no-img-element -- user-provided OG URL preview
                 <img
                   src={image}
                   alt="OG preview"
@@ -147,16 +177,11 @@ export function MetaTagGenerator() {
       </div>
 
       <div className="rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] p-4 flex flex-col gap-2">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-2 flex-wrap">
           <span className="text-xs uppercase tracking-wider text-[var(--text-muted)]">Generated HTML</span>
           <div className="flex items-center gap-3">
             <CopyChip value={html} label="HTML" />
-            <button
-              onClick={() => void copyAll()}
-              className="text-xs font-medium text-[#22c55e] hover:text-[#16a34a]"
-            >
-              {copied ? "Copied ✓" : "Copy all"}
-            </button>
+            <CopyButton value={html} label="Copy all" compact />
           </div>
         </div>
         <pre className="mono text-xs text-[var(--text-primary)] whitespace-pre-wrap break-all leading-relaxed max-h-80 overflow-auto">

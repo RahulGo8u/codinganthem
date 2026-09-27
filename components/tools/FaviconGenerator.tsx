@@ -1,9 +1,12 @@
 "use client";
 
-import { useState, useCallback, useRef, useEffect } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { getToolBySlug } from "@/lib/tools";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { DownloadButton } from "@/components/DownloadButton";
+import { CopyButton } from "@/components/CopyButton";
+import { FileDropzone } from "@/components/FileDropzone";
+import { SegmentedControl } from "@/components/SegmentedControl";
 import { downloadUrl } from "@/lib/download";
 import {
   IMAGE_ACCEPT,
@@ -17,6 +20,28 @@ import {
 const tool = getToolBySlug("favicon-generator")!;
 const SIZES = [16, 32, 48, 180] as const;
 
+function relativeLuminance(hex: string): number {
+  const raw = hex.replace("#", "");
+  if (raw.length !== 6) return 0;
+  const rgb = [0, 2, 4].map((i) => {
+    const c = parseInt(raw.slice(i, i + 2), 16) / 255;
+    return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+  });
+  return 0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2];
+}
+
+function contrastRatio(a: string, b: string): number {
+  const l1 = relativeLuminance(a);
+  const l2 = relativeLuminance(b);
+  const lighter = Math.max(l1, l2);
+  const darker = Math.min(l1, l2);
+  return (lighter + 0.05) / (darker + 0.05);
+}
+
+const LINK_SNIPPET = `<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">`;
+
 export function FaviconGenerator() {
   const [mode, setMode] = useState<"image" | "text">("text");
   const [text, setText] = useState("CA");
@@ -25,7 +50,9 @@ export function FaviconGenerator() {
   const [sourceImg, setSourceImg] = useState<HTMLImageElement | null>(null);
   const [previews, setPreviews] = useState<Record<number, string>>({});
   const [error, setError] = useState<string | null>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const [downloadNote, setDownloadNote] = useState<string | null>(null);
+
+  const contrast = contrastRatio(fg, bg);
 
   const renderSizes = useCallback(async (draw: (ctx: CanvasRenderingContext2D, size: number) => void) => {
     const next: Record<number, string> = {};
@@ -47,19 +74,27 @@ export function FaviconGenerator() {
   }, []);
 
   useEffect(() => {
-    if (mode === "text") {
-      void renderSizes((ctx, size) => {
-        ctx.fillStyle = bg;
-        ctx.fillRect(0, 0, size, size);
-        ctx.fillStyle = fg;
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.font = `bold ${Math.round(size * 0.45)}px system-ui, sans-serif`;
-        ctx.fillText(text.slice(0, 3) || "?", size / 2, size / 2 + size * 0.02);
-      });
-    } else if (sourceImg) {
-      void renderSizes((ctx, size) => drawCover(ctx, sourceImg, size));
-    }
+    let cancelled = false;
+    void (async () => {
+      await Promise.resolve();
+      if (cancelled) return;
+      if (mode === "text") {
+        await renderSizes((ctx, size) => {
+          ctx.fillStyle = bg;
+          ctx.fillRect(0, 0, size, size);
+          ctx.fillStyle = fg;
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.font = `bold ${Math.round(size * 0.45)}px system-ui, sans-serif`;
+          ctx.fillText(text.slice(0, 3) || "?", size / 2, size / 2 + size * 0.02);
+        });
+      } else if (sourceImg) {
+        await renderSizes((ctx, size) => drawCover(ctx, sourceImg, size));
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, [mode, text, bg, fg, sourceImg, renderSizes]);
 
   const processFile = async (f: File) => {
@@ -87,9 +122,12 @@ export function FaviconGenerator() {
     downloadUrl(dataUrl, size === 180 ? "apple-touch-icon.png" : `favicon-${size}x${size}.png`);
   };
 
-  const downloadAll = () => {
-    for (const size of SIZES) {
-      downloadSize(size);
+  const downloadAll = async () => {
+    setDownloadNote("Downloading sizes one at a time — allow multiple downloads if your browser asks.");
+    for (let i = 0; i < SIZES.length; i++) {
+      downloadSize(SIZES[i]);
+      // Stagger so browsers don't coalesce / block rapid downloads.
+      await new Promise((r) => setTimeout(r, 350));
     }
   };
 
@@ -103,21 +141,15 @@ export function FaviconGenerator() {
         </div>
       </div>
 
-      <div className="flex gap-2">
-        {(["text", "image"] as const).map((m) => (
-          <button
-            key={m}
-            onClick={() => setMode(m)}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
-              mode === m
-                ? "border-[#6366f1]/40 bg-[#6366f1]/15 text-[#6366f1]"
-                : "border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)]"
-            }`}
-          >
-            {m === "text" ? "From text" : "From image"}
-          </button>
-        ))}
-      </div>
+      <SegmentedControl
+        label="Favicon source"
+        value={mode}
+        onChange={setMode}
+        segments={[
+          { value: "text", label: "From text" },
+          { value: "image", label: "From image" },
+        ]}
+      />
 
       {mode === "text" ? (
         <div className="flex flex-wrap gap-4 px-4 py-3 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)]">
@@ -132,40 +164,37 @@ export function FaviconGenerator() {
           </label>
           <label className="flex flex-col gap-1 text-xs text-[var(--text-muted)]">
             Background
-            <input type="color" value={bg} onChange={(e) => setBg(e.target.value)} className="h-9 w-14 cursor-pointer" />
+            <input type="color" value={bg} onChange={(e) => setBg(e.target.value)} className="h-9 w-14 cursor-pointer" aria-label="Background color" />
           </label>
           <label className="flex flex-col gap-1 text-xs text-[var(--text-muted)]">
             Text color
-            <input type="color" value={fg} onChange={(e) => setFg(e.target.value)} className="h-9 w-14 cursor-pointer" />
+            <input type="color" value={fg} onChange={(e) => setFg(e.target.value)} className="h-9 w-14 cursor-pointer" aria-label="Text color" />
           </label>
+          <p
+            className={`self-end text-xs ${contrast < 3 ? "text-[#f59e0b]" : "text-[var(--text-muted)]"}`}
+            role="status"
+          >
+            Contrast {contrast.toFixed(1)}:1
+            {contrast < 3 ? " — low for small icons" : contrast >= 4.5 ? " — good" : " — fair"}
+          </p>
         </div>
       ) : (
-        <div className="flex flex-col gap-2">
-          <button
-            onClick={() => inputRef.current?.click()}
-            className="px-4 py-3 rounded-lg border border-dashed border-[var(--border)] bg-[var(--bg-surface)] text-sm text-[var(--text-muted)] hover:border-[#6366f1]/40"
-          >
-            {sourceImg ? "Replace image" : "Upload square image (PNG/JPG/WebP)"}
-          </button>
-          <input
-            ref={inputRef}
-            type="file"
-            accept={IMAGE_ACCEPT}
-            className="hidden"
-            onChange={(e) => {
-              const f = e.target.files?.[0];
-              if (f) void processFile(f);
-            }}
-          />
-        </div>
+        <FileDropzone
+          accept={IMAGE_ACCEPT}
+          onFile={(f) => void processFile(f)}
+          title={sourceImg ? "Replace image" : "Upload square image"}
+          description="PNG, JPG, WebP, GIF · max 10 MB · cropped to cover"
+        />
       )}
 
-      {error && <p className="text-sm text-[#ef4444]">{error}</p>}
+      {error && <p role="alert" className="text-sm text-[#ef4444]">{error}</p>}
+      {downloadNote && <p className="text-xs text-[var(--text-muted)]" role="status">{downloadNote}</p>}
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {SIZES.map((size) => (
           <div key={size} className="rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] p-4 flex flex-col items-center gap-3">
             {previews[size] ? (
+              // eslint-disable-next-line @next/next/no-img-element -- pixel-perfect favicon preview
               <img src={previews[size]} alt={`${size}x${size}`} width={size} height={size} className="border border-[var(--border)]" style={{ imageRendering: size <= 32 ? "pixelated" : "auto" }} />
             ) : (
               <div className="w-12 h-12 bg-[var(--bg-elevated)]" />
@@ -181,13 +210,23 @@ export function FaviconGenerator() {
         ))}
       </div>
 
+      <div className="rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] p-4 flex flex-col gap-2">
+        <div className="flex items-center justify-between gap-3">
+          <span className="text-xs uppercase tracking-wider text-[var(--text-muted)]">HTML link tags</span>
+          <CopyButton value={LINK_SNIPPET} label="Copy snippet" compact />
+        </div>
+        <pre className="mono text-xs text-[var(--text-primary)] whitespace-pre-wrap break-all leading-relaxed">
+          {LINK_SNIPPET}
+        </pre>
+      </div>
+
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <p className="text-xs text-[var(--text-muted)]">
-          Tip: use <code className="mono">favicon-32x32.png</code> as <code className="mono">favicon.ico</code> replacement, and{" "}
-          <code className="mono">apple-touch-icon.png</code> for iOS home screens.
+          Tip: use <code className="mono">favicon-32x32.png</code> as a modern favicon, and{" "}
+          <code className="mono">apple-touch-icon.png</code> for iOS home screens. ZIP packaging deferred — download sizes individually if “Download all” is blocked.
         </p>
         <DownloadButton
-          onClick={downloadAll}
+          onClick={() => void downloadAll()}
           disabled={Object.keys(previews).length === 0}
           className="self-end shrink-0"
         >

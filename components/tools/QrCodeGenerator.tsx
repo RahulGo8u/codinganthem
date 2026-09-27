@@ -4,30 +4,66 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import QRCode from "qrcode";
 import { ToolShell } from "@/components/ToolShell";
 import { DownloadButton } from "@/components/DownloadButton";
+import { SegmentedControl } from "@/components/SegmentedControl";
 import { getToolBySlug } from "@/lib/tools";
 import { downloadUrl } from "@/lib/download";
 
 const tool = getToolBySlug("qr-code-generator")!;
 
 const SIZES = [128, 256, 512] as const;
-type Size = typeof SIZES[number];
+type Size = (typeof SIZES)[number];
+type Correction = "L" | "M" | "Q" | "H";
 
 const SAMPLE = "https://www.codinganthem.com";
+
+const CORRECTION_HINT: Record<Correction, string> = {
+  L: "~7% recovery — denser code, fine for clean prints",
+  M: "~15% recovery — good default for most URLs",
+  Q: "~25% recovery — better if the code may be scuffed",
+  H: "~30% recovery — best for logos/damage; larger modules",
+};
 
 export function QrCodeGenerator() {
   const [input, setInput] = useState("");
   const [size, setSize] = useState<Size>(256);
+  const [correction, setCorrection] = useState<Correction>("M");
+  const [dark, setDark] = useState("#000000");
+  const [light, setLight] = useState("#ffffff");
   const [dataUrl, setDataUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | undefined>();
   const reqRef = useRef(0);
 
+  const lowContrast = dark.toLowerCase() === light.toLowerCase();
+
   useEffect(() => {
-    if (!input.trim()) { setDataUrl(null); setError(undefined); return; }
     const id = ++reqRef.current;
-    QRCode.toDataURL(input, { width: size, margin: 2, color: { dark: "#000000", light: "#ffffff" } })
-      .then((url) => { if (id === reqRef.current) { setDataUrl(url); setError(undefined); } })
-      .catch(() => { if (id === reqRef.current) { setDataUrl(null); setError("Failed to generate QR code."); } });
-  }, [input, size]);
+    if (!input.trim()) {
+      void Promise.resolve().then(() => {
+        if (id !== reqRef.current) return;
+        setDataUrl(null);
+        setError(undefined);
+      });
+      return;
+    }
+    QRCode.toDataURL(input, {
+      width: size,
+      margin: 2,
+      errorCorrectionLevel: correction,
+      color: { dark, light },
+    })
+      .then((url) => {
+        if (id === reqRef.current) {
+          setDataUrl(url);
+          setError(undefined);
+        }
+      })
+      .catch(() => {
+        if (id === reqRef.current) {
+          setDataUrl(null);
+          setError("Failed to generate QR code.");
+        }
+      });
+  }, [input, size, correction, dark, light]);
 
   const handleDownload = useCallback(() => {
     if (!dataUrl) return;
@@ -48,6 +84,7 @@ export function QrCodeGenerator() {
       inputPlaceholder={"Enter any text or URL...\n\nhttps://www.codinganthem.com"}
       extraActions={
         <button
+          type="button"
           onClick={() => setInput(SAMPLE)}
           className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
         >
@@ -60,37 +97,85 @@ export function QrCodeGenerator() {
         </DownloadButton>
       }
       options={
-        <label className="flex items-center gap-2 text-[var(--text-muted)] text-xs">
-          Size
-          <div className="flex rounded-lg border border-[var(--border)] overflow-hidden text-xs">
-            {SIZES.map((s) => (
-              <button
-                key={s}
-                onClick={() => setSize(s)}
-                className={`px-3 py-1.5 transition-colors ${
-                  size === s
-                    ? "bg-[#6366f1]/15 text-[#6366f1]"
-                    : "text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)]"
-                }`}
-              >
-                {s}px
-              </button>
-            ))}
+        <div className="flex flex-col gap-3 w-full">
+          <div className="flex flex-wrap items-center gap-4">
+            <div className="flex items-center gap-2 text-[var(--text-muted)] text-xs">
+              <span>Size</span>
+              <SegmentedControl
+                label="QR size"
+                compact
+                value={String(size)}
+                onChange={(v) => setSize(Number(v) as Size)}
+                segments={SIZES.map((s) => ({ value: String(s), label: `${s}px` }))}
+              />
+            </div>
+            <div className="flex items-center gap-2 text-[var(--text-muted)] text-xs">
+              <span>Correction</span>
+              <SegmentedControl
+                label="Error correction"
+                compact
+                value={correction}
+                onChange={setCorrection}
+                segments={(["L", "M", "Q", "H"] as Correction[]).map((c) => ({
+                  value: c,
+                  label: c,
+                }))}
+              />
+            </div>
+            <label className="flex items-center gap-2 text-xs text-[var(--text-muted)]">
+              Dark
+              <input
+                type="color"
+                value={dark}
+                onChange={(e) => setDark(e.target.value)}
+                className="h-8 w-10 cursor-pointer"
+                aria-label="QR dark modules color"
+              />
+            </label>
+            <label className="flex items-center gap-2 text-xs text-[var(--text-muted)]">
+              Light
+              <input
+                type="color"
+                value={light}
+                onChange={(e) => setLight(e.target.value)}
+                className="h-8 w-10 cursor-pointer"
+                aria-label="QR light background color"
+              />
+            </label>
+            <button
+              type="button"
+              onClick={() => {
+                setDark("#000000");
+                setLight("#ffffff");
+              }}
+              className="text-xs text-[#6366f1] hover:underline"
+            >
+              Reset colors
+            </button>
           </div>
-        </label>
+          <p className="text-[11px] text-[var(--text-muted)] leading-relaxed">
+            {CORRECTION_HINT[correction]}. Keep high contrast (dark on light) and a quiet zone — scanners need margin around the code.
+            {lowContrast && (
+              <span className="text-[#f59e0b]"> Low contrast may fail to scan.</span>
+            )}
+          </p>
+        </div>
       }
       outputContent={
         dataUrl ? (
-          <div className="w-full min-h-[320px] flex items-center justify-center p-4">
+          <div className="w-full min-h-[320px] flex flex-col items-center justify-center gap-3 p-4 overflow-auto">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={dataUrl}
               alt="Generated QR code"
               width={size}
               height={size}
-              className="rounded-lg"
-              style={{ imageRendering: "pixelated" }}
+              className="rounded-lg max-w-full h-auto"
+              style={{ imageRendering: "pixelated", background: light }}
             />
+            <p className="text-[11px] text-[var(--text-muted)] text-center max-w-sm">
+              Tip: scan with your phone camera to verify before printing. Prefer black modules on a white background for reliability.
+            </p>
           </div>
         ) : (
           <div className="w-full min-h-[320px] flex items-center justify-center p-4">

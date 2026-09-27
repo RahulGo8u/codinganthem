@@ -17,7 +17,7 @@ export function ToolPageHeader({
 }) {
   return (
     <div className="flex flex-col gap-3">
-      <Breadcrumb current={tool.name} asHeading={false} />
+      <Breadcrumb current={tool.name} category={tool.category} asHeading={false} />
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div className="flex flex-col gap-1.5 min-w-0">
           <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-[var(--text-primary)]">

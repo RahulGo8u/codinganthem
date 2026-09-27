@@ -12,6 +12,17 @@ const SAMPLE = `curl -X POST https://api.example.com/users \\
   -H "Authorization: Bearer token123" \\
   -d '{"name":"Alice","role":"admin"}'`;
 
+const UNSUPPORTED = [
+  { flag: "--form", alt: "-F / --form (multipart)" },
+  { flag: "-F", alt: "-F / --form (multipart)" },
+  { flag: "--data-urlencode", alt: "--data-urlencode" },
+  { flag: "--compressed", alt: "--compressed" },
+  { flag: "--location", alt: "-L / --location" },
+  { flag: "-L", alt: "-L / --location" },
+  { flag: "--cookie", alt: "-b / --cookie" },
+  { flag: "-b", alt: "-b / --cookie" },
+];
+
 function tokenize(cmd: string): string[] {
   const normalized = cmd.replace(/\\\r?\n/g, " ");
   const tokens: string[] = [];
@@ -40,11 +51,20 @@ function tokenize(cmd: string): string[] {
   return tokens;
 }
 
-function curlToFetch(curl: string): string {
+function curlToFetch(curl: string): { code: string; warnings: string[] } {
   const trimmed = curl.trim();
   if (!trimmed.toLowerCase().startsWith("curl")) {
     throw new Error("Input must start with `curl`.");
   }
+
+  const warnings: string[] = [];
+  for (const { flag, alt } of UNSUPPORTED) {
+    if (trimmed.includes(flag)) {
+      warnings.push(`${alt} is not fully supported in this converter.`);
+    }
+  }
+  // Dedupe similar warnings
+  const uniqueWarnings = [...new Set(warnings)];
 
   const tokens = tokenize(trimmed);
   let url = "";
@@ -86,7 +106,9 @@ function curlToFetch(curl: string): string {
     options.push(`  body: ${JSON.stringify(body)},`);
   }
 
-  return `fetch(${JSON.stringify(url)}, {\n${options.join("\n")}\n})\n  .then((res) => res.json())\n  .then((data) => console.log(data));`;
+  const code = `fetch(${JSON.stringify(url)}, {\n${options.join("\n")}\n})\n  .then(async (res) => {\n    if (!res.ok) throw new Error(\`HTTP \${res.status} \${res.statusText}\`);\n    return res.json();\n  })\n  .then((data) => console.log(data))\n  .catch((err) => console.error(err));`;
+
+  return { code, warnings: uniqueWarnings };
 }
 
 export function CurlToFetch() {
@@ -95,7 +117,11 @@ export function CurlToFetch() {
   const { output, error } = useMemo(() => {
     if (!input.trim()) return { output: "", error: undefined };
     try {
-      return { output: curlToFetch(input), error: undefined };
+      const { code, warnings } = curlToFetch(input);
+      return {
+        output: code,
+        error: warnings.length > 0 ? warnings.join(" ") : undefined,
+      };
     } catch (e) {
       return { output: "", error: (e as Error).message };
     }
@@ -110,19 +136,26 @@ export function CurlToFetch() {
       error={error}
       hideFileActions
       showClear
+      downloadFileName="fetch.js"
+      downloadMimeType="text/javascript"
       inputLabel="cURL command"
       outputLabel="fetch() call"
-      inputPlaceholder={"curl -X POST https://api.example.com \\\n  -H 'Content-Type: application/json' \\\n  -d '{\"key\":\"value\"}'"}
+      inputPlaceholder={
+        "curl -X POST https://api.example.com \\\n  -H 'Content-Type: application/json' \\\n  -d '{\"key\":\"value\"}'"
+      }
       outputPlaceholder="JavaScript fetch() code will appear here..."
       outputContent={
         output ? (
           <HighlightedOutput code={output} lang="js" />
         ) : (
-          <p className="p-4 text-[var(--text-muted)] text-sm">JavaScript fetch() code will appear here...</p>
+          <p className="p-4 text-[var(--text-muted)] text-sm">
+            JavaScript fetch() code will appear here...
+          </p>
         )
       }
       extraActions={
         <button
+          type="button"
           onClick={() => setInput(SAMPLE)}
           className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
         >

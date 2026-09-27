@@ -1,9 +1,11 @@
 "use client";
 
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { getToolBySlug } from "@/lib/tools";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { DownloadButton } from "@/components/DownloadButton";
+import { FileDropzone } from "@/components/FileDropzone";
+import { SegmentedControl } from "@/components/SegmentedControl";
 import {
   IMAGE_ACCEPT,
   IMAGE_MAX_BYTES,
@@ -50,13 +52,11 @@ async function compressToSmaller(
   let q = startQuality;
   let blob = await encodeImage(img, fmt, q);
 
-  // Prefer a smaller file; walk quality down in steps.
   while (blob.size >= sourceSize && q > 0.35) {
     q = Math.max(0.35, Math.round((q - 0.1) * 100) / 100);
     blob = await encodeImage(img, fmt, q);
   }
 
-  // Still larger (common for tiny already-optimized assets) — keep original.
   if (blob.size >= sourceSize) {
     return { blob, quality: q, usedOriginal: true };
   }
@@ -67,6 +67,7 @@ async function compressToSmaller(
 export function ImageCompressor() {
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
+  const [dims, setDims] = useState<{ w: number; h: number } | null>(null);
   const [resultUrl, setResultUrl] = useState<string | null>(null);
   const [resultSize, setResultSize] = useState(0);
   const [quality, setQuality] = useState(0.75);
@@ -75,10 +76,9 @@ export function ImageCompressor() {
   const [error, setError] = useState<string | null>(null);
   const [note, setNote] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  const [dragging, setDragging] = useState(false);
   const [keptOriginal, setKeptOriginal] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
   const resultBlob = useRef<Blob | null>(null);
+  const debounceRef = useRef<number | null>(null);
 
   const compress = useCallback(async (source: File, q: number, fmt: OutFormat) => {
     setBusy(true);
@@ -87,6 +87,7 @@ export function ImageCompressor() {
     setKeptOriginal(false);
     try {
       const img = await loadImageFromFile(source);
+      setDims({ w: img.naturalWidth, h: img.naturalHeight });
       const { blob, quality: usedQ, usedOriginal } = await compressToSmaller(
         img,
         source.size,
@@ -95,7 +96,6 @@ export function ImageCompressor() {
       );
 
       if (usedOriginal) {
-        // Serve the original bytes so download never ships a larger file.
         resultBlob.current = source;
         setResultSize(source.size);
         setAppliedQuality(null);
@@ -128,6 +128,22 @@ export function ImageCompressor() {
     }
   }, []);
 
+  const scheduleCompress = useCallback(
+    (source: File, q: number, fmt: OutFormat) => {
+      if (debounceRef.current) window.clearTimeout(debounceRef.current);
+      debounceRef.current = window.setTimeout(() => {
+        void compress(source, q, fmt);
+      }, 280);
+    },
+    [compress]
+  );
+
+  useEffect(() => {
+    return () => {
+      if (debounceRef.current) window.clearTimeout(debounceRef.current);
+    };
+  }, []);
+
   const processFile = useCallback(
     async (f: File) => {
       if (f.size > IMAGE_MAX_BYTES) {
@@ -143,8 +159,6 @@ export function ImageCompressor() {
         if (prev) URL.revokeObjectURL(prev);
         return URL.createObjectURL(f);
       });
-      // Always prefer a lossy format for compression. Keeping PNG as PNG often
-      // *increases* size because PNG is lossless and canvas re-encodes poorly.
       const defaultFmt: OutFormat = "image/webp";
       setFormat(defaultFmt);
       await compress(f, quality, defaultFmt);
@@ -167,32 +181,12 @@ export function ImageCompressor() {
         </div>
       </div>
 
-      <div
-        onDragOver={(e) => {
-          e.preventDefault();
-          setDragging(true);
-        }}
-        onDragLeave={() => setDragging(false)}
-        onDrop={(e) => {
-          e.preventDefault();
-          setDragging(false);
-          const f = e.dataTransfer.files?.[0];
-          if (f) void processFile(f);
-        }}
-        onClick={() => inputRef.current?.click()}
-        className={`rounded-xl border-2 border-dashed p-10 text-center cursor-pointer transition-colors ${
-          dragging
-            ? "border-[#6366f1] bg-[#6366f1]/10"
-            : "border-[var(--border)] bg-[var(--bg-surface)] hover:border-[#6366f1]/40"
-        }`}
-      >
-        <p className="text-sm text-[var(--text-primary)] font-medium">Drop an image here or click to upload</p>
-        <p className="text-xs text-[var(--text-muted)] mt-1">PNG, JPG, WebP, GIF · max 10 MB · outputs WebP or JPEG</p>
-        <input ref={inputRef} type="file" accept={IMAGE_ACCEPT} className="hidden" onChange={(e) => {
-          const f = e.target.files?.[0];
-          if (f) void processFile(f);
-        }} />
-      </div>
+      <FileDropzone
+        accept={IMAGE_ACCEPT}
+        onFile={(f) => void processFile(f)}
+        title="Drop an image here or click to upload"
+        description="PNG, JPG, WebP, GIF · max 10 MB · outputs WebP or JPEG"
+      />
 
       {error && <p role="alert" className="text-sm text-[#ef4444]">{error}</p>}
       {note && <p className="text-sm text-[var(--text-muted)] leading-relaxed">{note}</p>}
@@ -208,41 +202,52 @@ export function ImageCompressor() {
                 max={0.95}
                 step={0.05}
                 value={quality}
+                aria-valuetext={`${Math.round(quality * 100)} percent`}
                 onChange={(e) => {
                   const q = Number(e.target.value);
                   setQuality(q);
-                  if (file) void compress(file, q, format);
+                  if (file) scheduleCompress(file, q, format);
                 }}
                 className="w-32"
               />
               <span className="mono text-[var(--text-primary)] w-8">{Math.round(quality * 100)}</span>
             </label>
-            <label className="flex items-center gap-2 text-xs text-[var(--text-muted)]">
+            <div className="flex items-center gap-2 text-xs text-[var(--text-muted)]">
               Format
-              <select
+              <SegmentedControl
+                label="Output format"
+                compact
                 value={format}
-                onChange={(e) => {
-                  const fmt = e.target.value as OutFormat;
+                onChange={(fmt) => {
                   setFormat(fmt);
-                  if (file) void compress(file, quality, fmt);
+                  if (file) scheduleCompress(file, quality, fmt);
                 }}
-                className="rounded border border-[var(--border)] bg-[var(--bg-elevated)] px-2 py-1 text-[var(--text-primary)]"
-              >
-                <option value="image/webp">WebP (best compression)</option>
-                <option value="image/jpeg">JPEG</option>
-              </select>
-            </label>
+                segments={[
+                  { value: "image/webp", label: "WebP" },
+                  { value: "image/jpeg", label: "JPEG" },
+                ]}
+              />
+            </div>
             {appliedQuality !== null && appliedQuality < quality - 0.01 && (
               <span className="text-xs text-[var(--text-muted)]">
                 Applied quality: {Math.round(appliedQuality * 100)}
               </span>
             )}
-            {busy && <span className="text-xs text-[var(--text-muted)]">Compressing…</span>}
+            {busy && (
+              <span className="text-xs text-[var(--text-muted)]" aria-live="polite">
+                Compressing…
+              </span>
+            )}
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] p-4 flex flex-col gap-2">
-              <span className="text-xs uppercase tracking-wider text-[var(--text-muted)]">Original · {formatBytes(file.size)}</span>
+              <span className="text-xs uppercase tracking-wider text-[var(--text-muted)]">
+                Original · {formatBytes(file.size)}
+                {dims && ` · ${dims.w}×${dims.h}`}
+                {file.type && ` · ${file.type.replace("image/", "").toUpperCase()}`}
+              </span>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               {preview && <img src={preview} alt="Original" className="max-h-64 object-contain mx-auto" />}
             </div>
             <div className="rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] p-4 flex flex-col gap-2">
@@ -253,9 +258,10 @@ export function ImageCompressor() {
                       deltaPct > 0 ? ` · −${deltaPct}%` : deltaPct < 0 ? ` · +${Math.abs(deltaPct)}%` : ""
                     }`}
               </span>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               {resultUrl && <img src={resultUrl} alt="Compressed" className="max-h-64 object-contain mx-auto" />}
               <DownloadButton
-                disabled={!resultBlob.current}
+                disabled={!resultUrl}
                 onClick={() => {
                   if (!resultBlob.current || !file) return;
                   if (keptOriginal) {

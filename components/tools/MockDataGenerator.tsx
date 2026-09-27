@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { ToolShell } from "@/components/ToolShell";
+import { SegmentedControl } from "@/components/SegmentedControl";
 import { getToolBySlug } from "@/lib/tools";
 import { HighlightedOutput } from "@/lib/highlight";
 
@@ -16,26 +17,22 @@ interface FieldDef {
 }
 
 const FIELD_DEFS: FieldDef[] = [
-  // Identity
-  { key: "fullName",     label: "Full Name",      group: "Identity" },
-  { key: "email",        label: "Email",           group: "Identity" },
-  { key: "username",     label: "Username",        group: "Identity" },
-  { key: "phone",        label: "Phone",           group: "Identity" },
-  // Location
-  { key: "streetAddress",label: "Street Address",  group: "Location" },
-  { key: "city",         label: "City",            group: "Location" },
-  { key: "country",      label: "Country",         group: "Location" },
-  // Work
-  { key: "company",      label: "Company",         group: "Work" },
-  { key: "jobTitle",     label: "Job Title",       group: "Work" },
-  // Other
-  { key: "uuid",         label: "UUID",            group: "Other" },
-  { key: "date",         label: "Date",            group: "Other" },
-  { key: "number",       label: "Number (1–1000)", group: "Other" },
-  { key: "boolean",      label: "Boolean",         group: "Other" },
-  { key: "url",          label: "URL",             group: "Other" },
-  { key: "hexColor",     label: "Hex Color",       group: "Other" },
-  { key: "lorem",        label: "Lorem Sentence",  group: "Other" },
+  { key: "fullName", label: "Full Name", group: "Identity" },
+  { key: "email", label: "Email", group: "Identity" },
+  { key: "username", label: "Username", group: "Identity" },
+  { key: "phone", label: "Phone", group: "Identity" },
+  { key: "streetAddress", label: "Street Address", group: "Location" },
+  { key: "city", label: "City", group: "Location" },
+  { key: "country", label: "Country", group: "Location" },
+  { key: "company", label: "Company", group: "Work" },
+  { key: "jobTitle", label: "Job Title", group: "Work" },
+  { key: "uuid", label: "UUID", group: "Other" },
+  { key: "date", label: "Date", group: "Other" },
+  { key: "number", label: "Number (1–1000)", group: "Other" },
+  { key: "boolean", label: "Boolean", group: "Other" },
+  { key: "url", label: "URL", group: "Other" },
+  { key: "hexColor", label: "Hex Color", group: "Other" },
+  { key: "lorem", label: "Lorem Sentence", group: "Other" },
 ];
 
 const GROUPS = ["Identity", "Location", "Work", "Other"];
@@ -61,11 +58,25 @@ export function MockDataGenerator() {
   const [output, setOutput] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | undefined>();
+  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({
+    Identity: true,
+    Location: false,
+    Work: false,
+    Other: true,
+  });
 
   const toggle = useCallback((key: string) => {
     setSelected((prev) =>
       prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
     );
+  }, []);
+
+  const selectGroup = useCallback((group: string, on: boolean) => {
+    const keys = FIELD_DEFS.filter((f) => f.group === group).map((f) => f.key);
+    setSelected((prev) => {
+      if (on) return Array.from(new Set([...prev, ...keys]));
+      return prev.filter((k) => !keys.includes(k));
+    });
   }, []);
 
   const generate = useCallback(async (fields: string[], rows: number, fmt: Format) => {
@@ -81,22 +92,22 @@ export function MockDataGenerator() {
         const row: Record<string, unknown> = {};
         for (const key of fields) {
           switch (key) {
-            case "fullName":      row.fullName      = faker.person.fullName(); break;
-            case "email":         row.email         = faker.internet.email(); break;
-            case "username":      row.username      = faker.internet.username(); break;
-            case "phone":         row.phone         = faker.phone.number(); break;
+            case "fullName": row.fullName = faker.person.fullName(); break;
+            case "email": row.email = faker.internet.email(); break;
+            case "username": row.username = faker.internet.username(); break;
+            case "phone": row.phone = faker.phone.number(); break;
             case "streetAddress": row.streetAddress = faker.location.streetAddress(); break;
-            case "city":          row.city          = faker.location.city(); break;
-            case "country":       row.country       = faker.location.country(); break;
-            case "company":       row.company       = faker.company.name(); break;
-            case "jobTitle":      row.jobTitle      = faker.person.jobTitle(); break;
-            case "uuid":          row.uuid          = faker.string.uuid(); break;
-            case "date":          row.date          = faker.date.past().toISOString().split("T")[0]; break;
-            case "number":        row.number        = faker.number.int({ min: 1, max: 1000 }); break;
-            case "boolean":       row.boolean       = faker.datatype.boolean(); break;
-            case "url":           row.url           = faker.internet.url(); break;
-            case "hexColor":      row.hexColor      = faker.color.rgb({ format: "hex" }); break;
-            case "lorem":         row.lorem         = faker.lorem.sentence(); break;
+            case "city": row.city = faker.location.city(); break;
+            case "country": row.country = faker.location.country(); break;
+            case "company": row.company = faker.company.name(); break;
+            case "jobTitle": row.jobTitle = faker.person.jobTitle(); break;
+            case "uuid": row.uuid = faker.string.uuid(); break;
+            case "date": row.date = faker.date.past().toISOString().split("T")[0]; break;
+            case "number": row.number = faker.number.int({ min: 1, max: 1000 }); break;
+            case "boolean": row.boolean = faker.datatype.boolean(); break;
+            case "url": row.url = faker.internet.url(); break;
+            case "hexColor": row.hexColor = faker.color.rgb({ format: "hex" }); break;
+            case "lorem": row.lorem = faker.lorem.sentence(); break;
           }
         }
         return row;
@@ -110,7 +121,7 @@ export function MockDataGenerator() {
   }, []);
 
   const handleGenerate = useCallback(() => {
-    generate(selected, count, format);
+    void generate(selected, count, format);
   }, [generate, selected, count, format]);
 
   const handleLoadSample = useCallback(() => {
@@ -118,7 +129,7 @@ export function MockDataGenerator() {
     setSelected(sampleFields);
     setCount(5);
     setFormat("json");
-    generate(sampleFields, 5, "json");
+    void generate(sampleFields, 5, "json");
   }, [generate]);
 
   const handleClear = useCallback(() => {
@@ -139,7 +150,20 @@ export function MockDataGenerator() {
       outputLabel={format === "json" ? "JSON Output" : "CSV Output"}
       outputPlaceholder="Configure your schema above and click Generate..."
       outputContent={
-        output ? (
+        loading ? (
+          <div
+            className="p-6 flex flex-col gap-3"
+            role="status"
+            aria-busy="true"
+            aria-live="polite"
+          >
+            <p className="text-sm text-[var(--text-muted)]">Loading faker and generating rows…</p>
+            <div className="h-3 w-2/3 rounded bg-[var(--bg-elevated)] animate-pulse" />
+            <div className="h-3 w-1/2 rounded bg-[var(--bg-elevated)] animate-pulse" />
+            <div className="h-3 w-3/4 rounded bg-[var(--bg-elevated)] animate-pulse" />
+            <div className="h-3 w-2/5 rounded bg-[var(--bg-elevated)] animate-pulse" />
+          </div>
+        ) : output ? (
           format === "json" ? (
             <HighlightedOutput code={output} lang="json" />
           ) : (
@@ -152,12 +176,14 @@ export function MockDataGenerator() {
       extraActions={
         <>
           <button
+            type="button"
             onClick={handleLoadSample}
             className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
           >
             Load sample
           </button>
           <button
+            type="button"
             onClick={() => setOutput("")}
             disabled={!output}
             className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[#ef4444]/40 bg-[#ef4444]/10 text-[#ef4444] hover:bg-[#ef4444]/20 hover:border-[#ef4444]/60 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
@@ -167,34 +193,64 @@ export function MockDataGenerator() {
         </>
       }
       options={
-        <div className="flex flex-col gap-4 w-full">
-          {/* Field selection */}
-          <div className="flex flex-col gap-3">
-            {GROUPS.map((group) => (
-              <div key={group} className="flex flex-wrap items-center gap-x-4 gap-y-1.5">
-                <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--text-muted)] w-16 shrink-0">
-                  {group}
-                </span>
-                {FIELD_DEFS.filter((f) => f.group === group).map((field) => (
-                  <label
-                    key={field.key}
-                    className="flex items-center gap-1.5 text-xs text-[var(--text-muted)] cursor-pointer select-none hover:text-[var(--text-primary)] transition-colors"
+        <div className="flex flex-col gap-3 w-full">
+          {GROUPS.map((group) => {
+            const fields = FIELD_DEFS.filter((f) => f.group === group);
+            const groupKeys = fields.map((f) => f.key);
+            const selectedInGroup = groupKeys.filter((k) => selected.includes(k)).length;
+            const open = openGroups[group];
+            return (
+              <div key={group} className="rounded-lg border border-[var(--border)] bg-[var(--bg-elevated)]/40">
+                <div className="flex flex-wrap items-center gap-2 px-3 py-2">
+                  <button
+                    type="button"
+                    aria-expanded={open}
+                    onClick={() => setOpenGroups((prev) => ({ ...prev, [group]: !prev[group] }))}
+                    className="text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)] hover:text-[var(--text-primary)]"
                   >
-                    <input
-                      type="checkbox"
-                      checked={selected.includes(field.key)}
-                      onChange={() => toggle(field.key)}
-                      className="accent-[#6366f1]"
-                    />
-                    {field.label}
-                  </label>
-                ))}
+                    {open ? "▾" : "▸"} {group}
+                    <span className="ml-1.5 normal-case tracking-normal font-normal">
+                      ({selectedInGroup}/{fields.length})
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => selectGroup(group, true)}
+                    className="text-[11px] text-[#6366f1] hover:underline"
+                  >
+                    Select all
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => selectGroup(group, false)}
+                    className="text-[11px] text-[var(--text-muted)] hover:underline"
+                  >
+                    Clear
+                  </button>
+                </div>
+                {open && (
+                  <div className="flex flex-wrap gap-x-4 gap-y-1.5 px-3 pb-3">
+                    {fields.map((field) => (
+                      <label
+                        key={field.key}
+                        className="flex items-center gap-1.5 text-xs text-[var(--text-muted)] cursor-pointer select-none hover:text-[var(--text-primary)] transition-colors"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={selected.includes(field.key)}
+                          onChange={() => toggle(field.key)}
+                          className="accent-[#6366f1]"
+                        />
+                        {field.label}
+                      </label>
+                    ))}
+                  </div>
+                )}
               </div>
-            ))}
-          </div>
+            );
+          })}
 
-          {/* Controls row */}
-          <div className="flex flex-wrap items-center gap-4 pt-1 border-t border-[var(--border)]">
+          <div className="flex flex-wrap items-center gap-4 pt-1">
             <label className="flex items-center gap-2 text-[var(--text-muted)] text-xs">
               Rows
               <input
@@ -207,26 +263,21 @@ export function MockDataGenerator() {
               />
             </label>
 
-            <div className="flex rounded-lg border border-[var(--border)] overflow-hidden text-xs">
-              {(["json", "csv"] as Format[]).map((f) => (
-                <button
-                  key={f}
-                  onClick={() => setFormat(f)}
-                  className={`px-3 py-1.5 uppercase transition-colors ${
-                    format === f
-                      ? "bg-[#6366f1]/15 text-[#6366f1]"
-                      : "text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)]"
-                  }`}
-                >
-                  {f}
-                </button>
-              ))}
-            </div>
+            <SegmentedControl
+              label="Output format"
+              value={format}
+              onChange={setFormat}
+              segments={[
+                { value: "json", label: "JSON" },
+                { value: "csv", label: "CSV" },
+              ]}
+            />
 
             <button
+              type="button"
               onClick={handleGenerate}
               disabled={loading || selected.length === 0}
-              className="px-4 py-1.5 rounded-lg text-xs font-medium border border-[#6366f1]/40 bg-[#6366f1]/15 text-[#6366f1] hover:bg-[#6366f1]/25 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              className="px-4 py-2 rounded-lg text-sm font-semibold bg-[#6366f1] text-white hover:bg-[#5558e6] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
               {loading ? "Generating…" : "Generate"}
             </button>

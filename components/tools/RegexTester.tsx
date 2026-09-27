@@ -193,7 +193,7 @@ export function RegexTester() {
         </div>
         {result?.error && <p className="text-xs text-[#ef4444]">{result.error}</p>}
 
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2" role="group" aria-label="Regex flags">
           {[
             { f: "g", label: "global (g)" },
             { f: "i", label: "case insensitive (i)" },
@@ -203,11 +203,12 @@ export function RegexTester() {
             <button
               key={f}
               type="button"
+              aria-pressed={flags.includes(f)}
               onClick={() => {
                 toggleFlag(f);
                 setActiveMatch(0);
               }}
-              className={`px-2.5 py-1 rounded-full text-xs border transition-colors ${
+              className={`min-h-[36px] px-3 py-1.5 rounded-full text-xs border transition-colors ${
                 flags.includes(f)
                   ? "bg-[#6366f1]/15 text-[#6366f1] border-[#6366f1]/40"
                   : "text-[var(--text-muted)] border-[var(--border)] hover:text-[var(--text-primary)]"
@@ -217,6 +218,11 @@ export function RegexTester() {
             </button>
           ))}
         </div>
+        {result && !result.error && result.matches.length >= 1000 && (
+          <p role="status" className="text-xs text-[#f59e0b]">
+            Match list truncated at 1,000 results for performance.
+          </p>
+        )}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -248,18 +254,21 @@ export function RegexTester() {
                   <button
                     type="button"
                     onClick={goPrev}
-                    className="px-2.5 py-1 rounded-md text-xs font-medium border border-[#6366f1]/45 bg-[#6366f1]/10 text-[var(--accent-text)] hover:bg-[#6366f1]/20 transition-colors"
+                    className="min-h-[40px] min-w-[44px] px-3 py-2 rounded-md text-xs font-medium border border-[#6366f1]/45 bg-[#6366f1]/10 text-[var(--accent-text)] hover:bg-[#6366f1]/20 transition-colors"
                     aria-label="Previous match"
                   >
                     ↑ Prev
                   </button>
-                  <span className="text-xs text-[var(--text-muted)] mono tabular-nums min-w-[4.5rem] text-center">
+                  <span
+                    className="text-xs text-[var(--text-muted)] mono tabular-nums min-w-[4.5rem] text-center"
+                    aria-live="polite"
+                  >
                     {displayActive + 1} of {matchCount}
                   </span>
                   <button
                     type="button"
                     onClick={goNext}
-                    className="px-2.5 py-1 rounded-md text-xs font-medium border border-[#22c55e]/45 bg-[#22c55e]/10 text-[#22c55e] hover:bg-[#22c55e]/20 transition-colors"
+                    className="min-h-[40px] min-w-[44px] px-3 py-2 rounded-md text-xs font-medium border border-[#22c55e]/45 bg-[#22c55e]/10 text-[#22c55e] hover:bg-[#22c55e]/20 transition-colors"
                     aria-label="Next match"
                   >
                     ↓ Next

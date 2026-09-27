@@ -1,7 +1,9 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import Link from "next/link";
 import { ToolShell } from "@/components/ToolShell";
+import { SegmentedControl } from "@/components/SegmentedControl";
 import { getToolBySlug } from "@/lib/tools";
 import { HighlightedOutput } from "@/lib/highlight";
 
@@ -55,35 +57,58 @@ export function JwtValidator() {
   const [algo, setAlgo] = useState<Algo>("HS256");
   const [showSecret, setShowSecret] = useState(false);
   const [output, setOutput] = useState("");
-  const [statusLines, setStatusLines] = useState<string[]>([]);
+  const [statusLines, setStatusLines] = useState<{ label: string; bad: boolean }[]>([]);
   const [header, setHeader] = useState<Record<string, unknown> | null>(null);
   const [payload, setPayload] = useState<Record<string, unknown> | null>(null);
   const [error, setError] = useState<string | undefined>();
   const reqRef = useRef(0);
+  const hydratedQuery = useRef(false);
+
+  // Prefill token from ?token= when arriving from JWT Decoder.
+  useEffect(() => {
+    if (hydratedQuery.current || typeof window === "undefined") return;
+    hydratedQuery.current = true;
+    const params = new URLSearchParams(window.location.search);
+    const q = params.get("token");
+    if (q) {
+      void Promise.resolve().then(() => setToken(q));
+    }
+  }, []);
 
   useEffect(() => {
+    const id = ++reqRef.current;
     if (!token.trim() || !secret) {
-      setOutput("");
-      setStatusLines([]);
-      setHeader(null);
-      setPayload(null);
-      setError(undefined);
+      void Promise.resolve().then(() => {
+        if (id !== reqRef.current) return;
+        setOutput("");
+        setStatusLines([]);
+        setHeader(null);
+        setPayload(null);
+        setError(undefined);
+      });
       return;
     }
-    const id = ++reqRef.current;
     verifyJwt(token, secret, algo)
       .then(({ valid, expired, payload: p, header: h }) => {
         if (id !== reqRef.current) return;
-        const status = [
-          `Signature: ${valid ? "✓ VALID" : "✕ INVALID"}`,
-          ...(valid && expired ? ["Expiry:    ✕ TOKEN EXPIRED"] : []),
-          ...(valid && !expired && p.exp ? ["Expiry:    ✓ valid"] : []),
+        const status: { label: string; bad: boolean }[] = [
+          { label: valid ? "Signature: Valid" : "Signature: Invalid", bad: !valid },
+          ...(valid && expired ? [{ label: "Expiry: Token expired", bad: true }] : []),
+          ...(valid && !expired && p.exp ? [{ label: "Expiry: Valid", bad: false }] : []),
         ];
         setStatusLines(status);
         setHeader(h);
         setPayload(p);
         setOutput(
-          [...status, "", "Header:", JSON.stringify(h, null, 2), "", "Payload:", JSON.stringify(p, null, 2)].join("\n")
+          [
+            ...status.map((s) => s.label),
+            "",
+            "Header:",
+            JSON.stringify(h, null, 2),
+            "",
+            "Payload:",
+            JSON.stringify(p, null, 2),
+          ].join("\n")
         );
         setError(undefined);
       })
@@ -96,6 +121,10 @@ export function JwtValidator() {
         setError((e as Error).message);
       });
   }, [token, secret, algo]);
+
+  const decoderHref = token.trim()
+    ? `/tools/jwt-decoder?token=${encodeURIComponent(token.trim())}`
+    : "/tools/jwt-decoder";
 
   return (
     <ToolShell
@@ -112,29 +141,29 @@ export function JwtValidator() {
       outputPlaceholder="Validation result will appear here..."
       outputContent={
         header && payload ? (
-          <div className="flex flex-col">
+          <div
+            className={`flex flex-col border-l-4 ${
+              statusLines.some((s) => s.bad) ? "border-l-[var(--error)]" : "border-l-[#22c55e]"
+            }`}
+          >
             <div className="px-4 py-3 border-b border-[var(--border)] flex flex-wrap gap-2">
-              {statusLines.map((line) => {
-                const isBad = line.includes("INVALID") || line.includes("EXPIRED");
-                const [label, ...rest] = line.split(":");
-                return (
-                  <span
-                    key={line}
-                    className={`badge mono ${isBad ? "" : "badge-success"}`}
-                    style={
-                      isBad
-                        ? {
-                            color: "var(--error)",
-                            background: "color-mix(in srgb, var(--error) 12%, transparent)",
-                            borderColor: "color-mix(in srgb, var(--error) 35%, transparent)",
-                          }
-                        : undefined
-                    }
-                  >
-                    {label.trim()}: {rest.join(":").trim()}
-                  </span>
-                );
-              })}
+              {statusLines.map((line) => (
+                <span
+                  key={line.label}
+                  className={`badge mono ${line.bad ? "" : "badge-success"}`}
+                  style={
+                    line.bad
+                      ? {
+                          color: "var(--error)",
+                          background: "color-mix(in srgb, var(--error) 12%, transparent)",
+                          borderColor: "color-mix(in srgb, var(--error) 35%, transparent)",
+                        }
+                      : undefined
+                  }
+                >
+                  {line.label}
+                </span>
+              ))}
             </div>
             <div className="px-4 pt-3">
               <p className="text-[10px] font-medium uppercase tracking-wider text-[var(--text-muted)]">Header</p>
@@ -146,46 +175,57 @@ export function JwtValidator() {
             <HighlightedOutput code={JSON.stringify(payload, null, 2)} />
           </div>
         ) : token.trim() && !secret ? (
-          <p className="p-4 text-sm text-[var(--text-muted)] leading-relaxed">
-            Enter your secret key above to validate the signature.
+          <p className="p-4 text-sm text-[var(--text-muted)] leading-relaxed" role="status">
+            Enter your secret key in the field above to validate the signature.
           </p>
         ) : undefined
       }
       extraActions={
-        <button
-          onClick={() => { setToken(SAMPLE_TOKEN); setSecret(SAMPLE_SECRET); }}
-          className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
-        >
-          Load sample
-        </button>
+        <>
+          <button
+            type="button"
+            onClick={() => { setToken(SAMPLE_TOKEN); setSecret(SAMPLE_SECRET); }}
+            className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
+          >
+            Load sample
+          </button>
+          <Link
+            href={decoderHref}
+            className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
+          >
+            Open in JWT Decoder
+          </Link>
+        </>
       }
       options={
-        <div className="flex flex-wrap items-center gap-4">
-          <div className="flex rounded-lg border border-[var(--border)] overflow-hidden text-xs">
-            {(["HS256", "HS384", "HS512"] as Algo[]).map((a) => (
-              <button
-                key={a}
-                onClick={() => setAlgo(a)}
-                className={`px-3 py-1.5 transition-colors ${
-                  algo === a ? "bg-[#6366f1]/15 text-[#6366f1]" : "text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)]"
-                }`}
-              >
-                {a}
-              </button>
-            ))}
-          </div>
-          <div className="flex items-center gap-2">
-            <label className="text-xs text-[var(--text-muted)]">Secret</label>
-            <div className="relative">
+        <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3 w-full">
+          <SegmentedControl
+            label="HMAC algorithm"
+            value={algo}
+            onChange={setAlgo}
+            segments={(["HS256", "HS384", "HS512"] as Algo[]).map((a) => ({
+              value: a,
+              label: a,
+            }))}
+          />
+          <div className="flex flex-col gap-1 min-w-0 flex-1 sm:max-w-md">
+            <label htmlFor="jwt-validator-secret" className="text-xs text-[var(--text-muted)]">
+              Secret
+            </label>
+            <div className="relative w-full">
               <input
+                id="jwt-validator-secret"
                 type={showSecret ? "text" : "password"}
                 value={secret}
                 onChange={(e) => setSecret(e.target.value)}
                 placeholder="Enter secret key..."
-                className="mono pr-14 px-3 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--bg-elevated)] text-xs text-[var(--text-primary)] focus:outline-none w-48"
+                autoComplete="off"
+                className="mono w-full pr-16 px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--bg-elevated)] text-xs text-[var(--text-primary)] focus:outline-none"
               />
               <button
+                type="button"
                 onClick={() => setShowSecret((v) => !v)}
+                aria-label={showSecret ? "Hide secret" : "Show secret"}
                 className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-[var(--text-muted)] hover:text-[var(--text-primary)]"
               >
                 {showSecret ? "Hide" : "Show"}

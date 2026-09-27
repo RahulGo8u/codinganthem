@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { ToolShell } from "@/components/ToolShell";
+import { SegmentedControl } from "@/components/SegmentedControl";
 import { getToolBySlug } from "@/lib/tools";
 
 const tool = getToolBySlug("string-escape")!;
@@ -11,7 +12,7 @@ const SAMPLES = {
   unescape: 'He said \\"hello\\"\\nNew line here\\tTabbed',
 };
 
-function escapeString(str: string): string {
+function escapeGeneric(str: string): string {
   return str
     .replace(/\\/g, "\\\\")
     .replace(/"/g, '\\"')
@@ -24,8 +25,13 @@ function escapeString(str: string): string {
     );
 }
 
-function unescapeString(str: string): string {
-  return str
+function escapeJson(str: string): string {
+  return JSON.stringify(str).slice(1, -1);
+}
+
+function unescapeString(str: string): { value: string; warning?: string } {
+  const unknown: string[] = [];
+  const value = str
     .replace(/\\\\/g, "\x00BSLASH\x00")
     .replace(/\\n/g, "\n")
     .replace(/\\r/g, "\r")
@@ -33,17 +39,39 @@ function unescapeString(str: string): string {
     .replace(/\\0/g, "\0")
     .replace(/\\u([0-9a-fA-F]{4})/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)))
     .replace(/\\"/g, '"')
+    .replace(/\\'/g, "'")
+    .replace(/\\(.)/g, (_, ch: string) => {
+      unknown.push(`\\${ch}`);
+      return ch;
+    })
     .replace(/\x00BSLASH\x00/g, "\\");
+
+  const unique = [...new Set(unknown)].slice(0, 5);
+  return {
+    value,
+    warning:
+      unique.length > 0
+        ? `Unrecognized escape sequence${unique.length > 1 ? "s" : ""}: ${unique.join(", ")}`
+        : undefined,
+  };
 }
 
 export function StringEscape() {
   const [input, setInput] = useState("");
   const [mode, setMode] = useState<"escape" | "unescape">("escape");
+  const [flavor, setFlavor] = useState<"generic" | "json">("generic");
 
-  const output = useMemo(() => {
-    if (!input) return "";
-    return mode === "escape" ? escapeString(input) : unescapeString(input);
-  }, [input, mode]);
+  const { output, error } = useMemo(() => {
+    if (!input) return { output: "", error: undefined };
+    if (mode === "escape") {
+      return {
+        output: flavor === "json" ? escapeJson(input) : escapeGeneric(input),
+        error: undefined,
+      };
+    }
+    const result = unescapeString(input);
+    return { output: result.value, error: result.warning };
+  }, [input, mode, flavor]);
 
   return (
     <ToolShell
@@ -51,6 +79,8 @@ export function StringEscape() {
       input={input}
       output={output}
       onInputChange={setInput}
+      error={error}
+      downloadFileName={mode === "escape" ? "escaped.txt" : "unescaped.txt"}
       inputLabel={mode === "escape" ? "Raw string" : "Escaped string"}
       outputLabel={mode === "escape" ? "Escaped" : "Unescaped"}
       inputPlaceholder={
@@ -61,6 +91,7 @@ export function StringEscape() {
       outputPlaceholder="Output will appear here..."
       extraActions={
         <button
+          type="button"
           onClick={() => setInput(SAMPLES[mode])}
           className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
         >
@@ -68,20 +99,28 @@ export function StringEscape() {
         </button>
       }
       options={
-        <div className="flex rounded-lg border border-[var(--border)] overflow-hidden text-xs">
-          {(["escape", "unescape"] as const).map((m) => (
-            <button
-              key={m}
-              onClick={() => setMode(m)}
-              className={`px-3 py-1.5 capitalize transition-colors ${
-                mode === m
-                  ? "bg-[#6366f1]/15 text-[#6366f1]"
-                  : "text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)]"
-              }`}
-            >
-              {m}
-            </button>
-          ))}
+        <div className="flex flex-wrap items-center gap-3">
+          <SegmentedControl
+            label="Escape or unescape"
+            value={mode}
+            onChange={setMode}
+            segments={[
+              { value: "escape", label: "Escape" },
+              { value: "unescape", label: "Unescape" },
+            ]}
+          />
+          {mode === "escape" && (
+            <SegmentedControl
+              label="Escape style"
+              value={flavor}
+              onChange={setFlavor}
+              compact
+              segments={[
+                { value: "generic", label: "Generic" },
+                { value: "json", label: "JSON" },
+              ]}
+            />
+          )}
         </div>
       }
     />

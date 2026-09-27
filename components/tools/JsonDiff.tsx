@@ -4,6 +4,7 @@ import { useState, useMemo, useRef, useCallback, useEffect } from "react";
 import { diffLines } from "diff";
 import { getToolBySlug } from "@/lib/tools";
 import { ToolPageHeader } from "@/components/ToolPageHeader";
+import { CopyButton } from "@/components/CopyButton";
 import {
   activeHunkRowClass,
   findHunkStarts,
@@ -85,6 +86,19 @@ function buildRows(leftNorm: string, rightNorm: string): Row[] {
   }
   flush();
   return rows;
+}
+
+function rowsToUnifiedText(rows: Row[]): string {
+  const lines: string[] = [];
+  for (const row of rows) {
+    if (row.kind === "same") {
+      lines.push(`  ${row.left ?? ""}`);
+      continue;
+    }
+    if (row.left !== null) lines.push(`- ${row.left}`);
+    if (row.right !== null) lines.push(`+ ${row.right}`);
+  }
+  return lines.join("\n");
 }
 
 export function JsonDiff() {
@@ -172,8 +186,10 @@ export function JsonDiff() {
   const activeRange =
     rows && hunkStarts.length > 0 ? hunkRange(rows, hunkStarts[displayHunk]) : null;
 
+  const unifiedDiff = useMemo(() => (rows ? rowsToUnifiedText(rows) : ""), [rows]);
+
   return (
-    <div className="max-w-7xl mx-auto px-6 py-8 flex flex-col gap-6">
+    <div className="max-w-7xl mx-auto px-6 py-8 flex flex-col gap-6 pb-24">
       <ToolPageHeader
         tool={tool}
         trailing={
@@ -200,7 +216,7 @@ export function JsonDiff() {
               onChange={(e) => set(e.target.value)}
               placeholder={`Paste ${label.toLowerCase()} here...`}
               spellCheck={false}
-              className={`mono min-h-[160px] p-4 rounded-lg border ${err ? "border-[#ef4444]" : "border-[var(--border)]"} bg-[var(--bg-surface)] text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] resize-none focus:outline-none leading-relaxed`}
+              className={`mono min-h-[120px] sm:min-h-[160px] p-4 rounded-lg border ${err ? "border-[#ef4444]" : "border-[var(--border)]"} bg-[var(--bg-surface)] text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] resize-y focus:outline-none leading-relaxed`}
             />
             {err && <p className="text-xs text-[#ef4444] leading-relaxed">{err}</p>}
           </div>
@@ -209,18 +225,18 @@ export function JsonDiff() {
 
       {rows && (
         <div className="flex flex-col gap-2">
-          <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
-            <div />
-            <label className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider text-center">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+            <label className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">
               Comparison
             </label>
-            <div className="flex justify-end">
+            <div className="flex flex-wrap items-center gap-2 justify-between sm:justify-end">
+              <CopyButton value={unifiedDiff} label="Copy unified diff" compact />
               {hunkStarts.length > 0 && (
                 <div className="flex items-center gap-1.5" role="group" aria-label="Navigate differences">
                   <button
                     type="button"
                     onClick={goPrev}
-                    className="px-2.5 py-1 rounded-md text-xs font-medium border border-[#6366f1]/45 bg-[#6366f1]/10 text-[var(--accent-text)] hover:bg-[#6366f1]/20 transition-colors"
+                    className="min-h-9 min-w-9 sm:min-h-0 sm:min-w-0 px-2.5 py-1.5 rounded-md text-xs font-medium border border-[#6366f1]/45 bg-[#6366f1]/10 text-[var(--accent-text)] hover:bg-[#6366f1]/20 transition-colors"
                     aria-label="Previous difference"
                   >
                     ↑ Prev
@@ -231,7 +247,7 @@ export function JsonDiff() {
                   <button
                     type="button"
                     onClick={goNext}
-                    className="px-2.5 py-1 rounded-md text-xs font-medium border border-[#22c55e]/45 bg-[#22c55e]/10 text-[#22c55e] hover:bg-[#22c55e]/20 transition-colors"
+                    className="min-h-9 min-w-9 sm:min-h-0 sm:min-w-0 px-2.5 py-1.5 rounded-md text-xs font-medium border border-[#22c55e]/45 bg-[#22c55e]/10 text-[#22c55e] hover:bg-[#22c55e]/20 transition-colors"
                     aria-label="Next difference"
                   >
                     ↓ Next
@@ -243,87 +259,106 @@ export function JsonDiff() {
 
           <div
             ref={scrollRef}
-            className="rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] overflow-auto max-h-[70vh]"
+            className="rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] overflow-x-auto overflow-y-auto max-h-[70vh]"
           >
-            <div className="grid grid-cols-2 text-[10px] uppercase tracking-wider text-[var(--text-muted)] border-b border-[var(--border)] sticky top-0 bg-[var(--bg-surface)] z-10">
-              <div className="px-4 py-1.5 border-r border-[var(--border)]">Original</div>
-              <div className="px-4 py-1.5">Modified</div>
-            </div>
-            <div className="mono text-sm leading-relaxed">
-              {rows.map((row, i) => {
-                const inActive =
-                  activeRange !== null && i >= activeRange.start && i <= activeRange.end;
-                const isHunkStart = inActive && activeRange !== null && i === activeRange.start;
-                const isHunkEnd = inActive && activeRange !== null && i === activeRange.end;
-                return (
-                  <div
-                    key={i}
-                    ref={(el) => {
-                      if (el) rowRefs.current.set(i, el);
-                      else rowRefs.current.delete(i);
-                    }}
-                    data-diff-row={i}
-                    className={`grid grid-cols-2 ${activeHunkRowClass(inActive, isHunkStart, isHunkEnd)}`}
-                  >
+            <div className="min-w-[520px]">
+              <div className="grid grid-cols-2 text-[10px] uppercase tracking-wider text-[var(--text-muted)] border-b border-[var(--border)] sticky top-0 bg-[var(--bg-surface)] z-10">
+                <div className="px-4 py-1.5 border-r border-[var(--border)]">Original</div>
+                <div className="px-4 py-1.5">Modified</div>
+              </div>
+              <div className="mono text-sm leading-relaxed">
+                {rows.map((row, i) => {
+                  const inActive =
+                    activeRange !== null && i >= activeRange.start && i <= activeRange.end;
+                  const isHunkStart = inActive && activeRange !== null && i === activeRange.start;
+                  const isHunkEnd = inActive && activeRange !== null && i === activeRange.end;
+                  const leftMarker =
+                    row.left === null ? " " : row.kind === "change" ? "−" : " ";
+                  const rightMarker =
+                    row.right === null ? " " : row.kind === "change" ? "+" : " ";
+                  return (
                     <div
-                      className={`flex border-r border-[var(--border)] ${
-                        row.left === null
-                          ? "bg-[var(--bg-elevated)]/40"
-                          : row.kind === "change"
-                            ? "bg-[#ef4444]/10"
-                            : ""
-                      }`}
+                      key={i}
+                      ref={(el) => {
+                        if (el) rowRefs.current.set(i, el);
+                        else rowRefs.current.delete(i);
+                      }}
+                      data-diff-row={i}
+                      className={`grid grid-cols-2 ${activeHunkRowClass(inActive, isHunkStart, isHunkEnd)}`}
                     >
-                      <span className="select-none w-10 shrink-0 px-2 text-right text-[var(--text-muted)] opacity-50">
-                        {row.leftNo ?? ""}
-                      </span>
-                      <span
-                        className={`flex-1 px-2 whitespace-pre-wrap break-words ${
-                          row.left !== null && row.kind === "change"
-                            ? "text-[#ef4444]"
-                            : "text-[var(--text-primary)]"
+                      <div
+                        className={`flex border-r border-[var(--border)] ${
+                          row.left === null
+                            ? "bg-[var(--bg-elevated)]/40"
+                            : row.kind === "change"
+                              ? "bg-[#ef4444]/10"
+                              : ""
                         }`}
                       >
-                        {row.left ?? ""}
-                      </span>
-                    </div>
-                    <div
-                      className={`flex ${
-                        row.right === null
-                          ? "bg-[var(--bg-elevated)]/40"
-                          : row.kind === "change"
-                            ? "bg-[#22c55e]/10"
-                            : ""
-                      }`}
-                    >
-                      <span className="select-none w-10 shrink-0 px-2 text-right text-[var(--text-muted)] opacity-50">
-                        {row.rightNo ?? ""}
-                      </span>
-                      <span
-                        className={`flex-1 px-2 whitespace-pre-wrap break-words ${
-                          row.right !== null && row.kind === "change"
-                            ? "text-[#22c55e]"
-                            : "text-[var(--text-primary)]"
+                        <span
+                          className="select-none w-4 shrink-0 text-center text-[var(--text-muted)] font-semibold"
+                          aria-hidden="true"
+                        >
+                          {leftMarker}
+                        </span>
+                        <span className="select-none w-10 shrink-0 px-1 text-right text-[var(--text-muted)] opacity-50">
+                          {row.leftNo ?? ""}
+                        </span>
+                        <span
+                          className={`flex-1 px-2 whitespace-pre-wrap break-words ${
+                            row.left !== null && row.kind === "change"
+                              ? "text-[#ef4444]"
+                              : "text-[var(--text-primary)]"
+                          }`}
+                        >
+                          {row.left ?? ""}
+                        </span>
+                      </div>
+                      <div
+                        className={`flex ${
+                          row.right === null
+                            ? "bg-[var(--bg-elevated)]/40"
+                            : row.kind === "change"
+                              ? "bg-[#22c55e]/10"
+                              : ""
                         }`}
                       >
-                        {row.right ?? ""}
-                      </span>
+                        <span
+                          className="select-none w-4 shrink-0 text-center text-[var(--text-muted)] font-semibold"
+                          aria-hidden="true"
+                        >
+                          {rightMarker}
+                        </span>
+                        <span className="select-none w-10 shrink-0 px-1 text-right text-[var(--text-muted)] opacity-50">
+                          {row.rightNo ?? ""}
+                        </span>
+                        <span
+                          className={`flex-1 px-2 whitespace-pre-wrap break-words ${
+                            row.right !== null && row.kind === "change"
+                              ? "text-[#22c55e]"
+                              : "text-[var(--text-primary)]"
+                          }`}
+                        >
+                          {row.right ?? ""}
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
             </div>
           </div>
           {hunkStarts.length > 0 && (
             <p className="text-[10px] text-[var(--text-muted)]">
-              Tip: press <span className="mono">[</span> / <span className="mono">]</span> to jump
-              between changes
+              Tip: use Prev/Next above, or press <span className="mono">[</span> /{" "}
+              <span className="mono">]</span> on a keyboard to jump between changes. Markers −/+
+              mark removals and additions without relying on color alone.
             </p>
           )}
         </div>
       )}
 
-      <div className="flex items-center gap-2">
+      <div className="sticky bottom-0 z-20 -mx-6 border-t border-[var(--border)] bg-[var(--bg-base)]/90 backdrop-blur-md px-6 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] flex flex-wrap items-center gap-2">
         <button
           type="button"
           onClick={() => {
@@ -358,6 +393,7 @@ export function JsonDiff() {
         >
           Load sample
         </button>
+        {rows && <CopyButton value={unifiedDiff} label="Copy unified diff" compact className="ml-auto" />}
       </div>
     </div>
   );

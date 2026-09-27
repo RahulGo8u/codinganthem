@@ -58,6 +58,14 @@ export function ColorContrastChecker() {
   const bgRgb = useMemo(() => parseColor(bg), [bg]);
   const ratio = fgRgb && bgRgb ? contrastRatio(fgRgb, bgRgb) : null;
 
+  const plainSummary = useMemo(() => {
+    if (!ratio) return null;
+    if (ratio >= 7) return "Excellent contrast — passes WCAG AAA for normal text.";
+    if (ratio >= 4.5) return "Good contrast — passes WCAG AA for normal text.";
+    if (ratio >= 3) return "Limited contrast — passes AA only for large text (18pt+ / 14pt bold).";
+    return "Poor contrast — fails WCAG AA for both normal and large text.";
+  }, [ratio]);
+
   const checks = ratio
     ? [
         { label: "AA — Normal text", pass: ratio >= 4.5 },
@@ -104,34 +112,49 @@ export function ColorContrastChecker() {
       outputPlaceholder="Enter two colors above to check contrast..."
       badges={<span className="badge badge-success">WCAG 2.1 Ready</span>}
       options={
-        <div className="flex flex-wrap items-center gap-6 w-full">
+        <div className="flex flex-wrap items-center gap-4 w-full">
           <label className="flex items-center gap-2 text-xs text-[var(--text-muted)]">
             Text color
             <input
               type="color"
               value={fgRgb ? toHex(fgRgb) : "#111111"}
               onChange={(e) => setFg(e.target.value)}
+              aria-label="Foreground color picker"
               className="w-8 h-8 rounded border border-[var(--border)] cursor-pointer bg-transparent"
             />
             <input
               type="text"
               value={fg}
               onChange={(e) => setFg(e.target.value)}
+              aria-label="Foreground color value"
               className="mono w-28 bg-[var(--bg-elevated)] border border-[var(--border)] rounded px-2 py-1 text-xs text-[var(--text-primary)]"
             />
           </label>
+          <button
+            type="button"
+            onClick={() => {
+              setFg(bg);
+              setBg(fg);
+            }}
+            className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
+            aria-label="Swap foreground and background colors"
+          >
+            Swap ⇄
+          </button>
           <label className="flex items-center gap-2 text-xs text-[var(--text-muted)]">
             Background color
             <input
               type="color"
               value={bgRgb ? toHex(bgRgb) : "#ffffff"}
               onChange={(e) => setBg(e.target.value)}
+              aria-label="Background color picker"
               className="w-8 h-8 rounded border border-[var(--border)] cursor-pointer bg-transparent"
             />
             <input
               type="text"
               value={bg}
               onChange={(e) => setBg(e.target.value)}
+              aria-label="Background color value"
               className="mono w-28 bg-[var(--bg-elevated)] border border-[var(--border)] rounded px-2 py-1 text-xs text-[var(--text-primary)]"
             />
           </label>
@@ -140,7 +163,11 @@ export function ColorContrastChecker() {
       outputContent={
         ratio && fgRgb && bgRgb ? (
           <div className="p-4 flex flex-col gap-4">
-            {/* Result cards: ratio + WCAG AA/AAA */}
+            {plainSummary && (
+              <p role="status" aria-live="polite" className="text-sm text-[var(--text-primary)]">
+                {plainSummary}
+              </p>
+            )}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               {/* Big ratio card */}
               <div className="result-card flex flex-col gap-2">

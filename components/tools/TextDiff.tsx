@@ -4,6 +4,7 @@ import { useState, useMemo, useCallback, useRef, useEffect } from "react";
 import { diffLines, type Change } from "diff";
 import { getToolBySlug } from "@/lib/tools";
 import { ToolPageHeader } from "@/components/ToolPageHeader";
+import { CopyButton } from "@/components/CopyButton";
 import {
   activeHunkRowClass,
   findHunkStarts,
@@ -88,17 +89,34 @@ function rowsToUnifiedText(rows: Row[]): string {
   return lines.join("\n");
 }
 
+function normalizeForDiff(text: string, ignoreWhitespace: boolean, ignoreCase: boolean): string {
+  let result = text;
+  if (ignoreCase) result = result.toLowerCase();
+  if (ignoreWhitespace) {
+    result = result
+      .split("\n")
+      .map((line) => line.replace(/[ \t]+/g, " ").trim())
+      .join("\n");
+  }
+  return result;
+}
+
 export function TextDiff() {
   const [left, setLeft] = useState(SAMPLE_LEFT);
   const [right, setRight] = useState(SAMPLE_RIGHT);
-  const [copied, setCopied] = useState(false);
+  const [ignoreWhitespace, setIgnoreWhitespace] = useState(false);
+  const [ignoreCase, setIgnoreCase] = useState(false);
   const [activeHunk, setActiveHunk] = useState(0);
   const rowRefs = useRef<Map<number, HTMLDivElement>>(new Map());
 
   const rows = useMemo(() => {
     if (!left && !right) return null;
-    return buildRows(diffLines(left, right));
-  }, [left, right]);
+    const a = normalizeForDiff(left, ignoreWhitespace, ignoreCase);
+    const b = normalizeForDiff(right, ignoreWhitespace, ignoreCase);
+    return buildRows(diffLines(a, b));
+  }, [left, right, ignoreWhitespace, ignoreCase]);
+
+  const unifiedText = useMemo(() => (rows ? rowsToUnifiedText(rows) : ""), [rows]);
 
   const hunkStarts = useMemo(() => (rows ? findHunkStarts(rows) : []), [rows]);
   const displayHunk =
@@ -149,17 +167,6 @@ export function TextDiff() {
     return () => window.removeEventListener("keydown", onKey);
   }, [hunkStarts.length, goNext, goPrev]);
 
-  const handleCopyDiff = useCallback(async () => {
-    if (!rows) return;
-    try {
-      await navigator.clipboard.writeText(rowsToUnifiedText(rows));
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
-    } catch {
-      setCopied(false);
-    }
-  }, [rows]);
-
   const activeRange =
     rows && hunkStarts.length > 0 ? hunkRange(rows, hunkStarts[displayHunk]) : null;
 
@@ -176,6 +183,36 @@ export function TextDiff() {
           ) : undefined
         }
       />
+
+      <div className="flex flex-wrap items-center gap-3">
+        <label className="flex items-center gap-1.5 text-xs text-[var(--text-muted)] cursor-pointer select-none">
+          <input
+            type="checkbox"
+            checked={ignoreWhitespace}
+            onChange={(e) => {
+              setIgnoreWhitespace(e.target.checked);
+              setActiveHunk(0);
+            }}
+            className="accent-[#6366f1]"
+          />
+          Ignore whitespace
+        </label>
+        <label className="flex items-center gap-1.5 text-xs text-[var(--text-muted)] cursor-pointer select-none">
+          <input
+            type="checkbox"
+            checked={ignoreCase}
+            onChange={(e) => {
+              setIgnoreCase(e.target.checked);
+              setActiveHunk(0);
+            }}
+            className="accent-[#6366f1]"
+          />
+          Ignore case
+        </label>
+        <div className="sm:hidden ml-auto">
+          <CopyButton value={unifiedText} compact label="Copy diff" />
+        </div>
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {[
@@ -199,19 +236,9 @@ export function TextDiff() {
 
       {rows && (
         <div className="flex flex-col gap-2">
-          <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
+          <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 sticky top-0 z-20 bg-[var(--bg-base)] py-1 -mx-1 px-1">
             <div className="flex justify-start">
-              <button
-                type="button"
-                onClick={handleCopyDiff}
-                className={`text-xs px-2.5 py-1 rounded border transition-colors ${
-                  copied
-                    ? "text-[#22c55e] border-[#22c55e]/40"
-                    : "text-[var(--text-muted)] border-[var(--border)] hover:text-[var(--text-primary)]"
-                }`}
-              >
-                {copied ? "Copied ✓" : "Copy diff"}
-              </button>
+              <CopyButton value={unifiedText} compact label="Copy diff" />
             </div>
             <label className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider text-center">
               Comparison

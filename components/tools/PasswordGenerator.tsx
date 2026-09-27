@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { ToolShell } from "@/components/ToolShell";
+import { SegmentedControl } from "@/components/SegmentedControl";
 import { getToolBySlug } from "@/lib/tools";
 import { usePersistedState } from "@/lib/usePersistedState";
 
@@ -36,7 +37,9 @@ export function PasswordGenerator() {
   const [useNumbers, setUseNumbers] = usePersistedState("ca_pref_password_numbers", true);
   const [useSymbols, setUseSymbols] = usePersistedState("ca_pref_password_symbols", true);
   const [count, setCount] = useState(1);
+  const [autoRegen, setAutoRegen] = useState(true);
   const [output, setOutput] = useState("");
+  const mounted = useRef(false);
 
   const generate = useCallback(() => {
     let charset = "";
@@ -69,6 +72,19 @@ export function PasswordGenerator() {
     setOutput(passwords.join("\n"));
   }, [length, useUpper, useLower, useNumbers, useSymbols, count]);
 
+  // Initial password + optional auto-regenerate when options change.
+  useEffect(() => {
+    const run = () => {
+      if (!mounted.current) {
+        mounted.current = true;
+        generate();
+        return;
+      }
+      if (autoRegen) generate();
+    };
+    void Promise.resolve().then(run);
+  }, [generate, autoRegen]);
+
   const strength = getStrength(output.split("\n")[0] || "");
 
   return (
@@ -91,6 +107,7 @@ export function PasswordGenerator() {
               max={128}
               value={length}
               onChange={(e) => setLength(Number(e.target.value))}
+              aria-valuetext={`${length} characters`}
               className="w-24 accent-[#6366f1]"
             />
             <span className="w-6 text-[var(--text-primary)]">{length}</span>
@@ -122,9 +139,20 @@ export function PasswordGenerator() {
               {label}
             </label>
           ))}
+          <SegmentedControl
+            label="Auto regenerate"
+            compact
+            value={autoRegen ? "auto" : "manual"}
+            onChange={(v) => setAutoRegen(v === "auto")}
+            segments={[
+              { value: "auto", label: "Auto" },
+              { value: "manual", label: "Manual" },
+            ]}
+          />
           <button
+            type="button"
             onClick={generate}
-            className="px-4 py-1.5 rounded-lg text-xs font-medium bg-[#6366f1]/15 border border-[#6366f1]/40 text-[#6366f1] hover:bg-[#6366f1]/25 transition-colors"
+            className="px-4 py-2 rounded-lg text-sm font-semibold bg-[#6366f1] text-white hover:bg-[#5558e6] shadow-sm transition-colors"
           >
             Generate
           </button>
@@ -132,6 +160,7 @@ export function PasswordGenerator() {
       }
       extraActions={
         <button
+          type="button"
           onClick={() => setOutput("")}
           disabled={!output}
           className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[#ef4444]/40 bg-[#ef4444]/10 text-[#ef4444] hover:bg-[#ef4444]/20 hover:border-[#ef4444]/60 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
@@ -142,7 +171,6 @@ export function PasswordGenerator() {
       outputContent={
         output ? (
           <div className="flex flex-col gap-3">
-            {/* Strength indicator */}
             {count === 1 && strength.label && (
               <div className="flex items-center gap-3">
                 <div className="flex-1 h-1.5 rounded-full bg-[var(--bg-elevated)] overflow-hidden">
@@ -159,7 +187,7 @@ export function PasswordGenerator() {
                     borderColor: `color-mix(in srgb, ${strength.color} 35%, transparent)`,
                   }}
                 >
-                  {strength.label}
+                  Strength: {strength.label}
                 </span>
               </div>
             )}

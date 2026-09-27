@@ -114,17 +114,34 @@ export function MermaidViewer() {
   const reqRef = useRef(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const dragStartRef = useRef({ x: 0, y: 0, tx: 0, ty: 0 });
+  const pinchRef = useRef<{ distance: number; scale: number } | null>(null);
+  const translateRef = useRef(translate);
+  const scaleRef = useRef(scale);
+  const dragActiveRef = useRef(false);
+
+  useEffect(() => {
+    translateRef.current = translate;
+  }, [translate]);
+  useEffect(() => {
+    scaleRef.current = scale;
+  }, [scale]);
 
   const resetView = useCallback(() => {
     setScale(1);
     setTranslate({ x: 0, y: 0 });
   }, []);
 
+  const zoomBy = useCallback((factor: number) => {
+    setScale((s) => Math.min(MAX_SCALE, Math.max(MIN_SCALE, s * factor)));
+  }, []);
+
   useEffect(() => {
     if (!input.trim()) {
-      setSvg("");
-      setError(undefined);
-      return;
+      const timer = window.setTimeout(() => {
+        setSvg("");
+        setError(undefined);
+      }, 0);
+      return () => window.clearTimeout(timer);
     }
     let cancelled = false;
     const id = ++reqRef.current;
@@ -172,7 +189,10 @@ export function MermaidViewer() {
       const dy = e.clientY - dragStartRef.current.y;
       setTranslate({ x: dragStartRef.current.tx + dx, y: dragStartRef.current.ty + dy });
     };
-    const onUp = () => setIsDragging(false);
+    const onUp = () => {
+      dragActiveRef.current = false;
+      setIsDragging(false);
+    };
     window.addEventListener("mousemove", onMove);
     window.addEventListener("mouseup", onUp);
     return () => {
@@ -183,9 +203,83 @@ export function MermaidViewer() {
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if (e.button !== 0 || !svg) return;
+    dragActiveRef.current = true;
     setIsDragging(true);
     dragStartRef.current = { x: e.clientX, y: e.clientY, tx: translate.x, ty: translate.y };
   };
+
+  // Touch pan + pinch-zoom (mouse wheel / drag already supported)
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el || !svg) return;
+
+    const touchDistance = (touches: TouchList) => {
+      const a = touches[0];
+      const b = touches[1];
+      return Math.hypot(b.clientX - a.clientX, b.clientY - a.clientY);
+    };
+
+    const onTouchStart = (e: TouchEvent) => {
+      if (e.touches.length === 0) return;
+      if (e.touches.length === 2) {
+        pinchRef.current = {
+          distance: touchDistance(e.touches),
+          scale: scaleRef.current,
+        };
+        dragActiveRef.current = false;
+        setIsDragging(false);
+        return;
+      }
+      const t = e.touches[0];
+      dragActiveRef.current = true;
+      setIsDragging(true);
+      dragStartRef.current = {
+        x: t.clientX,
+        y: t.clientY,
+        tx: translateRef.current.x,
+        ty: translateRef.current.y,
+      };
+    };
+
+    const onTouchMove = (e: TouchEvent) => {
+      if (e.touches.length === 2 && pinchRef.current) {
+        e.preventDefault();
+        const next = touchDistance(e.touches);
+        const ratio = next / Math.max(1, pinchRef.current.distance);
+        setScale(
+          Math.min(MAX_SCALE, Math.max(MIN_SCALE, pinchRef.current.scale * ratio))
+        );
+        return;
+      }
+      if (e.touches.length === 1 && dragActiveRef.current) {
+        e.preventDefault();
+        const t = e.touches[0];
+        const dx = t.clientX - dragStartRef.current.x;
+        const dy = t.clientY - dragStartRef.current.y;
+        setTranslate({
+          x: dragStartRef.current.tx + dx,
+          y: dragStartRef.current.ty + dy,
+        });
+      }
+    };
+
+    const onTouchEnd = () => {
+      if (pinchRef.current) pinchRef.current = null;
+      dragActiveRef.current = false;
+      setIsDragging(false);
+    };
+
+    el.addEventListener("touchstart", onTouchStart, { passive: true });
+    el.addEventListener("touchmove", onTouchMove, { passive: false });
+    el.addEventListener("touchend", onTouchEnd);
+    el.addEventListener("touchcancel", onTouchEnd);
+    return () => {
+      el.removeEventListener("touchstart", onTouchStart);
+      el.removeEventListener("touchmove", onTouchMove);
+      el.removeEventListener("touchend", onTouchEnd);
+      el.removeEventListener("touchcancel", onTouchEnd);
+    };
+  }, [svg]);
 
   // Keep isFullscreen in sync even when exited via the browser's native Escape handling
   useEffect(() => {
@@ -280,29 +374,34 @@ export function MermaidViewer() {
         <div
           ref={containerRef}
           onMouseDown={handleMouseDown}
-          className={`relative w-full min-h-[320px] h-full overflow-hidden flex items-center justify-center ${
+          className={`relative w-full min-h-[320px] h-full overflow-hidden flex items-center justify-center touch-none ${
             svg ? (isDragging ? "cursor-grabbing" : "cursor-grab") : ""
           } select-none ${isFullscreen ? "bg-[var(--bg-base)]" : ""}`}
         >
-          {svg && (
+          {(svg || error) && (
             <div
               onMouseDown={(e) => e.stopPropagation()}
-              className="absolute top-2 right-2 z-10 flex flex-col gap-1"
+              className="absolute top-2 right-2 z-10 flex flex-col gap-1.5"
+              role="toolbar"
+              aria-label="Diagram zoom and pan controls"
             >
               <button
+                type="button"
                 onClick={toggleFullscreen}
-                className="w-7 h-7 flex items-center justify-center rounded-md border border-[var(--border)] bg-[var(--bg-elevated)] text-[var(--text-primary)] shadow-sm hover:bg-[var(--border)] transition-colors"
+                disabled={!svg}
+                className="w-10 h-10 sm:w-8 sm:h-8 flex items-center justify-center rounded-md border border-[var(--border)] bg-[var(--bg-elevated)] text-[var(--text-primary)] shadow-sm hover:bg-[var(--border)] transition-colors disabled:opacity-40"
                 title={isFullscreen ? "Exit fullscreen" : "Fullscreen"}
+                aria-label={isFullscreen ? "Exit fullscreen" : "Fullscreen"}
               >
                 {isFullscreen ? (
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                     <polyline points="4 14 10 14 10 20" />
                     <polyline points="20 10 14 10 14 4" />
                     <line x1="14" y1="10" x2="21" y2="3" />
                     <line x1="3" y1="21" x2="10" y2="14" />
                   </svg>
                 ) : (
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                     <polyline points="15 3 21 3 21 9" />
                     <polyline points="9 21 3 21 3 15" />
                     <line x1="21" y1="3" x2="14" y2="10" />
@@ -311,26 +410,38 @@ export function MermaidViewer() {
                 )}
               </button>
               <button
-                onClick={() => setScale((s) => Math.min(MAX_SCALE, s * 1.2))}
-                className="w-7 h-7 flex items-center justify-center rounded-md border border-[var(--border)] bg-[var(--bg-elevated)] text-[var(--text-primary)] shadow-sm hover:bg-[var(--border)] transition-colors text-sm"
+                type="button"
+                onClick={() => zoomBy(1.2)}
+                disabled={!svg}
+                className="w-10 h-10 sm:w-8 sm:h-8 flex items-center justify-center rounded-md border border-[var(--border)] bg-[var(--bg-elevated)] text-[var(--text-primary)] shadow-sm hover:bg-[var(--border)] transition-colors text-base disabled:opacity-40"
                 title="Zoom in"
+                aria-label="Zoom in"
               >
                 +
               </button>
               <button
-                onClick={() => setScale((s) => Math.max(MIN_SCALE, s / 1.2))}
-                className="w-7 h-7 flex items-center justify-center rounded-md border border-[var(--border)] bg-[var(--bg-elevated)] text-[var(--text-primary)] shadow-sm hover:bg-[var(--border)] transition-colors text-sm"
+                type="button"
+                onClick={() => zoomBy(1 / 1.2)}
+                disabled={!svg}
+                className="w-10 h-10 sm:w-8 sm:h-8 flex items-center justify-center rounded-md border border-[var(--border)] bg-[var(--bg-elevated)] text-[var(--text-primary)] shadow-sm hover:bg-[var(--border)] transition-colors text-base disabled:opacity-40"
                 title="Zoom out"
+                aria-label="Zoom out"
               >
                 −
               </button>
               <button
+                type="button"
                 onClick={resetView}
-                className="w-7 h-7 flex items-center justify-center rounded-md border border-[var(--border)] bg-[var(--bg-elevated)] text-[var(--text-primary)] shadow-sm hover:bg-[var(--border)] transition-colors text-[10px]"
+                disabled={!svg}
+                className="w-10 h-10 sm:w-8 sm:h-8 flex items-center justify-center rounded-md border border-[var(--border)] bg-[var(--bg-elevated)] text-[var(--text-primary)] shadow-sm hover:bg-[var(--border)] transition-colors text-xs disabled:opacity-40"
                 title="Reset zoom"
+                aria-label="Reset zoom and pan"
               >
                 ⟲
               </button>
+              <span className="text-[10px] text-center text-[var(--text-muted)] mono tabular-nums" aria-live="polite">
+                {Math.round(scale * 100)}%
+              </span>
             </div>
           )}
 
@@ -342,9 +453,17 @@ export function MermaidViewer() {
               }}
               dangerouslySetInnerHTML={{ __html: svg }}
             />
+          ) : error ? (
+            <div
+              role="alert"
+              className="m-4 max-w-md rounded-lg border border-[#ef4444]/40 bg-[#ef4444]/10 px-3 py-2.5 text-sm text-[#ef4444] leading-relaxed"
+            >
+              <p className="font-medium mb-1">Syntax error</p>
+              <p className="text-xs opacity-90 break-words">{error}</p>
+            </div>
           ) : (
             <p className="p-4 text-[var(--text-muted)] text-sm">
-              {error ? "" : "Diagram will appear here..."}
+              Diagram will appear here. Drag to pan; pinch or use +/− to zoom.
             </p>
           )}
         </div>

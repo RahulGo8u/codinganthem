@@ -1,8 +1,21 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo, useSyncExternalStore } from "react";
 import { ToolShell } from "@/components/ToolShell";
+import { CopyButton } from "@/components/CopyButton";
 import { getToolBySlug } from "@/lib/tools";
+
+function subscribeNoop() {
+  return () => {};
+}
+
+function getBrowserUa(): string {
+  return navigator.userAgent;
+}
+
+function getServerUa(): string {
+  return "";
+}
 
 const tool = getToolBySlug("user-agent-parser")!;
 
@@ -16,6 +29,7 @@ interface ParsedUA {
   os: string;
   osVersion: string;
   device: string;
+  isBot: boolean;
 }
 
 function parseUserAgent(ua: string): ParsedUA {
@@ -97,26 +111,51 @@ function parseUserAgent(ua: string): ParsedUA {
     device = "Mobile";
   }
 
-  return { browser, browserVersion, engine, os, osVersion, device };
+  const isBot =
+    /bot|crawler|spider|slurp|bingpreview|facebookexternalhit|linkedinbot|twitterbot|whatsapp|discordbot|semrush|ahrefs|petalbot/i.test(
+      ua
+    );
+
+  return { browser, browserVersion, engine, os, osVersion, device, isBot };
 }
 
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--border)] last:border-b-0">
-      <span className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">{label}</span>
-      <span className="text-sm text-[var(--text-primary)] font-medium">{value || "—"}</span>
+    <div className="flex items-center justify-between gap-3 px-4 py-3 border-b border-[var(--border)] last:border-b-0">
+      <span className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">
+        {label}
+      </span>
+      <div className="flex items-center gap-2 min-w-0">
+        <span className="text-sm text-[var(--text-primary)] font-medium truncate">
+          {value || "—"}
+        </span>
+        {value && <CopyButton value={value} compact label="Copy" />}
+      </div>
     </div>
   );
 }
 
 export function UserAgentParser() {
-  const [input, setInput] = useState("");
-
-  useEffect(() => {
-    if (typeof navigator !== "undefined") setInput(navigator.userAgent);
-  }, []);
+  const browserUa = useSyncExternalStore(subscribeNoop, getBrowserUa, getServerUa);
+  const [override, setOverride] = useState<string | null>(null);
+  const input = override ?? browserUa;
 
   const parsed = useMemo(() => (input.trim() ? parseUserAgent(input) : null), [input]);
+
+  const jsonExport = parsed
+    ? JSON.stringify(
+        {
+          browser: `${parsed.browser} ${parsed.browserVersion}`.trim(),
+          engine: parsed.engine,
+          os: `${parsed.os} ${parsed.osVersion}`.trim(),
+          device: parsed.device,
+          isBot: parsed.isBot,
+          userAgent: input.trim(),
+        },
+        null,
+        2
+      )
+    : "";
 
   const summary = parsed
     ? [
@@ -124,6 +163,7 @@ export function UserAgentParser() {
         `Engine: ${parsed.engine}`,
         `OS: ${parsed.os} ${parsed.osVersion}`,
         `Device: ${parsed.device}`,
+        `Bot: ${parsed.isBot ? "yes" : "no"}`,
       ].join("\n")
     : "";
 
@@ -131,29 +171,56 @@ export function UserAgentParser() {
     <ToolShell
       tool={tool}
       input={input}
-      output={summary}
-      onInputChange={setInput}
+      output={jsonExport || summary}
+      onInputChange={setOverride}
+      onClear={() => setOverride("")}
       hideFileActions
       showClear
+      downloadFileName="user-agent.json"
+      downloadMimeType="application/json"
       inputLabel="User-Agent String"
       outputLabel="Parsed Details"
       inputPlaceholder="Paste a User-Agent string, or your browser's is loaded by default..."
       extraActions={
-        <button
-          onClick={() => setInput(SAMPLE)}
-          className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
-        >
-          Load sample
-        </button>
+        <>
+          <button
+            type="button"
+            onClick={() => setOverride(SAMPLE)}
+            className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
+          >
+            Load sample
+          </button>
+          <button
+            type="button"
+            onClick={() => setOverride(null)}
+            disabled={!browserUa}
+            className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          >
+            Reset to my browser
+          </button>
+        </>
       }
       outputContent={
         parsed ? (
-          <div className="p-4">
+          <div className="p-4 flex flex-col gap-3">
             <div className="result-card !p-0 flex flex-col overflow-hidden">
-              <InfoRow label="Browser" value={`${parsed.browser} ${parsed.browserVersion}`.trim()} />
+              <InfoRow
+                label="Browser"
+                value={`${parsed.browser} ${parsed.browserVersion}`.trim()}
+              />
               <InfoRow label="Rendering Engine" value={parsed.engine} />
-              <InfoRow label="Operating System" value={`${parsed.os} ${parsed.osVersion}`.trim()} />
+              <InfoRow
+                label="Operating System"
+                value={`${parsed.os} ${parsed.osVersion}`.trim()}
+              />
               <InfoRow label="Device Type" value={parsed.device} />
+              <InfoRow label="Likely bot" value={parsed.isBot ? "Yes" : "No"} />
+            </div>
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-[10px] uppercase tracking-wider text-[var(--text-muted)]">
+                Raw UA
+              </span>
+              <CopyButton value={input.trim()} compact label="Copy UA" />
             </div>
           </div>
         ) : (

@@ -9,6 +9,12 @@ const tool = getToolBySlug("word-counter")!;
 const SAMPLE =
   "CodingAnthem offers dozens of free developer tools built for everyday use. Paste any text here to see live word and character counts.";
 
+const LIMITS = [
+  { id: "x", label: "X / Twitter", max: 280 },
+  { id: "meta", label: "Meta title", max: 60 },
+  { id: "sms", label: "SMS", max: 160 },
+] as const;
+
 interface Stats {
   words: number;
   charsWithSpaces: number;
@@ -16,6 +22,7 @@ interface Stats {
   sentences: number;
   paragraphs: number;
   readingTime: string;
+  speakingTime: string;
 }
 
 function countStats(text: string): Stats {
@@ -23,10 +30,21 @@ function countStats(text: string): Stats {
   const charsWithSpaces = text.length;
   const charsNoSpaces = text.replace(/\s/g, "").length;
   const sentences = text.trim() === "" ? 0 : (text.match(/[^.!?]*[.!?]+/g) ?? []).length;
-  const paragraphs = text.trim() === "" ? 0 : text.split(/\n\s*\n/).filter((p) => p.trim()).length;
-  const minutes = Math.ceil(words / 200);
-  const readingTime = words === 0 ? "—" : minutes < 1 ? "< 1 min" : `${minutes} min`;
-  return { words, charsWithSpaces, charsNoSpaces, sentences, paragraphs, readingTime };
+  const paragraphs =
+    text.trim() === "" ? 0 : text.split(/\n\s*\n/).filter((p) => p.trim()).length;
+  const readMinutes = Math.ceil(words / 200);
+  const speakMinutes = Math.ceil(words / 130);
+  const readingTime = words === 0 ? "—" : readMinutes < 1 ? "< 1 min" : `${readMinutes} min`;
+  const speakingTime = words === 0 ? "—" : speakMinutes < 1 ? "< 1 min" : `${speakMinutes} min`;
+  return {
+    words,
+    charsWithSpaces,
+    charsNoSpaces,
+    sentences,
+    paragraphs,
+    readingTime,
+    speakingTime,
+  };
 }
 
 const STATS: { label: string; key: keyof Stats }[] = [
@@ -36,28 +54,60 @@ const STATS: { label: string; key: keyof Stats }[] = [
   { label: "Sentences", key: "sentences" },
   { label: "Paragraphs", key: "paragraphs" },
   { label: "Reading time", key: "readingTime" },
+  { label: "Speaking time", key: "speakingTime" },
 ];
 
 export function WordCounter() {
   const [input, setInput] = useState("");
   const stats = useMemo(() => countStats(input), [input]);
 
+  const summary = useMemo(
+    () =>
+      STATS.map(({ label, key }) => `${label}: ${stats[key]}`).join("\n"),
+    [stats]
+  );
+
   return (
     <ToolShell
       tool={tool}
       input={input}
-      output=""
+      output={summary}
       onInputChange={setInput}
+      downloadFileName="word-count.txt"
       inputLabel="Text"
       outputLabel="Stats"
       inputPlaceholder="Paste or type your text here..."
       extraActions={
         <button
+          type="button"
           onClick={() => setInput(SAMPLE)}
           className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
         >
           Load sample
         </button>
+      }
+      options={
+        <div className="flex flex-wrap gap-3 w-full" role="status" aria-live="polite">
+          <span className="text-sm font-semibold text-[var(--text-primary)] mono">
+            {stats.words.toLocaleString()} words · {stats.charsWithSpaces.toLocaleString()} chars
+          </span>
+          {LIMITS.map(({ id, label, max }) => {
+            const over = stats.charsWithSpaces > max;
+            const remaining = max - stats.charsWithSpaces;
+            return (
+              <span
+                key={id}
+                className={`text-[10px] uppercase tracking-wider px-2 py-1 rounded border ${
+                  over
+                    ? "border-[#ef4444]/40 bg-[#ef4444]/10 text-[#ef4444]"
+                    : "border-[var(--border)] text-[var(--text-muted)]"
+                }`}
+              >
+                {label}: {over ? `${Math.abs(remaining)} over` : `${remaining} left`}
+              </span>
+            );
+          })}
+        </div>
       }
       outputContent={
         <div className="p-4">
@@ -69,7 +119,9 @@ export function WordCounter() {
               >
                 <span className="text-xs text-[var(--text-muted)]">{label}</span>
                 <span className="text-sm font-semibold text-[var(--text-primary)] mono">
-                  {stats[key].toLocaleString()}
+                  {typeof stats[key] === "number"
+                    ? (stats[key] as number).toLocaleString()
+                    : stats[key]}
                 </span>
               </div>
             ))}

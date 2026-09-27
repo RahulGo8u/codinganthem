@@ -9,6 +9,14 @@ const tool = getToolBySlug("cron-parser")!;
 
 const SAMPLE = "*/15 9-17 * * 1-5";
 
+const PRESETS: { label: string; value: string }[] = [
+  { label: "Every minute", value: "* * * * *" },
+  { label: "Hourly", value: "0 * * * *" },
+  { label: "Daily 9am", value: "0 9 * * *" },
+  { label: "Weekdays", value: "*/15 9-17 * * 1-5" },
+  { label: "Monthly 1st", value: "0 0 1 * *" },
+];
+
 interface FieldDef { name: string; min: number; max: number; labels?: string[]; }
 
 const FIELDS_5: FieldDef[] = [
@@ -117,6 +125,9 @@ function parseCron(cron: string): { fields: FieldDef[]; parts: string[]; explana
   if (dow !== "*") summary += `, on ${explainField(dow, fields[parts.length === 6 ? 5 : 4]).replace("day (week) ", "")}`;
 
   const runs = nextRuns(parts, fields);
+  if (runs.length === 0) {
+    summary += " — no runs found in the next ~27 hours of scanning";
+  }
   return { fields, parts, explanations, summary, runs };
 }
 
@@ -158,18 +169,22 @@ export function CronParser() {
       outputContent={
         parsed ? (
           <div className="p-4 flex flex-col gap-4">
-            {/* Summary */}
             <div className="result-card flex items-center justify-between gap-3">
               <div className="flex flex-col gap-1 min-w-0">
                 <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--text-muted)]">
                   Summary
                 </span>
-                <p className="text-base text-[var(--text-primary)] capitalize">{parsed.summary}</p>
+                <p
+                  role="status"
+                  aria-live="polite"
+                  className="text-base text-[var(--text-primary)] capitalize"
+                >
+                  {parsed.summary}
+                </p>
               </div>
               <CopyChip value={parsed.summary} label="summary" />
             </div>
 
-            {/* Field breakdown */}
             <div className="result-card flex flex-col gap-1">
               <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--text-muted)] mb-2">
                 Field Breakdown
@@ -185,13 +200,15 @@ export function CronParser() {
               </div>
             </div>
 
-            {/* Next runs */}
-            {parsed.runs.length > 0 && (
-              <div className="result-card flex flex-col gap-2">
-                <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--text-muted)]">
-                  Next 5 Scheduled Runs
-                </span>
-                <ol className="flex flex-col gap-2">
+            <div className="result-card flex flex-col gap-2">
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--text-muted)]">
+                Next 5 Scheduled Runs
+              </span>
+              <p className="text-[10px] text-[var(--text-muted)]">
+                Times shown in your local timezone ({Intl.DateTimeFormat().resolvedOptions().timeZone})
+              </p>
+              {parsed.runs.length > 0 ? (
+                <ol className="flex flex-col gap-2" aria-live="polite">
                   {parsed.runs.map((r, i) => (
                     <li key={i} className="flex items-center gap-2.5">
                       <span className="badge badge-accent">{i + 1}</span>
@@ -199,8 +216,13 @@ export function CronParser() {
                     </li>
                   ))}
                 </ol>
-              </div>
-            )}
+              ) : (
+                <p role="status" className="text-xs text-[var(--text-muted)]">
+                  No upcoming runs found in the near scan window. The expression may be too sparse
+                  or never match (check day-of-month vs day-of-week).
+                </p>
+              )}
+            </div>
           </div>
         ) : (
           <p className="p-4 text-[var(--text-muted)] text-sm">Plain-English explanation will appear here...</p>
@@ -208,11 +230,26 @@ export function CronParser() {
       }
       extraActions={
         <button
+          type="button"
           onClick={() => setInput(SAMPLE)}
           className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
         >
           Load sample
         </button>
+      }
+      options={
+        <div className="flex flex-wrap gap-1.5" role="group" aria-label="Cron presets">
+          {PRESETS.map((p) => (
+            <button
+              key={p.value}
+              type="button"
+              onClick={() => setInput(p.value)}
+              className="px-2.5 py-1 rounded-md text-xs border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
+            >
+              {p.label}
+            </button>
+          ))}
+        </div>
       }
     />
   );

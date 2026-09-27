@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CATEGORY_LABELS, type ToolCategory } from "@/lib/tools";
 
 interface BreadcrumbProps {
   /** Current page label shown after the separator */
@@ -9,6 +10,7 @@ interface BreadcrumbProps {
    * defines its own <h1> elsewhere.
    */
   asHeading?: boolean;
+  category?: ToolCategory;
 }
 
 /**
@@ -16,7 +18,7 @@ interface BreadcrumbProps {
  * tool page. Centralizing this avoids the markup drifting out of sync
  * across individual tool components.
  */
-export function Breadcrumb({ current, asHeading = true }: BreadcrumbProps) {
+export function Breadcrumb({ current, asHeading = true, category }: BreadcrumbProps) {
   return (
     <div className="flex items-center gap-3">
       <Link
@@ -29,6 +31,17 @@ export function Breadcrumb({ current, asHeading = true }: BreadcrumbProps) {
         All tools
       </Link>
       <span className="text-[var(--border)]">/</span>
+      {category && (
+        <>
+          <Link
+            href={`/category/${category}`}
+            className="text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
+          >
+            {CATEGORY_LABELS[category]}
+          </Link>
+          <span className="text-[var(--border)]">/</span>
+        </>
+      )}
       {asHeading ? (
         <h1 className="text-sm font-medium text-[var(--text-primary)]">{current}</h1>
       ) : (

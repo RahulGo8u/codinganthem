@@ -2,14 +2,16 @@
 
 import { useState, useEffect, useRef } from "react";
 import { ToolShell } from "@/components/ToolShell";
-import { CopyChip } from "@/components/CopyChip";
+import { CopyButton } from "@/components/CopyButton";
+import { SegmentedControl } from "@/components/SegmentedControl";
 import { getToolBySlug } from "@/lib/tools";
 
 const tool = getToolBySlug("hash-generator")!;
 
-type HashAlgo = "MD5" | "SHA-1" | "SHA-256" | "SHA-512";
+type HashAlgo = "MD5" | "SHA-1" | "SHA-256" | "SHA-512" | "ALL";
 
-const ALGOS: HashAlgo[] = ["MD5", "SHA-1", "SHA-256", "SHA-512"];
+const SINGLE_ALGOS = ["MD5", "SHA-1", "SHA-256", "SHA-512"] as const;
+const LEGACY_ALGOS = new Set<string>(["MD5", "SHA-1"]);
 
 const SAMPLE = "Hello, CodingAnthem!";
 
@@ -105,24 +107,50 @@ async function sha(input: string, algo: string): Promise<string> {
     .join("");
 }
 
+async function computeHash(input: string, algo: (typeof SINGLE_ALGOS)[number]): Promise<string> {
+  if (algo === "MD5") return md5(input);
+  return sha(input, algo);
+}
+
 export function HashGenerator() {
   const [input, setInput] = useState(SAMPLE);
   const [algo, setAlgo] = useState<HashAlgo>("SHA-256");
+  const [hashes, setHashes] = useState<Partial<Record<(typeof SINGLE_ALGOS)[number], string>>>({});
   const [output, setOutput] = useState("");
   const reqRef = useRef(0);
 
+  const byteLength = new TextEncoder().encode(input).length;
+  const showLegacyWarning = algo === "ALL" || LEGACY_ALGOS.has(algo);
+
   useEffect(() => {
-    if (!input) { setOutput(""); return; }
     const id = ++reqRef.current;
-    if (algo === "MD5") {
-      const result = md5(input);
-      if (id === reqRef.current) setOutput(result);
-    } else {
-      sha(input, algo).then((result) => {
-        if (id === reqRef.current) setOutput(result);
+    if (!input) {
+      void Promise.resolve().then(() => {
+        if (id !== reqRef.current) return;
+        setHashes({});
+        setOutput("");
       });
+      return;
     }
+    const algosToRun = algo === "ALL" ? [...SINGLE_ALGOS] : [algo as (typeof SINGLE_ALGOS)[number]];
+
+    void Promise.all(algosToRun.map(async (a) => [a, await computeHash(input, a)] as const)).then(
+      (entries) => {
+        if (id !== reqRef.current) return;
+        const next: Partial<Record<(typeof SINGLE_ALGOS)[number], string>> = {};
+        for (const [a, hash] of entries) next[a] = hash;
+        setHashes(next);
+        if (algo === "ALL") {
+          setOutput(entries.map(([a, hash]) => `${a}: ${hash}`).join("\n"));
+        } else {
+          setOutput(entries[0]?.[1] ?? "");
+        }
+      }
+    );
   }, [input, algo]);
+
+  const visibleAlgos =
+    algo === "ALL" ? [...SINGLE_ALGOS] : ([algo] as (typeof SINGLE_ALGOS)[number][]);
 
   return (
     <ToolShell
@@ -133,21 +161,46 @@ export function HashGenerator() {
       hideFileActions
       showClear
       inputLabel="Input text"
-      outputLabel={`${algo} Hash`}
+      outputLabel={algo === "ALL" ? "All hashes" : `${algo} Hash`}
       inputPlaceholder="Enter text to hash..."
       outputPlaceholder="Hash will appear here..."
       outputContent={
-        output ? (
-          <div className="p-4">
-            <div className="result-card flex items-center justify-between gap-3">
-              <div className="flex flex-col gap-1 min-w-0">
-                <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--text-muted)]">
-                  {algo} Hash
-                </span>
-                <span className="mono text-sm text-[var(--text-primary)] break-all">{output}</span>
-              </div>
-              <CopyChip value={output} label={`${algo} hash`} />
-            </div>
+        Object.keys(hashes).length > 0 ? (
+          <div className="p-4 flex flex-col gap-3">
+            {showLegacyWarning && (
+              <p
+                role="status"
+                className="text-xs leading-relaxed rounded-lg border border-[#f59e0b]/40 bg-[#f59e0b]/10 text-[#f59e0b] px-3 py-2"
+              >
+                {algo === "MD5" || algo === "SHA-1"
+                  ? `${algo} is cryptographically broken for password hashing and signatures. Prefer SHA-256 or SHA-512 for security-sensitive use.`
+                  : "MD5 and SHA-1 are listed for checksum compatibility only — they are not safe for password hashing or signatures."}
+              </p>
+            )}
+            <p className="text-[10px] text-[var(--text-muted)]">
+              {input.length.toLocaleString()} characters · {byteLength.toLocaleString()} bytes (UTF-8)
+            </p>
+            {visibleAlgos.map((a) => {
+              const value = hashes[a];
+              if (!value) return null;
+              const legacy = LEGACY_ALGOS.has(a);
+              return (
+                <div key={a} className="result-card flex items-center justify-between gap-3">
+                  <div className="flex flex-col gap-1 min-w-0">
+                    <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--text-muted)] flex items-center gap-2">
+                      {a} Hash
+                      {legacy && (
+                        <span className="normal-case tracking-normal font-medium text-[#f59e0b]">
+                          Legacy — not for security
+                        </span>
+                      )}
+                    </span>
+                    <span className="mono text-sm text-[var(--text-primary)] break-all">{value}</span>
+                  </div>
+                  <CopyButton value={value} label="Copy" compact />
+                </div>
+              );
+            })}
           </div>
         ) : (
           <p className="p-4 text-[var(--text-muted)] text-sm">Hash will appear here...</p>
@@ -155,6 +208,7 @@ export function HashGenerator() {
       }
       extraActions={
         <button
+          type="button"
           onClick={() => setInput(SAMPLE)}
           className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
         >
@@ -162,21 +216,15 @@ export function HashGenerator() {
         </button>
       }
       options={
-        <div className="flex rounded-lg border border-[var(--border)] overflow-hidden text-xs">
-          {ALGOS.map((a) => (
-            <button
-              key={a}
-              onClick={() => setAlgo(a)}
-              className={`px-3 py-1.5 transition-colors ${
-                algo === a
-                  ? "bg-[#6366f1]/15 text-[#6366f1]"
-                  : "text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)]"
-              }`}
-            >
-              {a}
-            </button>
-          ))}
-        </div>
+        <SegmentedControl
+          label="Hash algorithm"
+          value={algo}
+          onChange={setAlgo}
+          segments={[
+            ...SINGLE_ALGOS.map((a) => ({ value: a as HashAlgo, label: a })),
+            { value: "ALL" as HashAlgo, label: "All" },
+          ]}
+        />
       }
     />
   );

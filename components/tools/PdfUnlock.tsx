@@ -1,8 +1,10 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useState } from "react";
+import Link from "next/link";
 import { getToolBySlug } from "@/lib/tools";
 import { Breadcrumb } from "@/components/Breadcrumb";
+import { FileDropzone } from "@/components/FileDropzone";
 import { DownloadButton } from "@/components/DownloadButton";
 import { downloadBlob } from "@/lib/download";
 import {
@@ -33,10 +35,8 @@ export function PdfUnlock() {
   const [note, setNote] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [inspecting, setInspecting] = useState(false);
-  const [dragging, setDragging] = useState(false);
   const [unlockedBytes, setUnlockedBytes] = useState<Uint8Array | null>(null);
   const [unlockedPages, setUnlockedPages] = useState<number | null>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
 
   const resetResult = useCallback(() => {
     setUnlockedBytes(null);
@@ -83,7 +83,14 @@ export function PdfUnlock() {
       setUnlockedPages(pageCount);
       setNote("PDF unlocked successfully. Download the unprotected copy below.");
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Unlock failed.");
+      const msg = e instanceof Error ? e.message : "Unlock failed.";
+      const looksWrongPassword =
+        /password|authenticate|decrypt|incorrect|invalid/i.test(msg);
+      setError(
+        looksWrongPassword
+          ? "Wrong password — double-check and try again. Passwords are case-sensitive."
+          : msg
+      );
     } finally {
       setBusy(false);
     }
@@ -96,7 +103,6 @@ export function PdfUnlock() {
     setError(null);
     setNote(null);
     resetResult();
-    if (inputRef.current) inputRef.current.value = "";
   }, [resetResult]);
 
   const canUnlock = Boolean(file && status?.encrypted && !busy && !inspecting);
@@ -116,75 +122,43 @@ export function PdfUnlock() {
         </div>
       </div>
 
-      <div
-        onDragOver={(e) => {
-          e.preventDefault();
-          setDragging(true);
-        }}
-        onDragLeave={() => setDragging(false)}
-        onDrop={(e) => {
-          e.preventDefault();
-          setDragging(false);
-          const f = e.dataTransfer.files?.[0];
-          if (f) void processFile(f);
-        }}
-        onClick={() => inputRef.current?.click()}
-        role="button"
-        tabIndex={0}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            inputRef.current?.click();
-          }
-        }}
-        aria-label="Drop a PDF or click to upload"
-        className={`rounded-xl border-2 border-dashed p-10 text-center cursor-pointer transition-colors ${
-          dragging
-            ? "border-[#6366f1] bg-[#6366f1]/10"
-            : "border-[var(--border)] bg-[var(--bg-surface)] hover:border-[#6366f1]/40"
-        }`}
-      >
-        {file ? (
-          <>
-            <p className="text-sm text-[var(--text-primary)] font-medium truncate">
-              {safeFileName(file.name)}
-            </p>
-            <p className="text-xs text-[var(--text-muted)] mt-1">
-              {formatBytes(file.size)}
-              {status?.pageCount != null ? ` · ${status.pageCount} page${status.pageCount === 1 ? "" : "s"}` : ""}
-              {status?.encrypted
-                ? status.requiresPassword
-                  ? " · password required"
-                  : " · encrypted (no open password)"
-                : status
-                  ? " · not encrypted"
-                  : ""}
-              {inspecting ? " · checking…" : ""}
-            </p>
-            <p className="text-xs text-[var(--text-muted)] mt-2">
-              Drop another PDF or click to replace
-            </p>
-          </>
-        ) : (
-          <>
-            <p className="text-sm text-[var(--text-primary)] font-medium">
-              Drop a password-protected PDF here or click to upload
-            </p>
-            <p className="text-xs text-[var(--text-muted)] mt-1">
-              Max {formatBytes(PDF_MAX_BYTES)} · processed entirely in your browser
-            </p>
-          </>
-        )}
-        <input
-          ref={inputRef}
-          type="file"
+      <div aria-busy={inspecting || busy}>
+        <FileDropzone
           accept={PDF_ACCEPT}
-          className="hidden"
-          onChange={(e) => {
-            const f = e.target.files?.[0];
-            if (f) void processFile(f);
-          }}
-        />
+          onFile={(f) => void processFile(f)}
+          disabled={busy}
+          title={
+            file
+              ? "Drop another PDF or click to replace"
+              : "Drop a password-protected PDF here or click to upload"
+          }
+          description={`Max ${formatBytes(PDF_MAX_BYTES)} · processed entirely in your browser`}
+        >
+          {file ? (
+            <div className="flex flex-col items-center gap-1">
+              <p className="text-sm text-[var(--text-primary)] font-medium truncate max-w-full">
+                {safeFileName(file.name)}
+              </p>
+              <p className="text-xs text-[var(--text-muted)]">
+                {formatBytes(file.size)}
+                {status?.pageCount != null
+                  ? ` · ${status.pageCount} page${status.pageCount === 1 ? "" : "s"}`
+                  : ""}
+                {status?.encrypted
+                  ? status.requiresPassword
+                    ? " · password required"
+                    : " · encrypted (no open password)"
+                  : status
+                    ? " · not encrypted"
+                    : ""}
+                {inspecting ? " · checking…" : ""}
+              </p>
+              <span className="mt-2 inline-flex rounded-lg border border-[var(--border)] px-3 py-1.5 text-xs font-medium text-[var(--text-primary)]">
+                Replace PDF
+              </span>
+            </div>
+          ) : undefined}
+        </FileDropzone>
       </div>
 
       {error && (
@@ -193,7 +167,9 @@ export function PdfUnlock() {
         </p>
       )}
       {note && !error && (
-        <p className="text-sm text-[var(--text-muted)] leading-relaxed">{note}</p>
+        <p role="status" aria-live="polite" className="text-sm text-[var(--text-muted)] leading-relaxed">
+          {note}
+        </p>
       )}
 
       {file && status?.encrypted && (
@@ -218,10 +194,12 @@ export function PdfUnlock() {
                   unlockNeedsPassword ? "Enter the PDF password" : "Leave blank if none"
                 }
                 autoComplete="off"
+                aria-invalid={Boolean(error)}
                 className="flex-1 rounded-lg border border-[var(--border)] bg-[var(--bg-elevated)] px-3 py-2 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[#6366f1]/40"
               />
               <button
                 type="button"
+                aria-pressed={showPassword}
                 onClick={() => setShowPassword((v) => !v)}
                 className="rounded-lg border border-[var(--border)] px-3 py-2 text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:border-[var(--text-muted)] transition-colors"
               >
@@ -234,6 +212,7 @@ export function PdfUnlock() {
             <button
               type="button"
               disabled={!canUnlock || (unlockNeedsPassword && !password)}
+              aria-busy={busy}
               onClick={() => void handleUnlock()}
               className="inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-semibold border border-[#6366f1]/60 bg-[#6366f1] text-white shadow-sm shadow-[#6366f1]/20 hover:bg-[#4f46e5] hover:border-[#4f46e5] disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none transition-all"
             >
@@ -252,7 +231,7 @@ export function PdfUnlock() {
       )}
 
       {file && status && !status.encrypted && (
-        <div>
+        <div className="flex flex-wrap items-center gap-2">
           <button
             type="button"
             onClick={handleClear}
@@ -260,6 +239,12 @@ export function PdfUnlock() {
           >
             Clear
           </button>
+          <Link
+            href="/tools/pdf-compare"
+            className="rounded-lg border border-[var(--border)] px-3 py-2 text-sm text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
+          >
+            Compare PDFs instead →
+          </Link>
         </div>
       )}
 

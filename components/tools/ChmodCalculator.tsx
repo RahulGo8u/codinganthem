@@ -4,6 +4,7 @@ import { useMemo, useState, useCallback } from "react";
 import { getToolBySlug } from "@/lib/tools";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { CopyChip } from "@/components/CopyChip";
+import { CopyButton } from "@/components/CopyButton";
 
 const tool = getToolBySlug("chmod-calculator")!;
 
@@ -28,12 +29,12 @@ function fromDigit(n: number): Perm {
   return { r: (n & 4) !== 0, w: (n & 2) !== 0, x: (n & 1) !== 0 };
 }
 
-const PRESETS: { label: string; octal: string }[] = [
-  { label: "644", octal: "644" },
-  { label: "755", octal: "755" },
-  { label: "600", octal: "600" },
-  { label: "700", octal: "700" },
-  { label: "777", octal: "777" },
+const PRESETS: { label: string; octal: string; hint: string }[] = [
+  { label: "644", octal: "644", hint: "rw-r--r-- typical file" },
+  { label: "755", octal: "755", hint: "rwxr-xr-x scripts / dirs" },
+  { label: "600", octal: "600", hint: "rw------- private file" },
+  { label: "700", octal: "700", hint: "rwx------ private dir" },
+  { label: "777", octal: "777", hint: "rwxrwxrwx world-writable" },
 ];
 
 export function ChmodCalculator() {
@@ -41,6 +42,7 @@ export function ChmodCalculator() {
   const [sticky, setSticky] = useState(false);
   const [setuid, setSetuid] = useState(false);
   const [setgid, setSetgid] = useState(false);
+  const [filename, setFilename] = useState("file.txt");
 
   const octal = useMemo(() => {
     const special = (setuid ? 4 : 0) + (setgid ? 2 : 0) + (sticky ? 1 : 0);
@@ -53,7 +55,8 @@ export function ChmodCalculator() {
     [perms]
   );
 
-  const command = `chmod ${octal}`;
+  const safeName = filename.trim() || "file.txt";
+  const command = `chmod ${octal} ${safeName}`;
 
   const toggle = (who: keyof Triple, bit: keyof Perm) => {
     setPerms((prev) => ({
@@ -97,6 +100,8 @@ export function ChmodCalculator() {
         {PRESETS.map((p) => (
           <button
             key={p.octal}
+            type="button"
+            title={p.hint}
             onClick={() => applyOctal(p.octal)}
             className="px-3 py-1 rounded-full text-xs border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)]"
           >
@@ -105,70 +110,125 @@ export function ChmodCalculator() {
         ))}
       </div>
 
+      <label className="flex flex-wrap items-center gap-2 text-xs text-[var(--text-muted)] max-w-md">
+        Filename for command
+        <input
+          type="text"
+          value={filename}
+          onChange={(e) => setFilename(e.target.value)}
+          placeholder="file.txt"
+          className="mono flex-1 min-w-[10rem] rounded border border-[var(--border)] bg-[var(--bg-elevated)] px-2 py-1.5 text-sm text-[var(--text-primary)]"
+        />
+      </label>
+
       <div className="overflow-x-auto rounded-lg border border-[var(--border)] bg-[var(--bg-surface)]">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-[var(--border)] text-xs uppercase tracking-wider text-[var(--text-muted)]">
-              <th className="text-left p-3 font-medium">Class</th>
-              <th className="p-3 font-medium">Read (4)</th>
-              <th className="p-3 font-medium">Write (2)</th>
-              <th className="p-3 font-medium">Execute (1)</th>
+              <th scope="col" className="text-left p-3 font-medium">Class</th>
+              <th scope="col" className="p-3 font-medium">Read (4)</th>
+              <th scope="col" className="p-3 font-medium">Write (2)</th>
+              <th scope="col" className="p-3 font-medium">Execute (1)</th>
             </tr>
           </thead>
           <tbody>
             {rows.map(({ key, label }) => (
               <tr key={key} className="border-b border-[var(--border)] last:border-0">
-                <td className="p-3 text-[var(--text-primary)]">{label}</td>
-                {(["r", "w", "x"] as const).map((bit) => (
-                  <td key={bit} className="p-3 text-center">
-                    <input
-                      type="checkbox"
-                      checked={perms[key][bit]}
-                      onChange={() => toggle(key, bit)}
-                      className="h-4 w-4 accent-[#6366f1]"
-                    />
-                  </td>
-                ))}
+                <th scope="row" className="p-3 text-left font-normal text-[var(--text-primary)]">
+                  {label}
+                </th>
+                {(["r", "w", "x"] as const).map((bit) => {
+                  const bitLabel = bit === "r" ? "read" : bit === "w" ? "write" : "execute";
+                  return (
+                    <td key={bit} className="p-3 text-center">
+                      <input
+                        type="checkbox"
+                        checked={perms[key][bit]}
+                        onChange={() => toggle(key, bit)}
+                        aria-label={`${label} ${bitLabel}`}
+                        className="h-4 w-4 accent-[#6366f1]"
+                      />
+                    </td>
+                  );
+                })}
               </tr>
             ))}
           </tbody>
         </table>
       </div>
 
-      <div className="flex flex-wrap gap-4 text-xs text-[var(--text-muted)]">
-        <label className="flex items-center gap-2">
-          <input type="checkbox" checked={setuid} onChange={(e) => setSetuid(e.target.checked)} />
-          Setuid
-        </label>
-        <label className="flex items-center gap-2">
-          <input type="checkbox" checked={setgid} onChange={(e) => setSetgid(e.target.checked)} />
-          Setgid
-        </label>
-        <label className="flex items-center gap-2">
-          <input type="checkbox" checked={sticky} onChange={(e) => setSticky(e.target.checked)} />
-          Sticky bit
-        </label>
+      <div className="flex flex-col gap-2">
+        <p className="text-xs font-medium uppercase tracking-wider text-[var(--text-muted)]">Special bits</p>
+        <div className="flex flex-col sm:flex-row flex-wrap gap-3 text-xs text-[var(--text-muted)]">
+          <label className="flex items-start gap-2 max-w-xs">
+            <input
+              type="checkbox"
+              checked={setuid}
+              onChange={(e) => setSetuid(e.target.checked)}
+              className="mt-0.5 accent-[#6366f1]"
+            />
+            <span>
+              <span className="text-[var(--text-primary)]">Setuid</span>
+              <span className="block text-[11px] leading-relaxed">
+                Run as file owner (4xxx). Rare for scripts; security-sensitive.
+              </span>
+            </span>
+          </label>
+          <label className="flex items-start gap-2 max-w-xs">
+            <input
+              type="checkbox"
+              checked={setgid}
+              onChange={(e) => setSetgid(e.target.checked)}
+              className="mt-0.5 accent-[#6366f1]"
+            />
+            <span>
+              <span className="text-[var(--text-primary)]">Setgid</span>
+              <span className="block text-[11px] leading-relaxed">
+                Run as group / inherit group on directories (2xxx).
+              </span>
+            </span>
+          </label>
+          <label className="flex items-start gap-2 max-w-xs">
+            <input
+              type="checkbox"
+              checked={sticky}
+              onChange={(e) => setSticky(e.target.checked)}
+              className="mt-0.5 accent-[#6366f1]"
+            />
+            <span>
+              <span className="text-[var(--text-primary)]">Sticky bit</span>
+              <span className="block text-[11px] leading-relaxed">
+                Only owner can delete in shared dirs like /tmp (1xxx).
+              </span>
+            </span>
+          </label>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         {[
-          { label: "Octal", value: octal },
-          { label: "Symbolic", value: sym },
-          { label: "Command", value: command },
-        ].map(({ label, value }) => (
+          { label: "Octal", value: octal, editable: true },
+          { label: "Symbolic", value: sym, editable: false },
+          { label: "Command", value: command, editable: false },
+        ].map(({ label, value, editable }) => (
           <div key={label} className="rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] p-4 flex flex-col gap-2">
             <div className="flex items-center justify-between">
               <span className="text-xs uppercase tracking-wider text-[var(--text-muted)]">{label}</span>
-              <CopyChip value={value} label={label} />
+              {label === "Command" ? (
+                <CopyButton value={value} label="Copy" compact />
+              ) : (
+                <CopyChip value={value} label={label} />
+              )}
             </div>
-            {label === "Octal" ? (
+            {editable ? (
               <input
                 value={octal}
                 onChange={(e) => applyOctal(e.target.value)}
+                aria-label="Octal permissions"
                 className="mono text-lg text-[var(--text-primary)] bg-transparent focus:outline-none"
               />
             ) : (
-              <code className="mono text-lg text-[var(--text-primary)]">{value}</code>
+              <code className="mono text-lg text-[var(--text-primary)] break-all">{value}</code>
             )}
           </div>
         ))}

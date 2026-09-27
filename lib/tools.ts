@@ -692,13 +692,13 @@ export const tools: Tool[] = [
   {
     slug: "token-counter",
     name: "Token Counter & Estimator",
-    seoTitle: "AI Token Counter for GPT, Claude & Gemini — Free Online",
-    description: "Count tokens and estimate API cost for GPT, Claude, and Gemini models online, instantly. Free token counter using OpenAI's real tiktoken tokenizer.",
+    seoTitle: "AI Token Counter & API Cost Calculator — GPT, Claude, Gemini",
+    description: "Count tokens, compare current GPT, Claude, Gemini, and DeepSeek models, and forecast API costs with output, caching, batch, and volume controls.",
     category: "ai",
     icon: "Calculator",
-    keywords: ["token counter", "gpt tokenizer", "tiktoken", "llm tokens", "context window", "ai cost calculator", "claude tokens", "gemini tokens"],
+    keywords: ["token counter", "gpt tokenizer", "tiktoken", "llm tokens", "context window", "ai cost calculator", "claude tokens", "gemini tokens", "deepseek tokens", "api pricing", "prompt caching"],
     explainer:
-      "Count tokens and estimate API cost before you send a single request — entirely in your browser.\n\n• Exact counts for GPT-4o, GPT-4.1, and GPT-3.5 via OpenAI's real tiktoken tokenizer (bundled locally — no remote download)\n• Character-based estimates for Claude and Gemini, since those providers don't publish a public tokenizer\n• Shows how much of the model's context window your text uses, plus estimated cost for this prompt\n• Nothing you paste is ever sent to a server",
+      "Plan prompt size and API spend across current AI models — entirely in your browser.\n\n• Compare current OpenAI, Anthropic, Google, and DeepSeek models side by side\n• Forecast input and output costs per request, day, and month\n• Simulate prompt caching, Batch API discounts, and request volume\n• Check context-window fit, max output, words, characters, lines, and token density\n• Bundled OpenAI tokenizer for exact plain-text encoding; transparent local estimates for other providers\n• Pricing is dated and linked to official provider sources; nothing you paste is sent anywhere",
   },
   {
     slug: "xml-to-json",
