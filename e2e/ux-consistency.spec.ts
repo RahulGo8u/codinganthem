@@ -23,6 +23,9 @@ test.describe("Shared tool UX", () => {
 
   test("server-backed AI tools disclose data flow before input", async ({ page }) => {
     await page.goto("/tools/ai-code-explainer");
+    await expect(page.getByRole("note").filter({ hasText: /Google Gemini/i })).toHaveCount(0);
+
+    await page.goto("/tools/ai-sql-generator");
     const notice = page.getByRole("note").filter({ hasText: /sent to|Gemini/i }).first();
     await expect(notice).toBeVisible();
     await expect(notice).toContainText(/Do not paste secrets|confidential/i);

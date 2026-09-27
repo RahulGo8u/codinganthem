@@ -4,7 +4,6 @@ import { useState } from "react";
 import { Sparkles, Loader2, AlertCircle, Copy } from "lucide-react";
 import { ToolPageHeader } from "@/components/ToolPageHeader";
 import { AiDisclaimer } from "@/components/AiDisclaimer";
-import { DataFlowNotice } from "@/components/DataFlowNotice";
 import { getToolBySlug } from "@/lib/tools";
 
 const tool = getToolBySlug("ai-code-explainer")!;
@@ -94,8 +93,6 @@ export function AiCodeExplainer() {
           </button>
         }
       />
-
-      <DataFlowNotice destination="Google Gemini (via our server)" />
 
       <div className="flex flex-wrap items-center gap-3 px-4 py-2.5 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] text-sm">
         <label className="flex items-center gap-2 text-xs text-[var(--text-muted)]">
