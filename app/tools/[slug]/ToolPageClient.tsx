@@ -177,6 +177,14 @@ const TOOL_MAP: Record<string, React.ComponentType> = {
   "eth-unit-converter": dynamic(() =>
     import("@/components/tools/EthUnitConverter").then((m) => ({ default: m.EthUnitConverter }))
   ),
+  "ethereum-address-checksum": dynamic(() =>
+    import("@/components/tools/EthereumAddressChecksum").then((m) => ({
+      default: m.EthereumAddressChecksum,
+    }))
+  ),
+  "keccak-calculator": dynamic(() =>
+    import("@/components/tools/KeccakCalculator").then((m) => ({ default: m.KeccakCalculator }))
+  ),
   "image-compressor": dynamic(() =>
     import("@/components/tools/ImageCompressor").then((m) => ({ default: m.ImageCompressor }))
   ),

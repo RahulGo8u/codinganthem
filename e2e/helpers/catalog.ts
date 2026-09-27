@@ -87,6 +87,8 @@ export const DEDICATED_INTERACTION_SLUGS = [
   "hmac-generator",
   "http-status-codes",
   "cidr-calculator",
+  "ethereum-address-checksum",
+  "keccak-calculator",
 ] as const;
 
 export const INTERACTION_SLUGS = new Set<string>([

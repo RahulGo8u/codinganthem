@@ -114,12 +114,15 @@ A few tools (like URL Shortener) use a lightweight backend. AI tools send input 
 
 ### Web3
 - ETH Unit Converter — convert between Wei, Kwei, Mwei, Gwei, Szabo, Finney, and Ether with exact BigInt precision
+- Ethereum Address Checksum — validate and convert addresses to the EIP-55 checksummed format
+- Keccak-256 & Solidity Signature Calculator — hashes, 4-byte function selectors, and event topic0 values
 
 ## Stack
 
 - [Next.js 16](https://nextjs.org) (App Router, TypeScript)
 - [Tailwind CSS v4](https://tailwindcss.com)
 - [Lucide React](https://lucide.dev)
+- [Noble Hashes](https://paulmillr.com/noble/) for browser-based Ethereum Keccak-256
 - [cmdk](https://cmdk.paco.me) — ⌘K command palette
 - [yaml](https://eemeli.org/yaml/) and [marked](https://marked.js.org) for YAML / Markdown parsing
 - [mermaid](https://mermaid.js.org) for diagram rendering

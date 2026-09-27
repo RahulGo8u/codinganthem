@@ -817,6 +817,45 @@ export const tools: Tool[] = [
       "Convert between Wei, Kwei, Mwei, Gwei, Szabo, Finney, and Ether instantly — every field stays in sync as you type.\n\n• Uses BigInt arithmetic, not floating-point, so large values (like 1 ETH = 1,000,000,000,000,000,000 Wei) are always exact\n• Common ETH and Gwei presets, readable grouped values, denomination aliases, and one-click copying\n• Built-in gas fee estimator multiplies gas limit by max gas price without rounding\n• Useful for reading gas estimates, RPC logs, and contract values that come back in raw Wei\n• Runs entirely in your browser — never paste a private key or seed phrase into this or any online tool",
   },
   {
+    slug: "ethereum-address-checksum",
+    name: "Ethereum Address Checksum",
+    seoTitle: "Ethereum Address Checksum Validator — EIP-55 Converter",
+    description:
+      "Validate an Ethereum address and convert it to the EIP-55 checksummed format. Free, private, and entirely browser-based.",
+    category: "web3",
+    icon: "ShieldCheck",
+    keywords: [
+      "ethereum address checksum",
+      "eip-55",
+      "eth address validator",
+      "checksum address converter",
+      "ethereum address checker",
+    ],
+    isNew: true,
+    explainer:
+      "Validate a 20-byte Ethereum address and generate its EIP-55 mixed-case checksum.\n\n• Detects malformed addresses and incorrect mixed-case checksums\n• Converts lowercase or uppercase addresses to the canonical checksummed form\n• Uses Ethereum Keccak-256 locally in your browser\n• Always verify a destination independently before sending funds",
+  },
+  {
+    slug: "keccak-calculator",
+    name: "Keccak-256 & Solidity Signature Calculator",
+    seoTitle: "Keccak-256 Hash & Solidity Function Selector Calculator",
+    description:
+      "Calculate Ethereum Keccak-256 hashes, Solidity function selectors, and event topic0 hashes from text, hex, or signatures.",
+    category: "web3",
+    icon: "Hash",
+    keywords: [
+      "keccak256",
+      "keccak 256 hash",
+      "solidity function selector",
+      "ethereum event topic",
+      "topic0 calculator",
+      "4 byte selector",
+    ],
+    isNew: true,
+    explainer:
+      "Calculate Ethereum's Keccak-256 hash from UTF-8 text or hexadecimal bytes, or enter a canonical Solidity signature.\n\n• Shows the complete 32-byte Keccak-256 hash\n• Extracts the first 4 bytes as a Solidity function selector\n• Provides the full hash as event topic0 for log filtering\n• Keccak-256 is different from standardized SHA3-256; all calculations run locally",
+  },
+  {
     slug: "image-compressor",
     name: "Image Compressor",
     seoTitle: "Free Image Compressor Online — Compress JPG, PNG & WebP",
