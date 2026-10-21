@@ -81,6 +81,9 @@ export const metadata: Metadata = {
   verification: {
     google: process.env.GOOGLE_SITE_VERIFICATION,
   },
+  other: {
+    "google-adsense-account": "ca-pub-9076656538474287",
+  },
 };
 
 const jsonLd = {
@@ -116,13 +119,6 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable}`}
       suppressHydrationWarning
     >
-      <head>
-        <script
-          async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9076656538474287"
-          crossOrigin="anonymous"
-        />
-      </head>
       <body className="flex flex-col min-h-screen">
         <script
           type="application/ld+json"
@@ -134,7 +130,7 @@ export default function RootLayout({
           defer
           data-domain="codinganthem.com"
           src="https://plausible.io/js/script.js"
-          strategy="afterInteractive"
+          strategy="lazyOnload"
         />
 
         <a
@@ -151,6 +147,12 @@ export default function RootLayout({
           <Footer />
         </Providers>
         <Analytics />
+        <Script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9076656538474287"
+          crossOrigin="anonymous"
+          strategy="lazyOnload"
+        />
       </body>
     </html>
   );

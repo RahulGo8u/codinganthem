@@ -30,8 +30,8 @@
 :root {
   --accent: #6366f1;
   --accent-hover: #4f46e5;
-  /* Text-on-surface accent — darker in light mode for WCAG AA contrast */
-  --accent-text: #6366f1;
+  /* Text-on-surface accent fallback; each color scheme overrides it below */
+  --accent-text: #818cf8;
   --accent-soft: rgba(99, 102, 241, 0.12);
   --success: #22c55e;
   --error: #ef4444;
@@ -46,7 +46,8 @@
   --border: #1f1f1f;
   --text-primary: #ededed;
   --text-muted: #888888;
-  --accent-text: #6366f1;
+  /* indigo-400 — AA for regular text on the dark base and tinted surfaces */
+  --accent-text: #818cf8;
 
   /* Syntax highlighting (code output panes) — light pastels for dark backgrounds */
   --syntax-key: #a5b4fc;

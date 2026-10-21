@@ -12,7 +12,7 @@ export function ThemeToggle() {
   if (!mounted) {
     return (
       <button
-        className="w-8 h-8 rounded-lg flex items-center justify-center"
+        className="w-12 h-12 rounded-lg flex items-center justify-center"
         aria-label="Toggle theme"
       />
     );
@@ -23,7 +23,7 @@ export function ThemeToggle() {
   return (
     <button
       onClick={() => setTheme(isDark ? "light" : "dark")}
-      className="w-8 h-8 rounded-lg flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
+      className="w-12 h-12 rounded-lg flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
       aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
       title={isDark ? "Switch to light mode" : "Switch to dark mode"}
     >

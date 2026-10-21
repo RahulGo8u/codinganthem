@@ -32,7 +32,7 @@ export function Nav() {
           {/* Search trigger */}
           <button
             onClick={openPalette}
-            className="hidden sm:flex items-center gap-3 px-3 h-8 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] text-[var(--text-muted)] hover:border-[#6366f1]/40 hover:text-[var(--text-primary)] transition-colors text-sm"
+            className="hidden sm:flex items-center gap-3 px-3 h-11 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] text-[var(--text-muted)] hover:border-[#6366f1]/40 hover:text-[var(--text-primary)] transition-colors text-sm"
           >
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="11" cy="11" r="8" />
@@ -44,7 +44,7 @@ export function Nav() {
           {/* Mobile search icon */}
           <button
             onClick={openPalette}
-            className="sm:hidden w-8 h-8 flex items-center justify-center rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
+            className="sm:hidden w-12 h-12 flex items-center justify-center rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
             aria-label="Search tools"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -58,7 +58,7 @@ export function Nav() {
             href="https://buymeacoffee.com/codinganthem"
             target="_blank"
             rel="noopener noreferrer"
-            className="hidden sm:flex items-center gap-1.5 px-3 h-8 rounded-lg border border-[#f59e0b]/40 bg-[#f59e0b]/10 text-[#f59e0b] hover:bg-[#f59e0b]/20 transition-colors text-xs font-medium"
+            className="hidden sm:flex items-center gap-1.5 px-3 h-11 rounded-lg border border-[#f59e0b]/40 bg-[#f59e0b]/10 text-[#f59e0b] hover:bg-[#f59e0b]/20 transition-colors text-sm font-medium"
           >
             <Coffee size={13} />
             Buy me a coffee
@@ -69,7 +69,7 @@ export function Nav() {
             href="https://buymeacoffee.com/codinganthem"
             target="_blank"
             rel="noopener noreferrer"
-            className="sm:hidden w-8 h-8 flex items-center justify-center rounded-lg text-[#f59e0b] hover:bg-[#f59e0b]/10 transition-colors"
+            className="sm:hidden w-12 h-12 flex items-center justify-center rounded-lg text-[#f59e0b] hover:bg-[#f59e0b]/10 transition-colors"
             aria-label="Buy me a coffee"
           >
             <Coffee size={16} />

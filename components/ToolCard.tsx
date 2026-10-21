@@ -37,7 +37,7 @@ export function ToolCard({ tool }: { tool: Tool }) {
         <h3 className="text-sm font-semibold leading-snug">
           {tool.name}
         </h3>
-        <p className="text-xs text-[var(--text-muted)] leading-relaxed line-clamp-2">
+        <p className="text-sm text-[var(--text-muted)] leading-relaxed line-clamp-2">
           {tool.description}
         </p>
       </div>
