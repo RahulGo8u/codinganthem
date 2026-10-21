@@ -57,7 +57,7 @@ const TOOL_MAP: Record<string, React.ComponentType> = {
   "base-converter": dynamic(() =>
     import("@/components/tools/BaseConverter").then((m) => ({ default: m.BaseConverter }))
   ),
-  "lorem-ipsum": dynamic(() =>
+  "filler-copy": dynamic(() =>
     import("@/components/tools/LoremIpsumGenerator").then((m) => ({ default: m.LoremIpsumGenerator }))
   ),
   "csv-to-json": dynamic(() =>

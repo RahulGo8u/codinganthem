@@ -52,7 +52,7 @@ export function HomepageClient({ faqs = [] }: { faqs?: Faq[] }) {
               {tools.length} Free Developer Tools
             </h1>
             <p className="text-base sm:text-lg leading-relaxed" style={{ color: "var(--text-muted)" }}>
-              Built for developers, students, and AI engineers. No login, no ads — just instant
+              Built for developers, students, and AI engineers. No login — just instant
               results. Paste JSON from ChatGPT, decode a JWT from a bug report, or format SQL
               from Copilot, most tools running entirely in your browser.
             </p>

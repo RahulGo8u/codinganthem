@@ -23,11 +23,11 @@ test.describe("Generator tools", () => {
     expect(text.length).toBeGreaterThanOrEqual(16);
   });
 
-  test("lorem-ipsum generates paragraphs", async ({ page }) => {
-    await gotoTool(page, "lorem-ipsum");
-    await assertToolHeading(page, "Lorem Ipsum Generator");
+  test("filler-copy generates paragraphs", async ({ page }) => {
+    await gotoTool(page, "filler-copy");
+    await assertToolHeading(page, "Filler Copy Generator");
     await page.getByRole("button", { name: "Generate", exact: true }).click();
-    await expect(page.locator("textarea[readonly]")).toHaveValue(/lorem/i);
+    await expect(page.locator("textarea[readonly]")).toHaveValue(/dolor|amet|consectetur/i);
   });
 
   test("mock-data-generator Load sample yields JSON rows", async ({ page }) => {

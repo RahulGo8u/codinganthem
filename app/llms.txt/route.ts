@@ -53,6 +53,9 @@ function buildLlmsTxt(): string {
     `- Tools marked "(sends input to a server/API)" — the URL Shortener and AI tools — transmit your input to a backend or third-party API to function. See [Privacy](${BASE}/privacy) for details.`
   );
   lines.push(`- [About CodingAnthem](${BASE}/about)`);
+  lines.push(`- [Privacy Policy](${BASE}/privacy)`);
+  lines.push(`- [Cookie Policy](${BASE}/cookies)`);
+  lines.push(`- [Terms of Service](${BASE}/terms)`);
   lines.push("- Built with Next.js and React.");
   lines.push(
     "- Source: [github.com/RahulGo8u/codinganthem](https://github.com/RahulGo8u/codinganthem)"

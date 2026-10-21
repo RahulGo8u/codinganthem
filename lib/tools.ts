@@ -88,7 +88,7 @@ export const CATEGORY_META: Record<
     title: "Generators",
     tagline: "Generate UUIDs, passwords, QR codes, and mock data",
     intro:
-      "Free online generators for UUIDs, placeholder text, QR codes, chmod permissions, and realistic mock data. Create test fixtures, seed data, and unique identifiers on demand — no sign-up, and everything runs locally in your browser.",
+      "Free online generators for UUIDs, filler copy, QR codes, chmod permissions, and realistic mock data. Create test fixtures, seed data, and unique identifiers on demand — no sign-up, and everything runs locally in your browser.",
   },
   converters: {
     title: "Data Converters",
@@ -339,15 +339,15 @@ export const tools: Tool[] = [
       "Convert any number between binary, octal, decimal, and hex instantly.\n\n• Enter a number in any base and see all four representations at once\n• Supports binary (base 2), octal (base 8), decimal (base 10), and hex (base 16)\n• Validates digits against the selected input base\n• Useful for bitwise operations, memory addresses, and color values",
   },
   {
-    slug: "lorem-ipsum",
-    name: "Lorem Ipsum Generator",
-    seoTitle: "Lorem Ipsum Generator — Free Placeholder Text Online",
-    description: "Generate classic lorem ipsum placeholder text online, instantly. Choose how many paragraphs you need for wireframes and mockups — free, no sign-up.",
+    slug: "filler-copy",
+    name: "Filler Copy Generator",
+    seoTitle: "Filler Copy Generator — Sample Paragraphs for Mockups",
+    description: "Generate filler copy for wireframes and mockups. Choose how many paragraphs you need — free, in your browser, no sign-up.",
     category: "generators",
     icon: "AlignLeft",
-    keywords: ["lorem", "ipsum", "placeholder", "text", "dummy", "generate", "paragraph"],
+    keywords: ["filler", "copy", "mockup", "dummy", "paragraphs", "generate", "wireframe"],
     explainer:
-      "Generate classic lorem ipsum placeholder text in seconds.\n\n• Choose how many paragraphs to generate (1–10)\n• Classic lorem ipsum words used by designers and developers worldwide\n• Copy all generated text in one click\n• Useful for wireframes, UI mockups, and testing text-heavy layouts",
+      "Generate filler copy for layouts that need realistic-length paragraphs.\n\n• Choose how many paragraphs to generate (1–10)\n• Standard designer filler words used for wireframes and UI mockups\n• Copy all generated text in one click\n• Useful for testing text-heavy layouts before real copy is ready",
   },
   {
     slug: "csv-to-json",

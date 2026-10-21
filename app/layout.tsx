@@ -116,6 +116,13 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable}`}
       suppressHydrationWarning
     >
+      <head>
+        <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9076656538474287"
+          crossOrigin="anonymous"
+        />
+      </head>
       <body className="flex flex-col min-h-screen">
         <script
           type="application/ld+json"

@@ -5,6 +5,7 @@ const BASE = "https://www.codinganthem.com";
 // Bump this only when tool content/pages meaningfully change, so the sitemap's
 // lastmod stays a truthful freshness signal instead of resetting on every deploy.
 const LAST_MODIFIED = "2026-09-27";
+const LEGAL_LAST_MODIFIED = "2026-10-22";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const staticPages: MetadataRoute.Sitemap = [
@@ -22,7 +23,19 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
     {
       url: `${BASE}/privacy`,
-      lastModified: LAST_MODIFIED,
+      lastModified: LEGAL_LAST_MODIFIED,
+      changeFrequency: "yearly",
+      priority: 0.3,
+    },
+    {
+      url: `${BASE}/cookies`,
+      lastModified: LEGAL_LAST_MODIFIED,
+      changeFrequency: "yearly",
+      priority: 0.3,
+    },
+    {
+      url: `${BASE}/terms`,
+      lastModified: LEGAL_LAST_MODIFIED,
       changeFrequency: "yearly",
       priority: 0.3,
     },

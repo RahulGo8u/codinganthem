@@ -54,6 +54,12 @@ export function Footer() {
             <Link href="/privacy" className="hover:text-[var(--text-primary)] transition-colors">
               Privacy
             </Link>
+            <Link href="/cookies" className="hover:text-[var(--text-primary)] transition-colors">
+              Cookie Policy
+            </Link>
+            <Link href="/terms" className="hover:text-[var(--text-primary)] transition-colors">
+              Terms of Service
+            </Link>
             <a
               href="https://github.com/RahulGo8u/codinganthem"
               target="_blank"

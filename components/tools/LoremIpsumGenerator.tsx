@@ -5,10 +5,10 @@ import { ToolShell } from "@/components/ToolShell";
 import { SegmentedControl } from "@/components/SegmentedControl";
 import { getToolBySlug } from "@/lib/tools";
 
-const tool = getToolBySlug("lorem-ipsum")!;
+const tool = getToolBySlug("filler-copy")!;
 
 const WORDS = [
-  "lorem","ipsum","dolor","sit","amet","consectetur","adipiscing","elit","sed","do",
+  "dolor","sit","amet","consectetur","adipiscing","elit","sed","do",
   "eiusmod","tempor","incididunt","ut","labore","et","dolore","magna","aliqua","enim",
   "ad","minim","veniam","quis","nostrud","exercitation","ullamco","laboris","nisi",
   "aliquip","ex","ea","commodo","consequat","duis","aute","irure","in","reprehenderit",
@@ -75,7 +75,7 @@ export function LoremIpsumGenerator() {
       hideFileActions
       hideInputPane
       outputLabel="Generated text"
-      outputPlaceholder="Click Generate to create lorem ipsum text..."
+      outputPlaceholder="Click Generate to create filler copy..."
       extraActions={
         <>
           <button

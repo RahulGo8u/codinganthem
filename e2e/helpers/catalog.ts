@@ -64,7 +64,7 @@ export const DEDICATED_INTERACTION_SLUGS = [
   // Generators / custom / image / API
   "uuid-generator",
   "password-generator",
-  "lorem-ipsum",
+  "filler-copy",
   "mock-data-generator",
   "bcrypt-generator",
   "jwt-generator",

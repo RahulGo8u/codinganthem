@@ -4,7 +4,7 @@
 [![GitHub stars](https://img.shields.io/github/stars/RahulGo8u/codinganthem?style=flat&color=6366f1)](https://github.com/RahulGo8u/codinganthem)
 [![Buy Me a Coffee](https://img.shields.io/badge/Support-Buy%20Me%20a%20Coffee-6366f1?style=flat&logo=buy-me-a-coffee&logoColor=white)](https://buymeacoffee.com/codinganthem)
 
-**CodingAnthem** is a free online developer toolbox — JSON formatter, Base64 encoder/decoder, JWT decoder, UUID generator, regex tester, image compressor, bcrypt hash generator, and 50+ more utilities. No sign-up, no ads. Most tools run **100% client-side** in your browser.
+**CodingAnthem** is a free online developer toolbox — JSON formatter, Base64 encoder/decoder, JWT decoder, UUID generator, regex tester, image compressor, bcrypt hash generator, and 50+ more utilities. No sign-up. Most tools run **100% client-side** in your browser.
 
 🔗 [www.codinganthem.com](https://www.codinganthem.com) · [X / Twitter](https://x.com/codinganthem) · [YouTube](https://www.youtube.com/@codinganthem)
 
@@ -68,7 +68,7 @@ A few tools (like URL Shortener) use a lightweight backend. AI tools send input 
 
 ### Generators
 - chmod Calculator — Unix file permissions to octal, symbolic, and chmod command
-- Lorem Ipsum Generator
+- Filler Copy Generator — sample paragraphs for wireframes and mockups
 - Mock Data Generator — generate realistic fake data (names, emails, addresses, and more)
 - QR Code Generator — generate QR codes from any text or URL
 - UUID Generator (v4)

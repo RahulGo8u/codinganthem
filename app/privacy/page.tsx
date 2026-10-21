@@ -33,15 +33,19 @@ const SECTIONS = [
   },
   {
     title: "Analytics",
-    body: "We use Plausible Analytics and Vercel Analytics to understand aggregate site traffic — for example, which tools are most used. Both are cookie-free and do not track individuals across sites or devices. We do not use Google Analytics, ad-network trackers, or any cross-site tracking technology.",
+    body: "We use Plausible Analytics and Vercel Analytics to understand aggregate site traffic — for example, which tools are most used. Both are cookie-free and do not track individuals across sites or devices.",
+  },
+  {
+    title: "Advertising",
+    body: "CodingAnthem shows ads through Google AdSense. Google and its partners use cookies and similar technologies to serve ads based on your visits to this and other websites. Ads never receive what you paste into the tools; client-side tools still process that input only in your browser. You can opt out of personalized advertising at google.com/settings/ads, and learn more at policies.google.com/technologies/ads. Other ad vendors can be managed at aboutads.info.",
   },
   {
     title: "Cookies",
-    body: "CodingAnthem does not set tracking cookies. No cookie consent banner is shown because no cookies are used for tracking or advertising purposes.",
+    body: "CodingAnthem itself does not set tracking cookies. Google AdSense and its partners may set cookies to serve and measure ads, as described above. Where the law requires it, you will be asked for consent before personalized ads are shown. Details and opt-out links are on the Cookie Policy at /cookies.",
   },
   {
     title: "Third parties",
-    body: "We do not sell, rent, or share any data with third parties for advertising purposes. There are no ad networks or affiliate trackers on this site.",
+    body: "We do not sell or rent your data. Google receives standard browsing information, such as the page you visit and your IP address, to deliver ads. Google's Gemini API receives what you submit to the AI tools, as described above.",
   },
   {
     title: "Changes to this policy",
@@ -60,7 +64,15 @@ export default function PrivacyPage() {
           </h1>
           <p className="text-[var(--text-muted)] leading-relaxed">
             This page explains what data CodingAnthem collects, how it&apos;s used, and what stays
-            entirely on your device. Last updated July 2026.
+            entirely on your device. Advertising cookies are described in the{" "}
+            <Link href="/cookies" className="text-[var(--accent-text)] hover:underline">
+              Cookie Policy
+            </Link>
+            , and the rules for using the site are in the{" "}
+            <Link href="/terms" className="text-[var(--accent-text)] hover:underline">
+              Terms of Service
+            </Link>
+            . Last updated October 2026.
           </p>
         </div>
 
